@@ -1,4 +1,8 @@
-# Escopo do Projeto: LangClips (Nome Provisório)
+# Escopo do Projeto: LangClips
+
+Esse arquivo serve apenas como uma ATA, com o objetivo de registrar o que foi pensado inicialmente sobre o projeto. Arquivos criados posteriormente terão superiodade hierarquica em relação a este.
+
+Caso haja alguma discrepancia entre este arquivo e qualquer outro arquivo, o arquivo mais recente deve ser considerado o correto.
 
 ## 1. Visão Geral do Produto
 
