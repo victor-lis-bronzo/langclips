@@ -8,7 +8,7 @@ O objetivo aqui é alinhar a visão geral do projeto antes de detalhar a técnic
 
 [x] Documento de Visão e Escopo: (Concluído! É o texto base que você já escreveu).
 
-[ ] Definição de Personas: Criar 2 a 3 perfis de usuários fictícios (ex: "Maria, estudante intermediária que quer treinar o listening", "João, professor que precisa de exercícios rápidos").
+[X] Definição de Personas: Criar 2 a 3 perfis de usuários fictícios (ex: "Maria, estudante intermediária que quer treinar o listening", "João, professor que precisa de exercícios rápidos").
 
 [ ] Glossário do Projeto: Uma lista simples definindo termos técnicos do seu domínio (ex: o que é um "Clip", "Sessão Volátil", "Deck", "Ditado").
 
