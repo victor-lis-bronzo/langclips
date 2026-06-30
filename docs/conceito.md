@@ -9,7 +9,7 @@ Nesta versão inicial, a plataforma funcionará de forma totalmente temporária 
 ## 2. Público-Alvo
 
 - **Estudantes de inglês:** De níveis iniciante a avançado.
-- **Pessoas focadas em compreensão auditiva:** Que buscam melhorar a compreensão auditiva (*listening*) e vocabulário com sotaques e velocidades de fala reais.
+- **Pessoas focadas em compreensão auditiva:** Que buscam melhorar a compreensão auditiva (_listening_) e vocabulário com sotaques e velocidades de fala reais.
 - **Professores:** Que desejam gerar exercícios rápidos em sala de aula a partir de um vídeo, sem necessidade de cadastro.
 
 ## 3. Funcionalidades Principais (Core Features)
@@ -17,7 +17,7 @@ Nesta versão inicial, a plataforma funcionará de forma totalmente temporária 
 ### 3.1. Upload e Processamento de Vídeo Temporário
 
 - **Upload:** O usuário poderá fazer upload de pequenos trechos de vídeo (ex: `.mp4`, `.avi`, `.mov`). Restrição sugerida: vídeos de até 3 minutos ou 50MB para otimizar o processamento.
-- **Armazenamento Volátil:** O vídeo será salvo apenas na pasta temporária do servidor (ou em memória) exclusivamente para o processamento. Após a geração das frases ou fim da sessão, o arquivo original e os recortes serão deletados.
+- **Armazenamento Volátil:** O vídeo será salvo apenas na pasta temporária do servidor (ou em memória) exclusivamente para o processamento. Após a geração das frases ou fim da sessão, o arquivo original e os recortes serão deletados por default, mas com opção de salvar em local storage.
 - **Transcrição Automática (Speech-to-Text):** O sistema utilizará uma API de reconhecimento de fala (como `Whisper` da OpenAI) para gerar a transcrição.
 - **Segmentação:** O sistema dividirá o vídeo automaticamente em "clipes" menores, baseados em frases completas ou pausas naturais.
 
@@ -36,7 +36,7 @@ A partir da segmentação, a plataforma selecionará de 1 a 5 clipes (frases) ma
 - **Player Integrado:** Um player simples para exibir a cena. Botão para repetir o áudio facilmente, com opção de velocidade reduzida (`0.75x`).
 - **Feedback Imediato (Correção):**
   - Exibe a legenda oficial após a submissão.
-  - **Análise de Erros:** Destaca as palavras erradas, comparando a digitação com o correto (ex: *"Você escreveu though, mas o correto era thought"*).
+  - **Análise de Erros:** Destaca as palavras erradas, comparando a digitação com o correto (ex: _"Você escreveu though, mas o correto era thought"_).
 - **Tradução:** Opção de revelar a tradução da frase para o português.
 
 ### 3.4. Gestão de Usuários e Armazenamento em Nuvem (Planejado para o Futuro)
@@ -44,6 +44,7 @@ A partir da segmentação, a plataforma selecionará de 1 a 5 clipes (frases) ma
 Para a versão inicial, a plataforma não terá banco de dados de usuários nem persistência de mídia.
 
 Em atualizações futures, planeja-se adicionar:
+
 - Criação de contas (Email, Google).
 - Histórico de vídeos processados e salvamento de vocabulário.
 - Gamificação e pontuação progressiva.
@@ -65,17 +66,17 @@ Em atualizações futures, planeja-se adicionar:
 - **Frontend:** `React`, `Vue.js` ou `Next.js`.
 - **Backend:** `Node.js` (`Express`) ou `Python` (`FastAPI`).
 - **Banco de Dados:** Nenhum necessário inicialmente (pode-se usar o estado do React no frontend para gerenciar a pontuação da sessão atual).
-- **Armazenamento de Vídeo:** Sistema de arquivos local do servidor (ex: pastas `/tmp`) ou bibliotecas que processem o arquivo diretamente em memória (ex: `multer` em `Node.js`), com scripts de limpeza automática (*cron jobs*) para arquivos órfãos.
+- **Armazenamento de Vídeo:** Sistema de arquivos local do servidor (ex: pastas `/tmp`) ou bibliotecas que processem o arquivo diretamente em memória (ex: `multer` em `Node.js`), com scripts de limpeza automática (_cron jobs_) para arquivos órfãos.
 - **Processamento e IA:** `FFmpeg` (para cortar áudio/vídeo) e OpenAI `Whisper API`.
 
 ## 6. Riscos e Desafios
 
 - **Sobrecarga do Servidor:** Como os vídeos serão processados localmente antes de descartar, múltiplos usuários simultâneos podem travar a máquina.
-  - *Mitigação:* Definir limites estritos de tamanho de arquivo e implementar uma fila (*queue*) de processamento caso os acessos aumentem.
+  - _Mitigação:_ Definir limites estritos de tamanho de arquivo e implementar uma fila (_queue_) de processamento caso os acessos aumentem.
 - **Custo de APIs:** A transcrição via API gera custos por minuto processado.
-  - *Mitigação:* O limite de 3 minutos de vídeo é crucial para controlar este custo inicial.
+  - _Mitigação:_ O limite de 3 minutos de vídeo é crucial para controlar este custo inicial.
 - **Qualidade do Áudio:** Ruído de fundo ou fala sobreposta geram transcrições ruins.
-  - *Mitigação:* Instruções claras na tela de upload recomendando vídeos com áudio nítido.
+  - _Mitigação:_ Instruções claras na tela de upload recomendando vídeos com áudio nítido.
 
 ## 7. Fases de Desenvolvimento Sugeridas
 
