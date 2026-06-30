@@ -72,3 +72,5 @@ Garantindo que a plataforma funciona conforme documentado.
 - [ ] **Plano de Testes:** Definir quais fluxos terão testes automatizados *(ex: Testar se a função de verificar resposta do ditado lida bem com pontuação e letras maiúsculas/minúsculas)*.
 - [ ] **README.md do Repositório:** O documento principal do seu GitHub. Deve conter: O que é o projeto, Stack utilizada, Como rodar localmente, e Como contribuir.
 
+eu tava pensando nessa brisa onde, vamo encher umas linguica nas tarefas do fazendo?
+so pra n ficar paia nums relatorios futuros
