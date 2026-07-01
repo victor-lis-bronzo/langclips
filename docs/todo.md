@@ -18,10 +18,10 @@ O objetivo aqui é alinhar a visão geral do projeto antes de detalhar a técnic
 
 Tradução do escopo para itens testáveis e acionáveis.
 
-- [ ] **Documento de Requisitos Funcionais (RF):** Lista enumerada do que o sistema faz *(ex: RF01 - O sistema deve permitir upload de arquivos MP4 e MOV até 50MB)*.
-- [ ] **Documento de Requisitos Não Funcionais (RNF):** Lista enumerada de restrições técnicas *(ex: RNF01 - O processamento do vídeo deve ocorrer em memória RAM, sem persistência em disco)*.
-- [ ] **Product Backlog (Histórias de Usuário):** Transformar os requisitos no formato ágil *(ex: Como [Estudante], eu quero [ver a transcrição com lacunas] para [praticar minha audição])*.
-- [ ] **Critérios de Aceite:** Definir 2 a 3 regras para considerar cada História de Usuário como "pronta".
+- [X] **Documento de Requisitos Funcionais (RF):** Lista enumerada do que o sistema faz *(ex: RF01 - O sistema deve permitir upload de arquivos MP4 e MOV até 50MB)*.
+- [X] **Documento de Requisitos Não Funcionais (RNF):** Lista enumerada de restrições técnicas *(ex: RNF01 - O processamento do vídeo deve ocorrer em memória RAM, sem persistência em disco)*.
+- [X] **Product Backlog (Histórias de Usuário):** Transformar os requisitos no formato ágil *(ex: Como [Estudante], eu quero [ver a transcrição com lacunas] para [praticar minha audição])*.
+- [X] **Critérios de Aceite:** Definir 2 a 3 regras para considerar cada História de Usuário como "pronta".
 
 ---
 
