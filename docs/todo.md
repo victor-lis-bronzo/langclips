@@ -9,8 +9,8 @@ Este documento serve como um guia passo a passo para a construção de todos os 
 O objetivo aqui é alinhar a visão geral do projeto antes de detalhar a técnica.
 
 - [x] **Documento de Visão e Escopo:** (Concluído! É o texto base que você já escreveu).
-- [x] **Definição de Personas:** Criar 2 a 3 perfis de usuários fictícios *(ex: "Maria, estudante intermediária que quer treinar o listening", "João, professor que precisa de exercícios rápidos")*.
-- [x] **Glossário do Projeto:** Uma lista simples definindo termos técnicos do seu domínio *(ex: o que é um "Clip", "Sessão Volátil", "Deck", "Ditado")*.
+- [x] **Definição de Personas:** Criar 2 a 3 perfis de usuários fictícios _(ex: "Maria, estudante intermediária que quer treinar o listening", "João, professor que precisa de exercícios rápidos")_.
+- [x] **Glossário do Projeto:** Uma lista simples definindo termos técnicos do seu domínio _(ex: o que é um "Clip", "Sessão Volátil", "Deck", "Ditado")_.
 
 ---
 
@@ -18,10 +18,10 @@ O objetivo aqui é alinhar a visão geral do projeto antes de detalhar a técnic
 
 Tradução do escopo para itens testáveis e acionáveis.
 
-- [ ] **Documento de Requisitos Funcionais (RF):** Lista enumerada do que o sistema faz *(ex: RF01 - O sistema deve permitir upload de arquivos MP4 e MOV até 50MB)*.
-- [ ] **Documento de Requisitos Não Funcionais (RNF):** Lista enumerada de restrições técnicas *(ex: RNF01 - O processamento do vídeo deve ocorrer em memória RAM, sem persistência em disco)*.
-- [ ] **Product Backlog (Histórias de Usuário):** Transformar os requisitos no formato ágil *(ex: Como [Estudante], eu quero [ver a transcrição com lacunas] para [praticar minha audição])*.
-- [ ] **Critérios de Aceite:** Definir 2 a 3 regras para considerar cada História de Usuário como "pronta".
+- [x] **Documento de Requisitos Funcionais (RF):** Lista enumerada do que o sistema faz _(ex: RF01 - O sistema deve permitir upload de arquivos MP4 e MOV até 50MB)_.
+- [x] **Documento de Requisitos Não Funcionais (RNF):** Lista enumerada de restrições técnicas _(ex: RNF01 - O processamento do vídeo deve ocorrer em memória RAM, sem persistência em disco)_.
+- [x] **Product Backlog (Histórias de Usuário):** Transformar os requisitos no formato ágil _(ex: Como [Estudante], eu quero [ver a transcrição com lacunas] para [praticar minha audição])_.
+- [x] **Critérios de Aceite:** Definir 2 a 3 regras para considerar cada História de Usuário como "pronta".
 
 ---
 
@@ -29,9 +29,9 @@ Tradução do escopo para itens testáveis e acionáveis.
 
 Mapeando as interações e os fluxos lógicos antes de codar.
 
-- [ ] **Diagrama de Casos de Uso:** Desenho mostrando os atores (Usuário Anônimo, API Whisper) e as ações principais *(Fazer Upload, Responder Exercício, Ver Tradução)*.
-- [ ] **Diagrama de Atividades (Fluxo Principal):** Fluxograma detalhando o caminho do vídeo *(Início -> Upload -> Extração de Áudio via FFmpeg -> Chamada API Whisper -> Geração de Clipes -> Fim)*.
-- [ ] **Diagrama de Máquina de Estados (Opcional):** Mapear os estados do arquivo de vídeo *(Recebido -> Em Processamento -> Fatiado -> Descartado)*.
+- [x] **Diagrama de Casos de Uso:** Desenho mostrando os atores (Usuário Anônimo, API Whisper) e as ações principais _(Fazer Upload, Responder Exercício, Ver Tradução)_.
+- [x] **Diagrama de Atividades (Fluxo Principal):** Fluxograma detalhando o caminho do vídeo _(Início -> Upload -> Extração de Áudio via FFmpeg -> Chamada API Whisper -> Geração de Clipes -> Fim)_.
+- [x] **Diagrama de Máquina de Estados (Opcional):** Mapear os estados do arquivo de vídeo _(Recebido -> Em Processamento -> Fatiado -> Descartado)_.
 
 ---
 
@@ -39,9 +39,9 @@ Mapeando as interações e os fluxos lógicos antes de codar.
 
 Definindo as peças do quebra-cabeça técnico.
 
-- [ ] **Diagrama de Componentes (ou Modelo C4 - Nível 2):** Mostrar a relação macro *(Frontend Next.js <-> Backend Node.js <-> FFmpeg <-> API OpenAI)*.
-- [ ] **Diagrama de Classes (Foco no Domínio):** Modelar as classes/interfaces TypeScript *(ex: class VideoProcessor, interface Clip { id: string, text: string, startTime: number, endTime: number }, class ExerciseSession)*.
-- [ ] **Diagrama de Sequência:** Mostrar a linha do tempo da comunicação de um processo crítico *(ex: O clique no botão "Enviar Vídeo" até o retorno do "Exercício Gerado")*.
+- [ ] **Diagrama de Componentes (ou Modelo C4 - Nível 2):** Mostrar a relação macro _(Frontend Next.js <-> Backend Node.js <-> FFmpeg <-> API OpenAI)_.
+- [ ] **Diagrama de Classes (Foco no Domínio):** Modelar as classes/interfaces TypeScript _(ex: class VideoProcessor, interface Clip { id: string, text: string, startTime: number, endTime: number }, class ExerciseSession)_.
+- [x] **Diagrama de Sequência:** Mostrar a linha do tempo da comunicação de um processo crítico _(ex: O clique no botão "Enviar Vídeo" até o retorno do "Exercício Gerado")_.
 
 ---
 
@@ -49,7 +49,7 @@ Definindo as peças do quebra-cabeça técnico.
 
 Visão final do usuário.
 
-- [ ] **Wireframes (Baixa Fidelidade):** Rascunho estrutural das telas *(Tela de Upload, Tela do Player/Exercício, Tela de Resumo)*.
+- [ ] **Wireframes (Baixa Fidelidade):** Rascunho estrutural das telas _(Tela de Upload, Tela do Player/Exercício, Tela de Resumo)_.
 - [ ] **Prototipação (Alta Fidelidade - Figma/Penpot):** Design com cores, botões e tipografia reais.
 - [ ] **Mapeamento de Navegação:** Diagrama simples mostrando como o usuário vai de uma tela para outra.
 
@@ -59,8 +59,8 @@ Visão final do usuário.
 
 Artefatos criados paralelamente ou logo antes de escrever o código.
 
-- [ ] **Especificação de API (OpenAPI/Swagger):** Documentar os endpoints do seu backend *(ex: POST /api/v1/process-video, detalhando o payload que recebe o FormData e a resposta JSON com os clipes)*.
-- [ ] **Decisões de Arquitetura (ADRs - Architecture Decision Records):** Documentos curtos justificando escolhas tecnológicas *(ex: "Por que escolhemos Node.js com Multer ao invés de Python para a Fase 1?")*.
+- [ ] **Especificação de API (OpenAPI/Swagger):** Documentar os endpoints do seu backend _(ex: POST /api/v1/process-video, detalhando o payload que recebe o FormData e a resposta JSON com os clipes)_.
+- [ ] **Decisões de Arquitetura (ADRs - Architecture Decision Records):** Documentos curtos justificando escolhas tecnológicas _(ex: "Por que escolhemos Node.js com Multer ao invés de Python para a Fase 1?")_.
 - [ ] **Modelo de Dados (Estado / LocalStorage):** Como não há banco na Fase 1, documentar o formato do JSON que o frontend vai guardar no estado global (Zustand/Context API) para manter a pontuação da sessão atual.
 
 ---
@@ -69,7 +69,7 @@ Artefatos criados paralelamente ou logo antes de escrever o código.
 
 Garantindo que a plataforma funciona conforme documentado.
 
-- [ ] **Plano de Testes:** Definir quais fluxos terão testes automatizados *(ex: Testar se a função de verificar resposta do ditado lida bem com pontuação e letras maiúsculas/minúsculas)*.
+- [ ] **Plano de Testes:** Definir quais fluxos terão testes automatizados _(ex: Testar se a função de verificar resposta do ditado lida bem com pontuação e letras maiúsculas/minúsculas)_.
 - [ ] **README.md do Repositório:** O documento principal do seu GitHub. Deve conter: O que é o projeto, Stack utilizada, Como rodar localmente, e Como contribuir.
 
 eu tava pensando nessa brisa onde, vamo encher umas linguica nas tarefas do fazendo?
