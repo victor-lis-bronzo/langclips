@@ -39,8 +39,8 @@ Mapeando as interações e os fluxos lógicos antes de codar.
 
 Definindo as peças do quebra-cabeça técnico.
 
-- [ ] **Diagrama de Componentes (ou Modelo C4 - Nível 2):** Mostrar a relação macro _(Frontend Next.js <-> Backend Node.js <-> FFmpeg <-> API OpenAI)_.
-- [ ] **Diagrama de Classes (Foco no Domínio):** Modelar as classes/interfaces TypeScript _(ex: class VideoProcessor, interface Clip { id: string, text: string, startTime: number, endTime: number }, class ExerciseSession)_.
+- [x] **Diagrama de Componentes (ou Modelo C4 - Nível 2):** Mostrar a relação macro _(Frontend Next.js <-> Backend Node.js <-> FFmpeg <-> API OpenAI)_.
+- [x] **Diagrama de Classes (Foco no Domínio):** Modelar as classes/interfaces TypeScript _(ex: class VideoProcessor, interface Clip { id: string, text: string, startTime: number, endTime: number }, class ExerciseSession)_.
 - [x] **Diagrama de Sequência:** Mostrar a linha do tempo da comunicação de um processo crítico _(ex: O clique no botão "Enviar Vídeo" até o retorno do "Exercício Gerado")_.
 
 ---
