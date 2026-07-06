@@ -36,8 +36,8 @@ A arquitetura adota um modelo de processamento assíncrono baseado em eventos pa
 
 ## 4. Stack Tecnológica e Infraestrutura
 
-* **Frontend:** Next.js (React) + Tailwind CSS + localforage (para facilitar manipulação do IndexedDB).
-* Justificativa: Next.js atende ao requisito de UI moderna. O localforage abstrai a complexidade do IndexedDB permitindo salvar Blobs de vídeo de forma assíncrona com API baseada em Promises.
+* **Frontend:** Tanstack Start (React) + Tailwind CSS + localforage (para facilitar manipulação do IndexedDB).
+* Justificativa: Tanstack Start atende ao requisito de UI moderna. O localforage abstrai a complexidade do IndexedDB permitindo salvar Blobs de vídeo de forma assíncrona com API baseada em Promises.
 
 
 * **Backend (API):** Node.js com Fastify.

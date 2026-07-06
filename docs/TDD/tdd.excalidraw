@@ -19,21 +19,26 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 1,
-      "version": 1,
-      "versionNonce": 1,
+      "version": 3,
+      "versionNonce": 1897769588,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1718000000000,
-      "link": null
+      "boundElements": [],
+      "updated": 1783373033550,
+      "link": null,
+      "index": "bBN",
+      "frameId": null,
+      "locked": false
     },
     {
       "id": "frontend-text",
       "type": "text",
       "x": 110,
       "y": 315,
-      "width": 240,
+      "width": 215.535888671875,
       "height": 90,
       "angle": 0,
       "strokeColor": "#000000",
@@ -45,18 +50,26 @@
       "opacity": 100,
       "groupIds": [],
       "seed": 2,
-      "version": 1,
-      "versionNonce": 2,
+      "version": 22,
+      "versionNonce": 149661940,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1718000000000,
+      "boundElements": [],
+      "updated": 1783373046731,
       "link": null,
-      "text": "1. Cliente (Next.js)\n- Solicita Pre-signed URL\n- Faz Upload Direto (S3)\n- Escuta eventos via SSE",
+      "text": "1. Cliente (Tanstack Query)\n- Solicita Pre-signed URL\n- Faz Upload Direto (S3)\n- Escuta eventos via SSE",
       "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
-      "baseline": 80
+      "baseline": 80,
+      "index": "bBO",
+      "frameId": null,
+      "roundness": null,
+      "locked": false,
+      "containerId": null,
+      "originalText": "1. Cliente (Tanstack Query)\n- Solicita Pre-signed URL\n- Faz Upload Direto (S3)\n- Escuta eventos via SSE",
+      "autoResize": true,
+      "lineHeight": 1.40625
     },
     {
       "id": "storage-box",
@@ -74,14 +87,19 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3,
-      "version": 1,
-      "versionNonce": 3,
+      "version": 3,
+      "versionNonce": 40385524,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1718000000000,
-      "link": null
+      "boundElements": [],
+      "updated": 1783373033550,
+      "link": null,
+      "index": "bBP",
+      "frameId": null,
+      "locked": false
     },
     {
       "id": "storage-text",
@@ -100,18 +118,26 @@
       "opacity": 100,
       "groupIds": [],
       "seed": 4,
-      "version": 1,
-      "versionNonce": 4,
+      "version": 3,
+      "versionNonce": 1681960268,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1718000000000,
+      "boundElements": [],
+      "updated": 1783373033550,
       "link": null,
       "text": "2. Object Storage (S3/GCS)\n- Recebe vídeo bruto\n- Armazena clips finais",
       "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
-      "baseline": 60
+      "baseline": 60,
+      "index": "bBQ",
+      "frameId": null,
+      "roundness": null,
+      "locked": false,
+      "containerId": null,
+      "originalText": "2. Object Storage (S3/GCS)\n- Recebe vídeo bruto\n- Armazena clips finais",
+      "autoResize": true,
+      "lineHeight": 1.4583333333333333
     },
     {
       "id": "api-box",
@@ -129,14 +155,19 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 5,
-      "version": 1,
-      "versionNonce": 5,
+      "version": 3,
+      "versionNonce": 2137300340,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1718000000000,
-      "link": null
+      "boundElements": [],
+      "updated": 1783373033550,
+      "link": null,
+      "index": "bBR",
+      "frameId": null,
+      "locked": false
     },
     {
       "id": "api-text",
@@ -155,18 +186,26 @@
       "opacity": 100,
       "groupIds": [],
       "seed": 6,
-      "version": 1,
-      "versionNonce": 6,
+      "version": 3,
+      "versionNonce": 215294924,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1718000000000,
+      "boundElements": [],
+      "updated": 1783373033550,
       "link": null,
       "text": "3. API Principal (Fastify)\n- Gera URL Segura (Upload)\n- Publica o JOB na fila\n- Empurra dados via SSE",
       "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
-      "baseline": 80
+      "baseline": 80,
+      "index": "bBS",
+      "frameId": null,
+      "roundness": null,
+      "locked": false,
+      "containerId": null,
+      "originalText": "3. API Principal (Fastify)\n- Gera URL Segura (Upload)\n- Publica o JOB na fila\n- Empurra dados via SSE",
+      "autoResize": true,
+      "lineHeight": 1.40625
     },
     {
       "id": "redis-box",
@@ -184,14 +223,19 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 7,
-      "version": 1,
-      "versionNonce": 7,
+      "version": 3,
+      "versionNonce": 827903732,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1718000000000,
-      "link": null
+      "boundElements": [],
+      "updated": 1783373033550,
+      "link": null,
+      "index": "bBT",
+      "frameId": null,
+      "locked": false
     },
     {
       "id": "redis-text",
@@ -210,18 +254,26 @@
       "opacity": 100,
       "groupIds": [],
       "seed": 8,
-      "version": 1,
-      "versionNonce": 8,
+      "version": 3,
+      "versionNonce": 1217841740,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1718000000000,
+      "boundElements": [],
+      "updated": 1783373033550,
       "link": null,
       "text": "4. Fila (Redis + BullMQ)\n- Fila persistente de jobs\n- Pub/Sub de conclusão",
       "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
-      "baseline": 60
+      "baseline": 60,
+      "index": "bBU",
+      "frameId": null,
+      "roundness": null,
+      "locked": false,
+      "containerId": null,
+      "originalText": "4. Fila (Redis + BullMQ)\n- Fila persistente de jobs\n- Pub/Sub de conclusão",
+      "autoResize": true,
+      "lineHeight": 1.4583333333333333
     },
     {
       "id": "worker-box",
@@ -239,14 +291,19 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 9,
-      "version": 1,
-      "versionNonce": 9,
+      "version": 3,
+      "versionNonce": 1221251188,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1718000000000,
-      "link": null
+      "boundElements": [],
+      "updated": 1783373033550,
+      "link": null,
+      "index": "bBV",
+      "frameId": null,
+      "locked": false
     },
     {
       "id": "worker-text",
@@ -265,18 +322,26 @@
       "opacity": 100,
       "groupIds": [],
       "seed": 10,
-      "version": 1,
-      "versionNonce": 10,
+      "version": 3,
+      "versionNonce": 442474700,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1718000000000,
+      "boundElements": [],
+      "updated": 1783373033550,
       "link": null,
       "text": "5. Worker (Node.js Isolado)\n- Consome Job do Redis\n- Baixa vídeo temporário do S3\n- Corta usando FFmpeg\n- Transcreve com IA Whisper\n- Sobe clips gerados pro S3\n- Notifica Redis (Concluído)",
       "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
-      "baseline": 130
+      "baseline": 130,
+      "index": "bBW",
+      "frameId": null,
+      "roundness": null,
+      "locked": false,
+      "containerId": null,
+      "originalText": "5. Worker (Node.js Isolado)\n- Consome Job do Redis\n- Baixa vídeo temporário do S3\n- Corta usando FFmpeg\n- Transcreve com IA Whisper\n- Sobe clips gerados pro S3\n- Notifica Redis (Concluído)",
+      "autoResize": true,
+      "lineHeight": 1.25
     },
     {
       "id": "arrow-1",
@@ -295,18 +360,30 @@
       "opacity": 100,
       "groupIds": [],
       "seed": 11,
-      "version": 1,
-      "versionNonce": 11,
+      "version": 3,
+      "versionNonce": 1971364340,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1718000000000,
+      "boundElements": [],
+      "updated": 1783373033550,
       "link": null,
       "points": [
-        [0, 0],
-        [150, -150]
+        [
+          0,
+          0
+        ],
+        [
+          150,
+          -150
+        ]
       ],
       "startArrowhead": null,
-      "endArrowhead": "arrow"
+      "endArrowhead": "arrow",
+      "index": "bBX",
+      "frameId": null,
+      "roundness": null,
+      "locked": false,
+      "startBinding": null,
+      "endBinding": null
     },
     {
       "id": "arrow-2",
@@ -325,18 +402,30 @@
       "opacity": 100,
       "groupIds": [],
       "seed": 12,
-      "version": 1,
-      "versionNonce": 12,
+      "version": 3,
+      "versionNonce": 432645964,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1718000000000,
+      "boundElements": [],
+      "updated": 1783373033550,
       "link": null,
       "points": [
-        [0, 0],
-        [110, 130]
+        [
+          0,
+          0
+        ],
+        [
+          110,
+          130
+        ]
       ],
       "startArrowhead": "arrow",
-      "endArrowhead": "arrow"
+      "endArrowhead": "arrow",
+      "index": "bBY",
+      "frameId": null,
+      "roundness": null,
+      "locked": false,
+      "startBinding": null,
+      "endBinding": null
     },
     {
       "id": "arrow-3",
@@ -355,18 +444,30 @@
       "opacity": 100,
       "groupIds": [],
       "seed": 13,
-      "version": 1,
-      "versionNonce": 13,
+      "version": 3,
+      "versionNonce": 2122335092,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1718000000000,
+      "boundElements": [],
+      "updated": 1783373033550,
       "link": null,
       "points": [
-        [0, 0],
-        [100, 0]
+        [
+          0,
+          0
+        ],
+        [
+          100,
+          0
+        ]
       ],
       "startArrowhead": null,
-      "endArrowhead": "arrow"
+      "endArrowhead": "arrow",
+      "index": "bBZ",
+      "frameId": null,
+      "roundness": null,
+      "locked": false,
+      "startBinding": null,
+      "endBinding": null
     },
     {
       "id": "arrow-4",
@@ -385,18 +486,30 @@
       "opacity": 100,
       "groupIds": [],
       "seed": 14,
-      "version": 1,
-      "versionNonce": 14,
+      "version": 3,
+      "versionNonce": 1529798092,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1718000000000,
+      "boundElements": [],
+      "updated": 1783373033550,
       "link": null,
       "points": [
-        [0, 0],
-        [140, -110]
+        [
+          0,
+          0
+        ],
+        [
+          140,
+          -110
+        ]
       ],
       "startArrowhead": "arrow",
-      "endArrowhead": "arrow"
+      "endArrowhead": "arrow",
+      "index": "bBa",
+      "frameId": null,
+      "roundness": null,
+      "locked": false,
+      "startBinding": null,
+      "endBinding": null
     },
     {
       "id": "arrow-5",
@@ -415,23 +528,38 @@
       "opacity": 100,
       "groupIds": [],
       "seed": 15,
-      "version": 1,
-      "versionNonce": 15,
+      "version": 3,
+      "versionNonce": 1510978804,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1718000000000,
+      "boundElements": [],
+      "updated": 1783373033550,
       "link": null,
       "points": [
-        [0, 0],
-        [-380, -120]
+        [
+          0,
+          0
+        ],
+        [
+          -380,
+          -120
+        ]
       ],
       "startArrowhead": "arrow",
-      "endArrowhead": "arrow"
+      "endArrowhead": "arrow",
+      "index": "bBb",
+      "frameId": null,
+      "roundness": null,
+      "locked": false,
+      "startBinding": null,
+      "endBinding": null
     }
   ],
   "appState": {
+    "gridSize": 20,
+    "gridStep": 5,
+    "gridModeEnabled": false,
     "viewBackgroundColor": "#ffffff",
-    "gridSize": null
+    "lockedMultiSelections": {}
   },
   "files": {}
 }

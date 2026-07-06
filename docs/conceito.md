@@ -67,7 +67,7 @@ Em atualizações futures, planeja-se adicionar:
 
 ## 5. Requisitos Técnicos e Ferramentas Sugeridas (Para a versão Temporária)
 
-- **Frontend:** `React`, `Vue.js` ou `Next.js`.
+- **Frontend:** `React`, `Vue.js` ou `Tanstack Start`.
 - **Backend:** `Node.js` (`Express`) ou `Python` (`FastAPI`).
 - **Banco de Dados:** Nenhum necessário inicialmente (pode-se usar o estado do React no frontend para gerenciar a pontuação da sessão atual).
 - **Armazenamento de Vídeo:** Sistema de arquivos local do servidor (ex: pastas `/tmp`) ou bibliotecas que processem o arquivo diretamente em memória (ex: `multer` em `Node.js`), com scripts de limpeza automática (_cron jobs_) para arquivos órfãos.
