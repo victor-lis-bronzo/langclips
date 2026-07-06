@@ -1,0 +1,22 @@
+{
+  "projectName": "web",
+  "mode": "file-router",
+  "typescript": true,
+  "packageManager": "npm",
+  "includeExamples": true,
+  "tailwind": true,
+  "addOnOptions": {},
+  "envVarValues": {},
+  "git": false,
+  "install": true,
+  "routerOnly": false,
+  "version": 1,
+  "framework": "react",
+  "chosenAddOns": [
+    "biome",
+    "cloudflare",
+    "shadcn",
+    "tanstack-query",
+    "events"
+  ]
+}
