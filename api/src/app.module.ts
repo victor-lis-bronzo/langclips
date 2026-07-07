@@ -1,10 +1,22 @@
-import { Module } from '@nestjs/common';
+import { Module, DynamicModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ConfigModule } from '@nestjs/config';
+import { StorageModule } from './storage/storage.module';
+import { S3Client } from '@aws-sdk/client-s3';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
-  imports: [],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), UploadsModule],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  static register(s3Client: S3Client): DynamicModule {
+    return {
+      module: AppModule,
+      imports: [StorageModule.register(s3Client)],
+      exports: [StorageModule],
+    };
+  }
+}
