@@ -14,6 +14,8 @@ async function bootstrap() {
     new FastifyAdapter(),
   );
 
+  app.enableCors();
+
   const config = new DocumentBuilder()
     .setTitle('Lang Clips API')
     .setDescription('API para gerenciamento de vídeos com IA.')

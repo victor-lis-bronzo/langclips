@@ -1,0 +1,1079 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lang Clips | Testador de Upload S3</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg-primary: #080c14;
+        --bg-secondary: #0f172a;
+        --bg-card: rgba(17, 24, 39, 0.7);
+        --border-color: rgba(255, 255, 255, 0.08);
+        --border-hover: rgba(255, 255, 255, 0.16);
+
+        --accent-violet: #8b5cf6;
+        --accent-violet-glow: rgba(139, 92, 246, 0.4);
+        --accent-cyan: #06b6d4;
+        --accent-cyan-glow: rgba(6, 182, 212, 0.4);
+
+        --text-main: #f3f4f6;
+        --text-muted: #9ca3af;
+
+        --color-success: #10b981;
+        --color-error: #ef4444;
+        --color-warning: #f59e0b;
+        --color-info: #3b82f6;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: 'Outfit', sans-serif;
+        background-color: var(--bg-primary);
+        background-image:
+          radial-gradient(
+            at 0% 0%,
+            rgba(139, 92, 246, 0.15) 0px,
+            transparent 50%
+          ),
+          radial-gradient(
+            at 100% 100%,
+            rgba(6, 182, 212, 0.12) 0px,
+            transparent 50%
+          );
+        background-attachment: fixed;
+        color: var(--text-main);
+        line-height: 1.5;
+        min-height: 100vh;
+        padding: 2rem 1rem;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+      }
+
+      header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(
+          135deg,
+          #fff 30%,
+          #a78bfa 70%,
+          #22d3ee 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: inline-block;
+      }
+
+      header p {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .grid {
+        display: flex;
+        flex-direction: column;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      @media (min-width: 768px) {
+        .grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .span-2 {
+          grid-column: span 2;
+        }
+      }
+
+      .card {
+        background: var(--bg-card);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        transition:
+          border-color 0.3s ease,
+          box-shadow 0.3s ease;
+      }
+
+      .card:hover {
+        border-color: var(--border-hover);
+      }
+
+      .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .card-title .step-badge {
+        background: linear-gradient(
+          135deg,
+          var(--accent-violet),
+          var(--accent-cyan)
+        );
+        color: white;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        font-weight: 700;
+      }
+
+      /* Form Styles */
+      .form-group {
+        margin-bottom: 1.25rem;
+      }
+
+      .form-group label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+      }
+
+      .form-control {
+        width: 100%;
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        color: var(--text-main);
+        padding: 0.75rem 1rem;
+        font-family: inherit;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: var(--accent-cyan);
+        box-shadow: 0 0 0 3px var(--accent-cyan-glow);
+      }
+
+      /* Dropzone Styles */
+      .dropzone {
+        border: 2px dashed var(--border-color);
+        border-radius: 12px;
+        padding: 2rem 1.5rem;
+        text-align: center;
+        cursor: pointer;
+        background: rgba(15, 23, 42, 0.4);
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .dropzone.dragover {
+        border-color: var(--accent-violet);
+        background: rgba(139, 92, 246, 0.05);
+        box-shadow: 0 0 15px var(--accent-violet-glow);
+      }
+
+      .dropzone svg {
+        width: 48px;
+        height: 48px;
+        fill: none;
+        stroke: var(--text-muted);
+        stroke-width: 1.5;
+        transition: stroke 0.3s ease;
+      }
+
+      .dropzone:hover svg,
+      .dropzone.dragover svg {
+        stroke: var(--accent-violet);
+      }
+
+      .dropzone p {
+        font-size: 0.95rem;
+        color: var(--text-muted);
+      }
+
+      .dropzone .highlight {
+        color: var(--accent-violet);
+        font-weight: 500;
+      }
+
+      .file-input {
+        display: none;
+      }
+
+      .file-details {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+        font-size: 0.875rem;
+        gap: 0.25rem;
+      }
+
+      .file-details div {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+      }
+
+      .file-details span.label {
+        color: var(--text-muted);
+      }
+
+      .file-details span.val {
+        font-weight: 500;
+      }
+
+      /* Buttons */
+      .btn {
+        width: 100%;
+        background: linear-gradient(
+          135deg,
+          var(--accent-violet),
+          var(--accent-cyan)
+        );
+        border: none;
+        border-radius: 8px;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+          transform 0.2s ease,
+          opacity 0.2s ease,
+          box-shadow 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+
+      .btn:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px var(--accent-violet-glow);
+      }
+
+      .btn:active:not(:disabled) {
+        transform: translateY(1px);
+      }
+
+      .btn:disabled {
+        background: #334155;
+        color: var(--text-muted);
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+
+      /* Progress and Output elements */
+      .progress-wrapper {
+        margin-top: 1.25rem;
+        display: none;
+      }
+
+      .progress-bar-container {
+        width: 100%;
+        height: 8px;
+        background: rgba(15, 23, 42, 0.8);
+        border-radius: 9999px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+        border: 1px solid var(--border-color);
+      }
+
+      .progress-bar {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(
+          90deg,
+          var(--accent-violet),
+          var(--accent-cyan)
+        );
+        border-radius: 9999px;
+        transition: width 0.1s linear;
+      }
+
+      .progress-stats {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+      }
+
+      .code-preview {
+        width: 100%;
+        background: #090d16;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1rem;
+        font-family: monospace;
+        font-size: 0.8rem;
+        color: #a7f3d0;
+        overflow-x: auto;
+        max-height: 200px;
+        margin-top: 1rem;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+
+      .url-display {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 0.75rem;
+        font-family: monospace;
+        font-size: 0.8rem;
+        color: var(--accent-cyan);
+        margin-top: 0.75rem;
+        word-break: break-all;
+        position: relative;
+        padding-right: 3rem;
+      }
+
+      .copy-btn {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        color: var(--text-muted);
+        padding: 4px;
+        border-radius: 4px;
+        transition:
+          background 0.2s,
+          color 0.2s;
+      }
+
+      .copy-btn:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-main);
+      }
+
+      /* Logs console */
+      .console-card {
+        margin-top: 1.5rem;
+      }
+
+      .console-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+      }
+
+      .console-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .console-btn {
+        background: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+        border-radius: 4px;
+        padding: 2px 8px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        font-family: inherit;
+      }
+
+      .console-btn:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-main);
+      }
+
+      .console-logs {
+        background: #020617;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1rem;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 0.85rem;
+        color: #e2e8f0;
+        height: 250px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .log-entry {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        line-height: 1.4;
+      }
+
+      .log-time {
+        color: #64748b;
+        flex-shrink: 0;
+      }
+
+      .log-text {
+        word-break: break-all;
+      }
+
+      .log-info {
+        color: #38bdf8;
+      }
+      .log-success {
+        color: #4ade80;
+      }
+      .log-warning {
+        color: #fbbf24;
+      }
+      .log-error {
+        color: #f87171;
+      }
+
+      /* Alert and Troubleshooting */
+      .alert-guide {
+        margin-top: 1.5rem;
+        background: rgba(245, 158, 11, 0.05);
+        border: 1px solid rgba(245, 158, 11, 0.2);
+        border-radius: 12px;
+        padding: 1.25rem;
+      }
+
+      .alert-guide h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--color-warning);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .alert-guide ul {
+        margin-left: 1.25rem;
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+
+      .alert-guide code {
+        background: rgba(245, 158, 11, 0.1);
+        padding: 2px 4px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 0.8rem;
+        color: #fbd599;
+      }
+
+      /* Badge details */
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.5rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+
+      .badge-pending {
+        background: rgba(148, 163, 184, 0.1);
+        color: #94a3b8;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+      }
+      .badge-success {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+      }
+      .badge-error {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+      }
+      .badge-loading {
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Lang Clips S3 Upload Tester</h1>
+        <p>
+          Configure a API local, selecione um arquivo de mídia (vídeo ou áudio)
+          e acompanhe o pipeline de upload completo.
+        </p>
+      </header>
+
+      <div class="grid">
+        <!-- Config and File Setup -->
+        <div class="card">
+          <div class="card-title">
+            <span class="step-badge">#</span>
+            Configuração & Arquivo
+          </div>
+
+          <div class="form-group">
+            <label for="apiUrl">URL Base da API</label>
+            <input
+              type="text"
+              id="apiUrl"
+              class="form-control"
+              value="http://localhost:3000"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Selecione um Arquivo (Apenas Vídeo ou Áudio)</label>
+            <div class="dropzone" id="dropzone">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path
+                  d="M12 16V8M12 8L9 11M12 8L15 11"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M3 15C3 17.8284 3 19.2426 3.87868 20.1213C4.75736 21 6.17157 21 9 21H15C17.8284 21 19.2426 21 20.1213 20.1213C21 19.2426 21 17.8284 21 15"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M16 5H18C19.8856 5 20.8284 5 21.4142 5.58579C22 6.17157 22 7.11438 22 9V10"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M8 5H6C4.11438 5 3.17157 5 2.58579 5.58579C2 6.17157 2 7.11438 2 9V10"
+                  stroke-linecap="round"
+                />
+              </svg>
+              <p>
+                Arraste e solte o arquivo aqui ou
+                <span class="highlight">procure</span>
+              </p>
+              <input
+                type="file"
+                id="fileInput"
+                class="file-input"
+                accept="video/*,audio/*"
+              />
+            </div>
+          </div>
+
+          <div id="fileDetails" style="display: none">
+            <div class="file-details">
+              <div>
+                <span class="label">Nome:</span>
+                <span class="val" id="detName">-</span>
+              </div>
+              <div>
+                <span class="label">Tipo:</span>
+                <span class="val" id="detType">-</span>
+              </div>
+              <div>
+                <span class="label">Tamanho:</span>
+                <span class="val" id="detSize">-</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Steps Execution -->
+        <div class="grid" style="gap: 1.5rem">
+          <!-- Step 1 Card -->
+          <div class="card">
+            <div class="card-title">
+              <span class="step-badge">1</span>
+              Obter URL Assinada
+              <span
+                id="step1Status"
+                class="status-badge badge-pending"
+                style="margin-left: auto"
+                >Pendente</span
+              >
+            </div>
+
+            <button id="btnStep1" class="btn" disabled>
+              Gerar URL de Presign
+            </button>
+
+            <div id="urlDisplayWrapper" style="display: none">
+              <div class="url-display" id="urlDisplay">
+                -
+                <button class="copy-btn" id="copyUrlBtn" title="Copiar URL">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                    <path
+                      d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <pre class="code-preview" id="step1Output">-</pre>
+            </div>
+          </div>
+
+          <!-- Step 2 Card -->
+          <div class="card">
+            <div class="card-title">
+              <span class="step-badge">2</span>
+              Fazer Upload para o Bucket
+              <span
+                id="step2Status"
+                class="status-badge badge-pending"
+                style="margin-left: auto"
+                >Pendente</span
+              >
+            </div>
+
+            <button id="btnStep2" class="btn" disabled>Upload via PUT</button>
+
+            <div class="progress-wrapper" id="progressWrapper">
+              <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar"></div>
+              </div>
+              <div class="progress-stats">
+                <span id="progressPercent">0%</span>
+                <span id="progressStats">0 / 0 MB</span>
+              </div>
+            </div>
+
+            <div
+              id="step2Result"
+              class="code-preview"
+              style="display: none; color: #a7f3d0"
+            >
+              -
+            </div>
+          </div>
+        </div>
+
+        <!-- Real-time Console logs -->
+        <div class="card span-2 console-card">
+          <div class="console-header">
+            <div class="card-title" style="margin-bottom: 0">
+              Console de Logs de Eventos
+            </div>
+            <div class="console-actions">
+              <button class="console-btn" id="clearConsoleBtn">
+                Limpar Logs
+              </button>
+            </div>
+          </div>
+          <div class="console-logs" id="consoleLogs">
+            <div class="log-entry">
+              <span class="log-time">[16:55:00]</span>
+              <span class="log-text log-info"
+                >Pronto. Escolha um arquivo de mídia para começar o teste.</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Troubleshooting Guide -->
+        <div class="alert-guide span-2">
+          <h3>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+            Guia de Solução de Problemas de CORS
+          </h3>
+          <ul>
+            <li>
+              <strong>API NestJS bloqueando CORS:</strong> O testador precisa
+              que a API aceite requisições de outras origens. Certifique-se de
+              que <code>app.enableCors()</code> foi adicionado no
+              <code>main.ts</code> da sua API.
+            </li>
+            <li>
+              <strong>R2 / S3 Bucket bloqueando CORS no PUT:</strong> Por
+              padrão, buckets da AWS S3 e Cloudflare R2 rejeitam uploads diretos
+              do navegador devido a políticas de segurança.
+            </li>
+            <li>
+              <strong>Configuração de CORS no Cloudflare R2:</strong> Adicione
+              esta regra nas configurações de CORS do seu bucket:
+              <pre
+                style="
+                  background: rgba(0, 0, 0, 0.3);
+                  padding: 8px;
+                  border-radius: 4px;
+                  margin-top: 4px;
+                  font-family: monospace;
+                  font-size: 0.75rem;
+                  color: #e2e8f0;
+                  overflow-x: auto;
+                "
+              >
+[
+  {
+    "AllowedOrigins": ["*"],
+    "AllowedMethods": ["PUT", "GET"],
+    "AllowedHeaders": ["content-type"],
+    "ExposeHeaders": []
+  }
+]</pre>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // State management
+      const state = {
+        file: null,
+        presignedUrl: null,
+        apiUrl: 'http://localhost:3000',
+      };
+
+      // DOM Elements
+      const dropzone = document.getElementById('dropzone');
+      const fileInput = document.getElementById('fileInput');
+      const fileDetails = document.getElementById('fileDetails');
+      const detName = document.getElementById('detName');
+      const detType = document.getElementById('detType');
+      const detSize = document.getElementById('detSize');
+      const apiUrlInput = document.getElementById('apiUrl');
+
+      const btnStep1 = document.getElementById('btnStep1');
+      const btnStep2 = document.getElementById('btnStep2');
+
+      const step1Status = document.getElementById('step1Status');
+      const step2Status = document.getElementById('step2Status');
+
+      const urlDisplayWrapper = document.getElementById('urlDisplayWrapper');
+      const urlDisplay = document.getElementById('urlDisplay');
+      const copyUrlBtn = document.getElementById('copyUrlBtn');
+      const step1Output = document.getElementById('step1Output');
+
+      const progressWrapper = document.getElementById('progressWrapper');
+      const progressBar = document.getElementById('progressBar');
+      const progressPercent = document.getElementById('progressPercent');
+      const progressStats = document.getElementById('progressStats');
+      const step2Result = document.getElementById('step2Result');
+
+      const consoleLogs = document.getElementById('consoleLogs');
+      const clearConsoleBtn = document.getElementById('clearConsoleBtn');
+
+      // Helper: Logging
+      function log(message, type = 'info') {
+        const now = new Date();
+        const timeStr = `[${now.toTimeString().split(' ')[0]}]`;
+
+        const logEntry = document.createElement('div');
+        logEntry.className = 'log-entry';
+
+        const timeSpan = document.createElement('span');
+        timeSpan.className = 'log-time';
+        timeSpan.textContent = timeStr;
+
+        const textSpan = document.createElement('span');
+        textSpan.className = `log-text log-${type}`;
+        textSpan.textContent = message;
+
+        logEntry.appendChild(timeSpan);
+        logEntry.appendChild(textSpan);
+
+        consoleLogs.appendChild(logEntry);
+        consoleLogs.scrollTop = consoleLogs.scrollHeight;
+      }
+
+      // Helper: Byte size formatter
+      function formatBytes(bytes, decimals = 2) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return (
+          parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
+        );
+      }
+
+      // Helper: Badge state updates
+      function setBadge(element, status, text) {
+        element.className = `status-badge badge-${status}`;
+        element.textContent = text;
+      }
+
+      // Drag and Drop implementation
+      dropzone.addEventListener('click', () => fileInput.click());
+
+      dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.classList.add('dragover');
+      });
+
+      dropzone.addEventListener('dragleave', () => {
+        dropzone.classList.remove('dragover');
+      });
+
+      dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          handleFileSelect(files[0]);
+        }
+      });
+
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+          handleFileSelect(e.target.files[0]);
+        }
+      });
+
+      function handleFileSelect(file) {
+        const typeValid =
+          file.type.startsWith('video/') || file.type.startsWith('audio/');
+
+        if (!typeValid) {
+          log(
+            `Arquivo rejeitado: "${file.name}" (${file.type}). Escolha um arquivo de vídeo ou áudio compatível.`,
+            'error',
+          );
+          return;
+        }
+
+        state.file = file;
+        detName.textContent = file.name;
+        detType.textContent = file.type;
+        detSize.textContent = formatBytes(file.size);
+        fileDetails.style.display = 'block';
+
+        log(
+          `Arquivo selecionado com sucesso: "${file.name}" (MIME: ${file.type}, Tamanho: ${formatBytes(file.size)})`,
+          'success',
+        );
+
+        // Enable Step 1, reset elements
+        btnStep1.disabled = false;
+        setBadge(step1Status, 'pending', 'Pendente');
+        setBadge(step2Status, 'pending', 'Pendente');
+
+        btnStep2.disabled = true;
+        urlDisplayWrapper.style.display = 'none';
+        state.presignedUrl = null;
+
+        progressWrapper.style.display = 'none';
+        progressBar.style.width = '0%';
+        step2Result.style.display = 'none';
+      }
+
+      // API URL sync
+      apiUrlInput.addEventListener('change', (e) => {
+        state.apiUrl = e.target.value.trim().replace(/\/$/, '');
+        log(`API Base URL atualizada para: ${state.apiUrl}`);
+      });
+
+      // Step 1: Request Presigned URL
+      btnStep1.addEventListener('click', async () => {
+        if (!state.file) return;
+
+        setBadge(step1Status, 'loading', 'Gerando...');
+        log(`Iniciando requisição POST para ${state.apiUrl}/uploads...`);
+
+        btnStep1.disabled = true;
+        urlDisplayWrapper.style.display = 'none';
+
+        try {
+          const payload = {
+            filename: state.file.name,
+            contentType: state.file.type,
+          };
+
+          const response = await fetch(`${state.apiUrl}/uploads`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+          });
+
+          if (!response.ok) {
+            throw new Error(
+              `Servidor respondeu com código ${response.status}: ${response.statusText}`,
+            );
+          }
+
+          const data = await response.json();
+
+          if (!data.uploadUrl) {
+            throw new Error(
+              'Propriedade "uploadUrl" ausente no JSON retornado.',
+            );
+          }
+
+          state.presignedUrl = data.uploadUrl;
+
+          // Show URL results
+          urlDisplay.firstChild.textContent = state.presignedUrl;
+          step1Output.textContent = JSON.stringify(data, null, 2);
+          urlDisplayWrapper.style.display = 'block';
+
+          setBadge(step1Status, 'success', 'URL Gerada');
+          log('Presigned URL obtida com sucesso da API!', 'success');
+
+          // Enable Step 2
+          btnStep2.disabled = false;
+        } catch (err) {
+          setBadge(step1Status, 'error', 'Erro');
+          log(`Erro ao gerar presigned URL: ${err.message}`, 'error');
+          console.error(err);
+        } finally {
+          btnStep1.disabled = false;
+        }
+      });
+
+      // Copy Presigned URL helper
+      copyUrlBtn.addEventListener('click', () => {
+        if (!state.presignedUrl) return;
+        navigator.clipboard
+          .writeText(state.presignedUrl)
+          .then(() => {
+            log('Presigned URL copiada para a área de transferência.', 'info');
+          })
+          .catch((err) => {
+            log('Falha ao copiar URL automaticamente.', 'warning');
+          });
+      });
+
+      // Step 2: Upload File via PUT
+      btnStep2.addEventListener('click', () => {
+        if (!state.file || !state.presignedUrl) return;
+
+        setBadge(step2Status, 'loading', 'Enviando...');
+        btnStep1.disabled = true;
+        btnStep2.disabled = true;
+
+        progressWrapper.style.display = 'block';
+        progressBar.style.width = '0%';
+        progressPercent.textContent = '0%';
+        progressStats.textContent = `0 / ${formatBytes(state.file.size)}`;
+
+        step2Result.style.display = 'none';
+
+        log(`Iniciando upload binário direto via PUT para o bucket...`);
+
+        const xhr = new XMLHttpRequest();
+
+        xhr.open('PUT', state.presignedUrl, true);
+        xhr.setRequestHeader('Content-Type', state.file.type);
+
+        // Track progress
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            const percentComplete = Math.round((e.loaded / e.total) * 100);
+            progressBar.style.width = `${percentComplete}%`;
+            progressPercent.textContent = `${percentComplete}%`;
+            progressStats.textContent = `${formatBytes(e.loaded)} / ${formatBytes(e.total)}`;
+
+            if (percentComplete % 20 === 0 || percentComplete === 100) {
+              log(
+                `Progresso do upload: ${percentComplete}% (${formatBytes(e.loaded)} enviados)`,
+              );
+            }
+          }
+        };
+
+        xhr.onload = () => {
+          btnStep1.disabled = false;
+          btnStep2.disabled = false;
+
+          if (xhr.status >= 200 && xhr.status < 300) {
+            setBadge(step2Status, 'success', 'Concluído');
+            log(
+              `Upload bem-sucedido! Status: ${xhr.status} ${xhr.statusText}`,
+              'success',
+            );
+
+            step2Result.textContent = `Upload Concluído com sucesso!\nStatus HTTP: ${xhr.status} ${xhr.statusText}\nHeaders de resposta:\n${xhr.getAllResponseHeaders()}`;
+            step2Result.style.display = 'block';
+          } else {
+            setBadge(step2Status, 'error', 'Erro');
+            log(
+              `Erro no upload. Status do S3/R2: ${xhr.status} ${xhr.statusText}`,
+              'error',
+            );
+
+            step2Result.textContent = `Falha no Upload!\nStatus HTTP: ${xhr.status} ${xhr.statusText}\nHeaders de resposta:\n${xhr.getAllResponseHeaders()}`;
+            step2Result.style.display = 'block';
+          }
+        };
+
+        xhr.onerror = () => {
+          btnStep1.disabled = false;
+          btnStep2.disabled = false;
+          setBadge(step2Status, 'error', 'Erro de Rede');
+          log(
+            `Erro de rede ou bloqueio de CORS ao tentar enviar para o Bucket. Verifique se o CORS está configurado no bucket.`,
+            'error',
+          );
+
+          step2Result.textContent = `Erro de Conexão/CORS na tentativa de PUT para o Bucket.`;
+          step2Result.style.display = 'block';
+        };
+
+        xhr.send(state.file);
+      });
+
+      // Clear logs
+      clearConsoleBtn.addEventListener('click', () => {
+        consoleLogs.innerHTML = '';
+        log('Console limpo.');
+      });
+    </script>
+  </body>
+</html>
