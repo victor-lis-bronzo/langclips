@@ -1,7 +1,7 @@
-import { Module, DynamicModule, Global } from '@nestjs/common';
-import { StorageService } from './storage.service';
+import { Module, Global } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config'
 import { S3Client } from '@aws-sdk/client-s3';
-import { ConfigService } from '@nestjs/config';
+import { StorageService } from './storage.service';
 
 @Global()
 @Module({
