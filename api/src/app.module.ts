@@ -7,16 +7,12 @@ import { S3Client } from '@aws-sdk/client-s3';
 import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), UploadsModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    StorageModule,
+    UploadsModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {
-  static register(s3Client: S3Client): DynamicModule {
-    return {
-      module: AppModule,
-      imports: [StorageModule.register(s3Client)],
-      exports: [StorageModule],
-    };
-  }
-}
+export class AppModule {}

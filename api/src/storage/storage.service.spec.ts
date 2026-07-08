@@ -31,14 +31,14 @@ describe('StorageService', () => {
   });
 
   it('should generate a presigned URL', async () => {
-    process.env.AWS_BUCKET_NAME = 'my-bucket';
+    process.env.STORAGE_BUCKET_NAME = 'my-bucket';
     const url = await service.generatePresignedUrl('video.mp4', 'video/mp4');
 
     expect(url).toBe('https://mocked-url.com');
     expect(getSignedUrl).toHaveBeenCalledWith(
       client,
       expect.any(PutObjectCommand),
-      { expiresIn: 300 }
+      { expiresIn: 300 },
     );
   });
 });

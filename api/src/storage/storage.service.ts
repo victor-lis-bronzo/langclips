@@ -9,9 +9,12 @@ export class StorageService {
     this.client = injectedClient;
   }
 
-  async generatePresignedUrl(fileName: string, fileType: string): Promise<string> {
+  async generatePresignedUrl(
+    fileName: string,
+    fileType: string,
+  ): Promise<string> {
     const command = new PutObjectCommand({
-      Bucket: process.env.AWS_BUCKET_NAME,
+      Bucket: process.env.STORAGE_BUCKET_NAME,
       Key: fileName,
       ContentType: fileType,
     });
