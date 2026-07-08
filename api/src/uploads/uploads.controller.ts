@@ -8,7 +8,10 @@ export class UploadsController {
 
   @Post()
   async generatePresignedUrl(@Body() body: GeneratePresignedUrlDto) {
-    const uploadUrl = await this.storageService.generatePresignedUrl(body.filename, body.contentType);
+    const uploadUrl = await this.storageService.generatePresignedUrl(
+      body.filename,
+      body.contentType,
+    );
     return { uploadUrl };
   }
 }
