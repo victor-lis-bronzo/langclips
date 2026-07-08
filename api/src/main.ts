@@ -20,7 +20,6 @@ async function bootstrap() {
     .setTitle('Lang Clips API')
     .setDescription('API para gerenciamento de vídeos com IA.')
     .setVersion('1.0')
-    .addTag('videos')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
