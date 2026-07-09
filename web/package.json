@@ -69,8 +69,12 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
+      "@google/genai",
       "esbuild",
-      "lightningcss"
+      "lightningcss",
+      "protobufjs",
+      "sharp",
+      "workerd"
     ]
   }
 }
