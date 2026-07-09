@@ -12,7 +12,7 @@ export type DropFileProps = Omit<
   containerClassName?: string;
 };
 
-export const DropFile = React.forwardRef<HTMLInputElement, DropFileProps>(
+export const DropFileInput = React.forwardRef<HTMLInputElement, DropFileProps>(
   (
     {
       title = "Preparado para começar?",
@@ -121,4 +121,4 @@ export const DropFile = React.forwardRef<HTMLInputElement, DropFileProps>(
   },
 );
 
-DropFile.displayName = "DropFile";
+DropFileInput.displayName = "DropFileInput";
