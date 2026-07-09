@@ -9,11 +9,33 @@ import { TanStackQueryDevtools } from "../integrations/tanstack-query/devtools";
 
 import type { QueryClient } from "@tanstack/react-query";
 
+import indexCss from "#/styles/index.css?url";
+
 interface MyRouterContext {
   queryClient: QueryClient;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
+  head: () => ({
+    meta: [
+      {
+        charSet: "utf-8",
+      },
+      {
+        name: "viewport",
+        content: "width=device-width, initial-scale=1",
+      },
+      {
+        title: "Lang Clips",
+      },
+    ],
+    links: [
+      {
+        rel: "stylesheet",
+        href: indexCss,
+      },
+    ],
+  }),
   shellComponent: RootDocument,
 });
 
