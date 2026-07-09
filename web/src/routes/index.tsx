@@ -1,6 +1,6 @@
 import { Container } from "#/components/container";
-import { DropFile } from "#/components/drop-file";
-import { Header } from "#/components/header";
+import { DropFileForm } from "#/features/home/components/upload-file-form";
+import { Header } from "#/modules/header";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
@@ -18,7 +18,7 @@ function HomePage() {
             baseada em vídeos curtos.
           </Header.Description>
         </Header.Root>
-        <DropFile title="Pronto para praticar?" />
+        <DropFileForm />
       </Container>
     </div>
   );
