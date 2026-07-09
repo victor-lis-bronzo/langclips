@@ -12,7 +12,7 @@ export default function HeaderTitle({
   return (
     <h1
       className={cn(
-        "font-caveat font-bold tracking-tight text-[48px] leading-tight text-white",
+        "font-bold tracking-tight text-[48px] leading-tight text-white",
         className,
       )}
       {...rest}
