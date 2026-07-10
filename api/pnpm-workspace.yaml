@@ -1,3 +1,4 @@
 allowBuilds:
   '@scarf/scarf': true
+  msgpackr-extract: true
   unrs-resolver: true
