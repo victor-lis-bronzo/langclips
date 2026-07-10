@@ -17,7 +17,10 @@ export const submitFileToR2 = createServerFn({ method: "POST" })
 
     console.log("Server received file:", file.name, file.type, file.size);
 
-    const { data: response } = await apiServer.post<{ uploadUrl: string }>(
+    const { data: response } = await apiServer.post<{
+      uploadUrl: string;
+      fileKey: string;
+    }>(
       "uploads/generate-presigned-url",
       {
         filename: file.name,
@@ -46,11 +49,9 @@ export const submitFileToR2 = createServerFn({ method: "POST" })
 
     console.log("R2 upload successful");
 
-    const fileKey = file.name;
-
     const { jobId } = await startVideoJob({
       data: {
-        fileKey,
+        fileKey: response.fileKey,
       },
     });
 
