@@ -6,7 +6,7 @@ import { GeneratePresignedUrlDto } from './dto/generate-presigned-url.dto';
 export class UploadsController {
   constructor(private storageService: StorageService) {}
 
-  @Post()
+  @Post('/generate-presigned-url')
   async generatePresignedUrl(@Body() body: GeneratePresignedUrlDto) {
     const uploadUrl = await this.storageService.generatePresignedUrl(
       body.filename,

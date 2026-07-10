@@ -1,21 +1,7 @@
 import { useForm } from "@tanstack/react-form";
-import { z } from "zod";
 import { DropFileInput } from "#/components/drop-file-input";
-
-const videoUploadSchema = z.object({
-  videoFile: z
-    .instanceof(File, {
-      message: "Você precisa selecionar um arquivo de vídeo.",
-    })
-    .refine(
-      (file) => file.size <= 50 * 1024 * 1024,
-      "O vídeo excede o limite estrito de 50MB.",
-    )
-    .refine(
-      (file) => ["video/mp4", "video/quicktime"].includes(file.type),
-      "Formato inválido. Envie apenas MP4 ou MOV.",
-    ),
-});
+import { videoUploadSchema } from "../schemas/video-upload-schema";
+import { submitFile } from "../functions/upload-to-r2";
 
 export function DropFileForm() {
   const form = useForm({
@@ -27,6 +13,14 @@ export function DropFileForm() {
     },
     onSubmit: async ({ value }) => {
       console.log("Arquivo pronto para upload:", value.videoFile.name);
+      const formData = new FormData();
+      formData.append("file", value.videoFile);
+
+      const response = await submitFile({
+        data: formData,
+      });
+
+      console.log({ response });
     },
   });
 

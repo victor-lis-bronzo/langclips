@@ -14,7 +14,7 @@
     "format": "biome format",
     "lint": "biome lint",
     "check": "biome check",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "pnpm run build && wrangler deploy"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "1.26.0",
@@ -37,6 +37,7 @@
     "@tanstack/router-plugin": "^1.132.0",
     "@tanstack/store": "latest",
     "@tanstack/zod-form-adapter": "^0.42.1",
+    "axios": "^1.18.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.577.0",

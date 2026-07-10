@@ -11,11 +11,15 @@ function HomePage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
       <Container>
-        <Header.Root>
+        <Header.Root className="lg:max-w-2/3">
           <Header.Title>LangClips</Header.Title>
           <Header.Description>
-            O LangClips é uma plataforma interativa de aprendizado de inglês
-            baseada em vídeos curtos.
+            É uma plataforma interativa de aprendizado que foca em aprender
+            Inglês.
+          </Header.Description>
+          <Header.Description className="max-md:hidden">
+            Você faz o upload do seu trecho de série, filme, anime ou qualquer
+            vídeo que você queira aprender a traduzir e analisar.
           </Header.Description>
         </Header.Root>
         <DropFileForm />

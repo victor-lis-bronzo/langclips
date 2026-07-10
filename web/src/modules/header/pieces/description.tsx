@@ -12,7 +12,7 @@ export default function HeaderDescription({
   return (
     <p
       className={cn(
-        "font-caveat font-bold tracking-tight text-[20px] max-w-4xl text-white/80",
+        "font-caveat font-bold tracking-tight text-[20px] text-white/80",
         className,
       )}
       {...rest}
