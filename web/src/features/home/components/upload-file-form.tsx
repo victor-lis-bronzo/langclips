@@ -1,7 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import { DropFileInput } from "#/components/drop-file-input";
 import { videoUploadSchema } from "../schemas/video-upload-schema";
-import { submitFile } from "../functions/upload-to-r2";
+import { submitFileToR2 } from "../functions/submit-to-r2";
 
 export function DropFileForm() {
   const form = useForm({
@@ -16,7 +16,7 @@ export function DropFileForm() {
       const formData = new FormData();
       formData.append("file", value.videoFile);
 
-      const response = await submitFile({
+      const response = await submitFileToR2({
         data: formData,
       });
 
