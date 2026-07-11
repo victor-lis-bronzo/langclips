@@ -1,52 +1,46 @@
-import { Worker, JobState } from "bullmq";
-import path from "path";
-import dotenv from "dotenv";
+import "./config/env"; // Carrega dotenv + validação Zod — DEVE ser o primeiro import
 
-dotenv.config({ path: path.resolve(__dirname, "../.env") });
+import { Worker } from "bullmq";
+import { env } from "./config/env";
+import { redisConnection } from "./config/redis";
+import { s3Client } from "./config/s3-client";
 
-const redisConnection = {
-  host: process.env.REDIS_HOST || "localhost",
-  port: Number(process.env.REDIS_PORT) || 6379,
-  password: process.env.REDIS_PASSWORD || undefined,
-};
+import { R2StorageService } from "./services/r2-storage.service";
+import { FFmpegAudioExtractorService } from "./services/ffmpeg-audio-extractor.service";
+import { DeckBuilderService } from "./services/deck-builder.service";
+import { LocalDiskCleanupService } from "./services/local-disk-cleanup.service";
+import { VideoProcessingJob } from "./job/video-processing.job";
 
 console.log({ redisConnection });
 
+// --- Composition Root: monta as dependências ---
+const storageService = new R2StorageService(s3Client, env.STORAGE_BUCKET_NAME);
+const audioExtractor = new FFmpegAudioExtractorService();
+const deckBuilder = new DeckBuilderService();
+const diskCleanup = new LocalDiskCleanupService();
+const videoJob = new VideoProcessingJob(
+  storageService,
+  audioExtractor,
+  deckBuilder,
+  diskCleanup,
+);
+
+// --- Registra o Worker ---
 console.log("👷 Worker de processamento iniciado. Escutando a fila...");
 
 const videoWorker = new Worker(
   "video-processing",
   async (job) => {
-    console.log(
-      `[INÍCIO] Recebi o job ${job.id} referente ao arquivo: ${job.data.fileKey}`,
-    );
-
-    // Passo 1: Informar o Redis que começamos
-    let jobState: JobState = "active";
-    await job.updateProgress(jobState);
-
-    // As próximas etapas vão entrar aqui:
-    // 1. Download do R2
-    // 2. Extração com FFmpeg
-    // 3. API do Whisper
-    // 4. Limpeza de disco
-
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        jobState = "completed";
-        job.updateProgress(jobState);
-        console.log(`[FIM] Job ${job.id} concluído.`);
-        resolve({ status: "success", file: job.data.fileKey });
-      }, 5000);
-    });
+    console.log(`[INÍCIO] Job ${job.id} — arquivo: ${job.data.fileKey}`);
+    return videoJob.execute({ job });
   },
   { connection: redisConnection },
 );
 
 videoWorker.on("completed", (job) => {
-  console.log(`✅ Sucesso total no job ${job.id}`);
+  console.log(`✅ Sucesso no job ${job.id}`);
 });
 
 videoWorker.on("failed", (job, err) => {
-  console.error(`❌ O job ${job?.id} falhou miseravelmente:`, err.message);
+  console.error(`❌ Job ${job?.id} falhou:`, err.message);
 });
