@@ -60,7 +60,7 @@ export class StorageService {
       .trim()
       .replaceAll(/[^a-zA-Z0-9]/g, '-')
       .toLowerCase();
-    const fileKey = `${randomUUID()}-${formattedName}`;
+    const fileKey = `videos/${randomUUID()}-${formattedName}`;
 
     const command = new PutObjectCommand({
       Bucket: process.env.STORAGE_BUCKET_NAME,
