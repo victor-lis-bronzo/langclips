@@ -1,7 +1,14 @@
 import ffmpeg from "fluent-ffmpeg";
+import ffmpegPath from "ffmpeg-static";
 import { IAudioExtractorService } from "../interfaces/audio-extractor.interface";
 
 export class FFmpegAudioExtractorService implements IAudioExtractorService {
+  constructor() {
+    if (ffmpegPath) {
+      ffmpeg.setFfmpegPath(ffmpegPath);
+    }
+  }
+
   async extract({
     videoPath,
     outputPath,
