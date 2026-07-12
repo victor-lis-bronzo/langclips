@@ -2,8 +2,8 @@ import path from "path";
 import dotenv from "dotenv";
 import { z } from "zod";
 
-// Carrega o arquivo .env resolvendo o caminho relativo a este arquivo
-dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+// Carrega o arquivo .env resolvendo o caminho relativo ao diretório atual do processo
+dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
 const envSchema = z.object({
   // Cloudflare R2 / Storage
