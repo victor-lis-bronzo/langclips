@@ -2,7 +2,9 @@ export interface IStorageService {
   /**
    * Faz download de um arquivo do storage remoto para o disco local.
    */
-  download(params: { fileKey: string; destinationPath: string }): Promise<void>;
+  download(params: { fileKey: string; destinationPath: string }): Promise<{
+    success: boolean;
+  }>;
 
   /**
    * Faz upload de um conteúdo para o storage remoto.
@@ -11,10 +13,10 @@ export interface IStorageService {
     fileKey: string;
     body: Buffer | string;
     contentType: string;
-  }): Promise<void>;
+  }): Promise<{ success: boolean }>;
 
   /**
    * Deleta um arquivo do storage remoto.
    */
-  delete(params: { fileKey: string }): Promise<void>;
+  delete(params: { fileKey: string }): Promise<{ success: boolean }>;
 }

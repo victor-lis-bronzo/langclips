@@ -15,15 +15,15 @@ export class FFmpegAudioExtractorService implements IAudioExtractorService {
   }: {
     videoPath: string;
     outputPath: string;
-  }): Promise<{ outputPath: string }> {
+  }): Promise<{ outputPath: string; success: boolean }> {
     return new Promise((resolve, reject) => {
       ffmpeg(videoPath)
         .noVideo()
         .audioCodec("libmp3lame")
         .audioQuality(2)
         .output(outputPath)
-        .on("end", () => resolve({ outputPath }))
-        .on("error", (err) => reject(err))
+        .on("end", () => resolve({ outputPath, success: true }))
+        .on("error", () => resolve({ outputPath: "", success: false }))
         .run();
     });
   }

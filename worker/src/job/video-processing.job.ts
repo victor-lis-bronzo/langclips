@@ -22,7 +22,6 @@ export class VideoProcessingJob {
   }): Promise<{ status: string; deck: Deck }> {
     const { fileKey } = job.data;
     const tmpDir = os.tmpdir();
-    console.log({ tmpDir });
 
     const videoPath = path.join(tmpDir, `${job.id}-video`);
     const audioPath = path.join(tmpDir, `${job.id}-audio.mp3`);
@@ -31,18 +30,24 @@ export class VideoProcessingJob {
       // Passo 1: Download do vídeo bruto do R2
       console.log(`[DOWNLOAD] Baixando ${fileKey}...`);
       await job.updateProgress(10);
-      await this.storageService.download({
+      const { success: downloadSucess } = await this.storageService.download({
         fileKey,
         destinationPath: videoPath,
       });
+      if (!downloadSucess) {
+        throw new Error(`Falha ao baixar arquivo ${fileKey}`);
+      }
       await job.updateProgress(25);
 
       // Passo 2: Extração de áudio com FFmpeg
       console.log(`[FFMPEG] Extraindo áudio...`);
-      const { outputPath } = await this.audioExtractor.extract({
+      const { outputPath, success: extractionSuccess } = await this.audioExtractor.extract({
         videoPath,
         outputPath: audioPath,
       });
+      if (!extractionSuccess) {
+        throw new Error(`Falha ao extrair áudio do arquivo ${fileKey}`);
+      }
       await job.updateProgress(50);
 
       // Passo 3: Transcrição via Whisper (futuro)

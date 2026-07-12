@@ -21,7 +21,7 @@ export class R2StorageService implements IStorageService {
   }: {
     fileKey: string;
     destinationPath: string;
-  }): Promise<void> {
+  }) {
     const command = new GetObjectCommand({
       Bucket: this.bucketName,
       Key: fileKey,
@@ -29,6 +29,10 @@ export class R2StorageService implements IStorageService {
     const response = await this.client.send(command);
     const body = response.Body as Readable;
     await pipeline(body, createWriteStream(destinationPath));
+    return {
+      success: true,
+      downloadedFilePath: destinationPath,
+    };
   }
 
   async upload({
@@ -39,7 +43,7 @@ export class R2StorageService implements IStorageService {
     fileKey: string;
     body: Buffer | string;
     contentType: string;
-  }): Promise<void> {
+  }) {
     const command = new PutObjectCommand({
       Bucket: this.bucketName,
       Key: fileKey,
@@ -47,13 +51,19 @@ export class R2StorageService implements IStorageService {
       ContentType: contentType,
     });
     await this.client.send(command);
+    return {
+      success: true,
+    };
   }
 
-  async delete({ fileKey }: { fileKey: string }): Promise<void> {
+  async delete({ fileKey }: { fileKey: string }) {
     const command = new DeleteObjectCommand({
       Bucket: this.bucketName,
       Key: fileKey,
     });
     await this.client.send(command);
+    return {
+      success: true,
+    };
   }
 }

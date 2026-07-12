@@ -10,8 +10,7 @@ import { FFmpegAudioExtractorService } from "./services/ffmpeg-audio-extractor.s
 import { DeckBuilderService } from "./services/deck-builder.service";
 import { LocalDiskCleanupService } from "./services/local-disk-cleanup.service";
 import { VideoProcessingJob } from "./job/video-processing.job";
-
-console.log({ redisConnection });
+import { VideoProcessingJobType } from "./types/job.types";
 
 // --- Composition Root: monta as dependências ---
 const storageService = new R2StorageService(s3Client, env.STORAGE_BUCKET_NAME);
@@ -25,12 +24,11 @@ const videoJob = new VideoProcessingJob(
   diskCleanup,
 );
 
-// --- Registra o Worker ---
 console.log("👷 Worker de processamento iniciado. Escutando a fila...");
 
 const videoWorker = new Worker(
   "video-processing",
-  async (job) => {
+  async (job: VideoProcessingJobType) => {
     console.log(`[INÍCIO] Job ${job.id} — arquivo: ${job.data.fileKey}`);
     return videoJob.execute({ job });
   },
