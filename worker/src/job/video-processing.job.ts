@@ -8,6 +8,7 @@ import { IDiskCleanupService } from "../interfaces/disk-cleanup.interface";
 import { Deck } from "../types/deck.types";
 import { ITranscriptionService } from "../interfaces/transcription.interface";
 import { IVideoClipperService } from "../interfaces/video-clipper.interface";
+import { IClipUploaderService } from "../interfaces/clip-uploader.interface";
 
 export class VideoProcessingJob {
   constructor(
@@ -15,6 +16,7 @@ export class VideoProcessingJob {
     private readonly audioExtractor: IAudioExtractorService,
     private readonly transcriber: ITranscriptionService,
     private readonly videoClipper: IVideoClipperService,
+    private readonly clipUploader: IClipUploaderService,
     private readonly deckBuilder: IDeckBuilderService,
     private readonly diskCleanup: IDiskCleanupService,
   ) {}
@@ -79,12 +81,17 @@ export class VideoProcessingJob {
       console.log(`[CLIPPER] Cortes gerados com sucesso.`);
       await job.updateProgress(70);
 
+      const uploadedClips =
+        await this.clipUploader.upload(localClips);
+      await job.updateProgress(85);
+
       // Passo 5: Construir o Deck
       console.log(`[DECK] Construindo deck...`);
       const deck = this.deckBuilder.build({
         title: fileKey,
         sourceFileKey: fileKey,
         transcriptionData,
+        uploadedClips,
       });
       await job.updateProgress(85);
 

@@ -15,26 +15,37 @@ export class DeckBuilderService implements IDeckBuilderService {
     title,
     sourceFileKey,
     transcriptionData,
+    uploadedClips,
   }: {
     title: string;
     sourceFileKey: string;
     transcriptionData: TranscriptionSegment[];
+    uploadedClips: Clip[];
   }): Deck {
-    const clips: Clip[] = transcriptionData
-      .filter((segment) => {
-        const duration = segment.end - segment.start;
+    const clips: Clip[] = uploadedClips
+      .filter((clip) => {
+        const duration = clip.endTime - clip.startTime;
         return (
           duration >= this.MIN_CLIP_DURATION &&
           duration <= this.MAX_CLIP_DURATION
         );
       })
-      .map((segment) => ({
-        id: uuidv4(),
-        transcription: segment.text,
-        sourceFileKey,
-        startTime: segment.start,
-        endTime: segment.end,
-      }));
+      .map((clip) => {
+        const matchedSegment = transcriptionData.find(
+          (segment) =>
+            Math.abs(segment.start - clip.startTime) < 0.1 &&
+            Math.abs(segment.end - clip.endTime) < 0.1,
+        );
+
+        return {
+          id: clip.id,
+          transcription: clip.transcription,
+          sourceFileKey: clip.sourceFileKey,
+          startTime: clip.startTime,
+          endTime: clip.endTime,
+          words: matchedSegment ? matchedSegment.words : [],
+        };
+      });
 
     return {
       id: uuidv4(),

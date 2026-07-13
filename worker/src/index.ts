@@ -14,18 +14,21 @@ import { LocalDiskCleanupService } from "./services/local-disk-cleanup.service";
 import { VideoProcessingJob } from "./job/video-processing.job";
 
 import { VideoProcessingJobType } from "./types/job.types";
+import { ClipUploaderService } from "./services/clip-uploader.service";
 
 const storageService = new R2StorageService(s3Client, env.STORAGE_BUCKET_NAME);
 const audioExtractor = new FFmpegAudioExtractorService();
 const whisperTranscriber = new WhisperTranscriptionService(env.GROQ_API_KEY);
 const videoClipper = new FFmpegVideoClipperService();
 const deckBuilder = new DeckBuilderService();
+const clipUploader = new ClipUploaderService(storageService);
 const diskCleanup = new LocalDiskCleanupService();
 const videoJob = new VideoProcessingJob(
   storageService,
   audioExtractor,
   whisperTranscriber,
   videoClipper,
+  clipUploader,
   deckBuilder,
   diskCleanup,
 );

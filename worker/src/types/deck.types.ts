@@ -4,6 +4,7 @@ export interface Clip {
   sourceFileKey: string;
   startTime: number;
   endTime: number;
+  words?: Array<{ word: string; start: number; end: number }>;
 }
 
 export interface Deck {
