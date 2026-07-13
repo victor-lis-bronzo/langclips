@@ -38,7 +38,8 @@ export class FFmpegVideoClipperService implements IVideoClipperService {
             .outputOptions(
               "-c:v copy",
               "-c:a copy",
-              "-avoid_negative_ts make_zero",
+              "-avoid_negative_ts",
+              "make_zero",
             )
             .output(tempFilePath)
             .on("end", () => resolve())
