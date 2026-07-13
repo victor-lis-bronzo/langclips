@@ -13,7 +13,7 @@ export class ClipUploaderService implements IClipUploaderService {
 
     for (const localClip of localClips) {
       const fileId = crypto.randomUUID();
-      const cloudKey = `videos/clips/${fileId}.mp4`;
+      const cloudKey = `clips/${fileId}.mp4`;
 
       try {
         const fileBuffer = await fs.readFile(localClip.tempFilePath);

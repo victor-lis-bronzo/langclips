@@ -4,7 +4,6 @@ export interface TranscriptionSegment {
   text: string;
   start: number;
   end: number;
-  words: Array<{ word: string; start: number; end: number }>;
 }
 
 export interface IDeckBuilderService {

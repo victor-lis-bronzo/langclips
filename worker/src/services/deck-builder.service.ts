@@ -31,19 +31,12 @@ export class DeckBuilderService implements IDeckBuilderService {
         );
       })
       .map((clip) => {
-        const matchedSegment = transcriptionData.find(
-          (segment) =>
-            Math.abs(segment.start - clip.startTime) < 0.1 &&
-            Math.abs(segment.end - clip.endTime) < 0.1,
-        );
-
         return {
           id: clip.id,
           transcription: clip.transcription,
           sourceFileKey: clip.sourceFileKey,
           startTime: clip.startTime,
           endTime: clip.endTime,
-          words: matchedSegment ? matchedSegment.words : [],
         };
       });
 

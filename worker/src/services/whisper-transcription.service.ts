@@ -34,7 +34,6 @@ export class WhisperTranscriptionService implements ITranscriptionService {
       );
 
       const data = response.data;
-      console.log("WHISPER TRANSCRIPTION RAW DATA", data);
 
       const confidentSegments = this.filterConfidentSegments(data.segments);
       const transcriptionData = this.mapToDeckSegments(confidentSegments);
@@ -62,8 +61,7 @@ export class WhisperTranscriptionService implements ITranscriptionService {
     return segments.map((seg) => ({
       text: seg.text.trim(),
       start: seg.start,
-      end: seg.end,
-      words: seg.words ?? [], // word-level timestamps (se disponíveis)
+      end: seg.end
     }));
   }
 }

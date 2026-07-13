@@ -35,13 +35,18 @@ export class FFmpegVideoClipperService implements IVideoClipperService {
           ffmpeg(sourceFilePath)
             .setStartTime(request.startTime)
             .setDuration(request.endTime - request.startTime)
-            .outputOptions(
-              "-c:v copy",
-              "-c:a copy",
-              "-avoid_negative_ts",
-              "make_zero",
-            )
+            // .outputOptions(
+            //   "-c:v copy",
+            //   "-c:a copy",
+            //   "-avoid_negative_ts",
+            //   "make_zero",
+            // )
             .output(tempFilePath)
+            .on("start", (commandLine) => {
+              console.log(
+                `[CLIPPER] Executando comando ffmpeg: ${commandLine}`,
+              );
+            })
             .on("end", () => resolve())
             .on("error", (err) => reject(err))
             .run();
