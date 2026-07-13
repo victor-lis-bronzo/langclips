@@ -6,11 +6,6 @@ import {
 } from "../interfaces/deck-builder.interface";
 
 export class DeckBuilderService implements IDeckBuilderService {
-  constructor(
-    private readonly MIN_CLIP_DURATION: number = 2,
-    private readonly MAX_CLIP_DURATION: number = 20,
-  ) {}
-
   build({
     title,
     sourceFileKey,
