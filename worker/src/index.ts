@@ -15,10 +15,15 @@ import { VideoProcessingJob } from "./job/video-processing.job";
 
 import { VideoProcessingJobType } from "./types/job.types";
 import { ClipUploaderService } from "./services/clip-uploader.service";
+import { FFmpegAudioChunkerService } from "./services/ffmpeg-audio-chunker.service";
 
 const storageService = new R2StorageService(s3Client, env.STORAGE_BUCKET_NAME);
 const audioExtractor = new FFmpegAudioExtractorService();
-const whisperTranscriber = new WhisperTranscriptionService(env.GROQ_API_KEY);
+const audioChunker = new FFmpegAudioChunkerService();
+const whisperTranscriber = new WhisperTranscriptionService(
+  env.GROQ_API_KEY,
+  audioChunker,
+);
 const videoClipper = new FFmpegVideoClipperService();
 const deckBuilder = new DeckBuilderService();
 const clipUploader = new ClipUploaderService(storageService);
