@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { Deck, Clip, WordToken } from "../types/deck.types";
+import { Deck, Clip } from "../types/deck.types";
 import {
   IDeckBuilderService,
   TranscriptionSegment,
@@ -7,7 +7,7 @@ import {
 
 export class DeckBuilderService implements IDeckBuilderService {
   constructor(
-    private readonly MIN_CLIP_DURATION: number = 5,
+    private readonly MIN_CLIP_DURATION: number = 2,
     private readonly MAX_CLIP_DURATION: number = 20,
   ) {}
 
@@ -30,31 +30,17 @@ export class DeckBuilderService implements IDeckBuilderService {
       })
       .map((segment) => ({
         id: uuidv4(),
+        transcription: segment.text,
+        sourceFileKey,
         startTime: segment.start,
         endTime: segment.end,
-        fullTranscription: segment.text,
-        tokens: this.buildTokens({ words: segment.words }),
       }));
 
     return {
       id: uuidv4(),
       title,
-      sourceFileKey,
       clips,
       createdAt: Date.now(),
     };
-  }
-
-  private buildTokens({
-    words,
-  }: {
-    words: Array<{ word: string; start: number; end: number }>;
-  }): WordToken[] {
-    return words.map((word, index) => ({
-      text: word.word,
-      start: word.start,
-      end: word.end,
-      isGapCandidate: index % 3 === 1,
-    }));
   }
 }
