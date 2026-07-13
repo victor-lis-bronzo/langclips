@@ -11,15 +11,17 @@ import { DeckBuilderService } from "./services/deck-builder.service";
 import { LocalDiskCleanupService } from "./services/local-disk-cleanup.service";
 import { VideoProcessingJob } from "./job/video-processing.job";
 import { VideoProcessingJobType } from "./types/job.types";
+import { WhisperTranscriptionService } from "./services/whisper-transcription.service";
 
-// --- Composition Root: monta as dependências ---
 const storageService = new R2StorageService(s3Client, env.STORAGE_BUCKET_NAME);
 const audioExtractor = new FFmpegAudioExtractorService();
+const whisperTranscriber = new WhisperTranscriptionService(env.GROQ_API_KEY);
 const deckBuilder = new DeckBuilderService();
 const diskCleanup = new LocalDiskCleanupService();
 const videoJob = new VideoProcessingJob(
   storageService,
   audioExtractor,
+  whisperTranscriber,
   deckBuilder,
   diskCleanup,
 );

@@ -6,11 +6,13 @@ import { IAudioExtractorService } from "../interfaces/audio-extractor.interface"
 import { IDeckBuilderService } from "../interfaces/deck-builder.interface";
 import { IDiskCleanupService } from "../interfaces/disk-cleanup.interface";
 import { Deck } from "../types/deck.types";
+import { ITranscriptionService } from "../interfaces/transcription.interface";
 
 export class VideoProcessingJob {
   constructor(
     private readonly storageService: IStorageService,
     private readonly audioExtractor: IAudioExtractorService,
+    private readonly transcriber: ITranscriptionService,
     private readonly deckBuilder: IDeckBuilderService,
     private readonly diskCleanup: IDiskCleanupService,
   ) {}
@@ -41,10 +43,11 @@ export class VideoProcessingJob {
 
       // Passo 2: Extração de áudio com FFmpeg
       console.log(`[FFMPEG] Extraindo áudio...`);
-      const { outputPath, success: extractionSuccess } = await this.audioExtractor.extract({
-        videoPath,
-        outputPath: audioPath,
-      });
+      const { outputPath, success: extractionSuccess } =
+        await this.audioExtractor.extract({
+          videoPath,
+          outputPath: audioPath,
+        });
       if (!extractionSuccess) {
         throw new Error(`Falha ao extrair áudio do arquivo ${fileKey}`);
       }
@@ -52,8 +55,10 @@ export class VideoProcessingJob {
 
       // Passo 3: Transcrição via Whisper (futuro)
       // TODO: Injetar ITranscriptionService e chamar aqui
-      // const transcription = await this.transcriber.transcribe({ audioPath });
-      console.log(`[WHISPER] Transcrição pendente de implementação...`);
+      const { transcriptionData } = await this.transcriber.transcribe({
+        audioPath,
+      });
+      console.log(`[WHISPER] Transcrição realizada com sucesso.`);
       await job.updateProgress(70);
 
       // Passo 4: Construir o Deck
@@ -61,7 +66,7 @@ export class VideoProcessingJob {
       const deck = this.deckBuilder.build({
         title: fileKey,
         sourceFileKey: fileKey,
-        transcriptionData: [],
+        transcriptionData,
       });
       await job.updateProgress(85);
 

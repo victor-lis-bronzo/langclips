@@ -5,10 +5,12 @@ import {
   TranscriptionSegment,
 } from "../interfaces/deck-builder.interface";
 
-const MIN_CLIP_DURATION = 5;  // BR01: mínimo 5s
-const MAX_CLIP_DURATION = 20; // BR01: máximo 20s
-
 export class DeckBuilderService implements IDeckBuilderService {
+  constructor(
+    private readonly MIN_CLIP_DURATION: number = 5,
+    private readonly MAX_CLIP_DURATION: number = 20,
+  ) {}
+
   build({
     title,
     sourceFileKey,
@@ -21,7 +23,10 @@ export class DeckBuilderService implements IDeckBuilderService {
     const clips: Clip[] = transcriptionData
       .filter((segment) => {
         const duration = segment.end - segment.start;
-        return duration >= MIN_CLIP_DURATION && duration <= MAX_CLIP_DURATION;
+        return (
+          duration >= this.MIN_CLIP_DURATION &&
+          duration <= this.MAX_CLIP_DURATION
+        );
       })
       .map((segment) => ({
         id: uuidv4(),
