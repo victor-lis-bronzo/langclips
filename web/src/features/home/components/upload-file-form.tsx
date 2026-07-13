@@ -19,8 +19,6 @@ export function DropFileForm() {
       const response = await submitFileToR2({
         data: formData,
       });
-
-      console.log({ response });
     },
   });
 

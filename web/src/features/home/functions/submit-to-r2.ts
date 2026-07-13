@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { apiServer } from "#/lib/axios/server";
-import { startVideoJob } from "./start-video-job";
 
 export const submitFileToR2 = createServerFn({ method: "POST" })
   .validator((data: unknown) => {
@@ -49,11 +48,11 @@ export const submitFileToR2 = createServerFn({ method: "POST" })
 
     console.log("R2 upload successful");
 
-    const { jobId } = await startVideoJob({
-      data: {
-        fileKey: response.fileKey,
-      },
+    console.log("Sending job request with fileKey:", response.fileKey);
+
+    const { data: job } = await apiServer.post("videos/process", {
+      fileKey: response.fileKey,
     });
 
-    return { success: true, jobId };
+    return { success: true, jobId: job.jobId };
   });
