@@ -22,23 +22,15 @@ export class DeckBuilderService implements IDeckBuilderService {
     transcriptionData: TranscriptionSegment[];
     uploadedClips: Clip[];
   }): Deck {
-    const clips: Clip[] = uploadedClips
-      .filter((clip) => {
-        const duration = clip.endTime - clip.startTime;
-        return (
-          duration >= this.MIN_CLIP_DURATION &&
-          duration <= this.MAX_CLIP_DURATION
-        );
-      })
-      .map((clip) => {
-        return {
-          id: clip.id,
-          transcription: clip.transcription,
-          sourceFileKey: clip.sourceFileKey,
-          startTime: clip.startTime,
-          endTime: clip.endTime,
-        };
-      });
+    const clips: Clip[] = uploadedClips.map((clip) => {
+      return {
+        id: clip.id,
+        transcription: clip.transcription,
+        sourceFileKey: clip.sourceFileKey,
+        startTime: clip.startTime,
+        endTime: clip.endTime,
+      };
+    });
 
     return {
       id: uuidv4(),

@@ -7,7 +7,10 @@ import { IDeckBuilderService } from "../interfaces/deck-builder.interface";
 import { IDiskCleanupService } from "../interfaces/disk-cleanup.interface";
 import { Deck } from "../types/deck.types";
 import { ITranscriptionService } from "../interfaces/transcription.interface";
-import { IVideoClipperService } from "../interfaces/video-clipper.interface";
+import {
+  IVideoClipperService,
+  LocalGeneratedClip,
+} from "../interfaces/video-clipper.interface";
 import { IClipUploaderService } from "../interfaces/clip-uploader.interface";
 
 export class VideoProcessingJob {
@@ -31,6 +34,7 @@ export class VideoProcessingJob {
 
     const videoPath = path.join(tmpDir, `${job.id}-video`);
     const audioPath = path.join(tmpDir, `${job.id}-audio.mp3`);
+    let clips: LocalGeneratedClip[] = [];
 
     try {
       // Passo 1: Download do vídeo bruto do R2
@@ -64,16 +68,22 @@ export class VideoProcessingJob {
       console.log(`[WHISPER] Transcrição realizada com sucesso.`);
       await job.updateProgress(50);
 
+      const validRequests = transcriptionData.filter((data) => {
+        const duration = data.end - data.start;
+        return duration >= 2 && duration <= 20;
+      });
+
       // Passo 4: Gera os cortes solicitados
       const { clips: localClips, success: clipsSuccess } =
         await this.videoClipper.generateClips({
           sourceFilePath: videoPath,
-          requests: transcriptionData.map((data) => ({
+          requests: validRequests.map((data) => ({
             startTime: data.start,
             endTime: data.end,
             transcription: data.text,
           })),
         });
+      clips = localClips;
 
       if (!clipsSuccess) {
         throw new Error(`Falha ao gerar cortes para o arquivo ${fileKey}`);
@@ -81,8 +91,7 @@ export class VideoProcessingJob {
       console.log(`[CLIPPER] Cortes gerados com sucesso.`);
       await job.updateProgress(70);
 
-      const uploadedClips =
-        await this.clipUploader.upload(localClips);
+      const uploadedClips = await this.clipUploader.upload(localClips);
       await job.updateProgress(85);
 
       // Passo 5: Construir o Deck
@@ -106,8 +115,6 @@ export class VideoProcessingJob {
       await job.updateProgress(90);
 
       // Passo 7: Deletar vídeo original do R2 (BR03)
-      console.log(`[CLEANUP] Deletando vídeo original ${fileKey} do R2...`);
-      await this.storageService.delete({ fileKey });
       await job.updateProgress(100);
 
       console.log(`[FIM] Job ${job.id} concluído. Deck: ${deck.id}`);
@@ -115,7 +122,11 @@ export class VideoProcessingJob {
     } finally {
       // Limpeza de disco local (sempre executa, mesmo com erro)
       console.log(`[CLEANUP] Limpando arquivos locais...`);
-      const paths = [videoPath, audioPath];
+      const paths = [
+        videoPath,
+        audioPath,
+        ...clips.map((clip) => clip.tempFilePath),
+      ];
       await this.diskCleanup.cleanup({ paths });
       await this.storageService.delete({ fileKey });
     }

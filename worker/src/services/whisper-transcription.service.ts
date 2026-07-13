@@ -20,7 +20,7 @@ export class WhisperTranscriptionService implements ITranscriptionService {
     formData.append("response_format", "verbose_json"); // Absolutamente necessário para obter os timestamps
     formData.append("timestamp_granularities[]", "word");
     formData.append("timestamp_granularities[]", "segment");
-
+    
     try {
       const response = await axios.post<WhisperResponse>(
         "https://api.groq.com/openai/v1/audio/transcriptions",
