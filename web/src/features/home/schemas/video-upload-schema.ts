@@ -6,8 +6,8 @@ export const videoUploadSchema = z.object({
       message: "Você precisa selecionar um arquivo de vídeo.",
     })
     .refine(
-      (file) => file.size <= 50 * 1024 * 1024,
-      "O vídeo excede o limite estrito de 50MB.",
+      (file) => file.size <= 100 * 1024 * 1024,
+      "O vídeo excede o limite estrito de 100MB.",
     )
     .refine(
       (file) => ["video/mp4", "video/quicktime"].includes(file.type),

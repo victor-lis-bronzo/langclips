@@ -7,19 +7,33 @@ import { s3Client } from "./config/s3-client";
 
 import { R2StorageService } from "./services/r2-storage.service";
 import { FFmpegAudioExtractorService } from "./services/ffmpeg-audio-extractor.service";
+import { WhisperTranscriptionService } from "./services/whisper-transcription.service";
+import { FFmpegVideoClipperService } from "./services/ffmpeg-video-clipper.service";
 import { DeckBuilderService } from "./services/deck-builder.service";
 import { LocalDiskCleanupService } from "./services/local-disk-cleanup.service";
 import { VideoProcessingJob } from "./job/video-processing.job";
-import { VideoProcessingJobType } from "./types/job.types";
 
-// --- Composition Root: monta as dependências ---
+import { VideoProcessingJobType } from "./types/job.types";
+import { ClipUploaderService } from "./services/clip-uploader.service";
+import { FFmpegAudioChunkerService } from "./services/ffmpeg-audio-chunker.service";
+
 const storageService = new R2StorageService(s3Client, env.STORAGE_BUCKET_NAME);
 const audioExtractor = new FFmpegAudioExtractorService();
+const audioChunker = new FFmpegAudioChunkerService();
+const whisperTranscriber = new WhisperTranscriptionService(
+  env.GROQ_API_KEY,
+  audioChunker,
+);
+const videoClipper = new FFmpegVideoClipperService();
 const deckBuilder = new DeckBuilderService();
+const clipUploader = new ClipUploaderService(storageService);
 const diskCleanup = new LocalDiskCleanupService();
 const videoJob = new VideoProcessingJob(
   storageService,
   audioExtractor,
+  whisperTranscriber,
+  videoClipper,
+  clipUploader,
   deckBuilder,
   diskCleanup,
 );
