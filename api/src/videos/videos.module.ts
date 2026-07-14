@@ -3,6 +3,7 @@ import { VideosController } from './videos.controller';
 import { BullModule } from '@nestjs/bullmq';
 import { BullBoardModule } from '@bull-board/nestjs';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
+import { VideoEventsService } from './video-events.service';
 
 @Module({
   imports: [
@@ -15,5 +16,6 @@ import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
     }),
   ],
   controllers: [VideosController],
+  providers: [VideoEventsService],
 })
 export class VideosModule {}
