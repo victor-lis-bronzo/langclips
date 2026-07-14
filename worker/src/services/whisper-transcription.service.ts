@@ -74,7 +74,8 @@ export class WhisperTranscriptionService implements ITranscriptionService {
 
         const data = response.data;
 
-        const confidentSegments = this.filterConfidentSegments(data.segments);
+        const consolidatedSegments = this.consolidateSegments(data.segments);
+        const confidentSegments = this.filterConfidentSegments(consolidatedSegments);
         let transcriptionData = this.mapToDeckSegments(confidentSegments);
 
         if (chunk.startTimeOffset > 0) {
@@ -127,5 +128,125 @@ export class WhisperTranscriptionService implements ITranscriptionService {
       start: seg.start,
       end: seg.end,
     }));
+  }
+
+  private consolidateSegments(segments: WhisperSegment[]): WhisperSegment[] {
+    if (segments.length === 0) return [];
+
+    const consolidated: WhisperSegment[] = [];
+    let currentGroup: WhisperSegment[] = [];
+
+    const MAX_DURATION = 15; // 15 seconds
+    const MIN_DURATION = 5;  // 5 seconds
+    const MAX_GAP = 2.0;     // 2 seconds gap of silence
+
+    const isSentenceEnd = (text: string): boolean => {
+      const trimmed = text.trim();
+      const cleanText = trimmed.replace(/["'”’]+$/, "");
+      return /[.!?]$/.test(cleanText);
+    };
+
+    for (const seg of segments) {
+      if (currentGroup.length > 0) {
+        const lastInGroup = currentGroup[currentGroup.length - 1];
+        const gap = seg.start - lastInGroup.end;
+        const groupStart = currentGroup[0].start;
+        const currentDuration = seg.end - groupStart;
+
+        // Se houver um gap muito grande de silêncio, ou se adicionar este segmento estourar a duração máxima
+        if (gap > MAX_GAP || currentDuration > MAX_DURATION) {
+          consolidated.push(this.mergeSegments(currentGroup));
+          currentGroup = [seg];
+          continue;
+        }
+      }
+
+      currentGroup.push(seg);
+
+      const groupStart = currentGroup[0].start;
+      const duration = seg.end - groupStart;
+      const endsWithSentencePunctuation = isSentenceEnd(seg.text);
+
+      if (endsWithSentencePunctuation && duration >= MIN_DURATION) {
+        consolidated.push(this.mergeSegments(currentGroup));
+        currentGroup = [];
+      }
+    }
+
+    if (currentGroup.length > 0) {
+      const mergedResidual = this.mergeSegments(currentGroup);
+      const residualDuration = mergedResidual.end - mergedResidual.start;
+
+      // Se o grupo residual for menor que a duração mínima e já temos outros consolidados,
+      // tentamos mesclar com o último consolidado se a duração combinada não passar de MAX_DURATION.
+      if (residualDuration < MIN_DURATION && consolidated.length > 0) {
+        const lastConsolidated = consolidated[consolidated.length - 1];
+        const combinedDuration = mergedResidual.end - lastConsolidated.start;
+        const gap = mergedResidual.start - lastConsolidated.end;
+
+        if (combinedDuration <= MAX_DURATION && gap <= MAX_GAP) {
+          consolidated.pop();
+          consolidated.push(this.mergeSegments([lastConsolidated, mergedResidual]));
+        } else {
+          consolidated.push(mergedResidual);
+        }
+      } else {
+        consolidated.push(mergedResidual);
+      }
+    }
+
+    return consolidated;
+  }
+
+  private mergeSegments(group: WhisperSegment[]): WhisperSegment {
+    if (group.length === 1) return group[0];
+
+    const first = group[0];
+    const last = group[group.length - 1];
+
+    const mergedText = group
+      .map((s) => s.text.trim())
+      .filter(Boolean)
+      .join(" ");
+
+    const mergedTokens = group.flatMap((s) => s.tokens || []);
+    const mergedWords = group.some((s) => s.words)
+      ? group.flatMap((s) => s.words || [])
+      : undefined;
+
+    // Calcula médias ponderadas pela duração para os metadados de confiança
+    let totalDuration = 0;
+    let sumLogprob = 0;
+    let sumCompressionRatio = 0;
+    let sumNoSpeechProb = 0;
+    let sumTemp = 0;
+
+    for (const s of group) {
+      const d = Math.max(s.end - s.start, 0.001);
+      totalDuration += d;
+      sumLogprob += s.avg_logprob * d;
+      sumCompressionRatio += s.compression_ratio * d;
+      sumNoSpeechProb += s.no_speech_prob * d;
+      sumTemp += s.temperature * d;
+    }
+
+    const avgLogprob = sumLogprob / totalDuration;
+    const compressionRatio = sumCompressionRatio / totalDuration;
+    const noSpeechProb = sumNoSpeechProb / totalDuration;
+    const temp = sumTemp / totalDuration;
+
+    return {
+      id: first.id,
+      seek: first.seek,
+      start: first.start,
+      end: last.end,
+      text: mergedText,
+      tokens: mergedTokens,
+      temperature: temp,
+      avg_logprob: avgLogprob,
+      compression_ratio: compressionRatio,
+      no_speech_prob: noSpeechProb,
+      words: mergedWords,
+    };
   }
 }
