@@ -18,6 +18,7 @@ export class FFmpegAudioExtractorService implements IAudioExtractorService {
   }): Promise<{ outputPath: string; success: boolean }> {
     return new Promise((resolve, reject) => {
       ffmpeg(videoPath)
+        .duration(60)
         .noVideo()
         .audioCodec("libmp3lame")
         .audioQuality(2)
