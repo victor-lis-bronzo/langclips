@@ -97,9 +97,8 @@ export class VideoProcessingJob {
       // Passo 5: Construir o Deck
       console.log(`[DECK] Construindo deck...`);
       const deck = this.deckBuilder.build({
-        title: fileKey,
+        jobId: job.id!,
         sourceFileKey: fileKey,
-        transcriptionData,
         uploadedClips,
       });
       await job.updateProgress(85);

@@ -1,35 +1,29 @@
-import { v4 as uuidv4 } from "uuid";
 import { Deck, Clip } from "../types/deck.types";
-import {
-  IDeckBuilderService,
-  TranscriptionSegment,
-} from "../interfaces/deck-builder.interface";
+import { IDeckBuilderService } from "../interfaces/deck-builder.interface";
 
 export class DeckBuilderService implements IDeckBuilderService {
   build({
-    title,
+    jobId,
     sourceFileKey,
-    transcriptionData,
     uploadedClips,
   }: {
-    title: string;
+    jobId: string;
     sourceFileKey: string;
-    transcriptionData: TranscriptionSegment[];
     uploadedClips: Clip[];
   }): Deck {
-    const clips: Clip[] = uploadedClips.map((clip) => {
-      return {
-        id: clip.id,
-        transcription: clip.transcription,
-        sourceFileKey: clip.sourceFileKey,
-        startTime: clip.startTime,
-        endTime: clip.endTime,
-      };
-    });
+    const clips: Omit<Clip, "startTime" | "endTime">[] = uploadedClips.map(
+      (clip) => {
+        return {
+          id: clip.id,
+          transcription: clip.transcription,
+          sourceFileKey: clip.sourceFileKey,
+        };
+      },
+    );
 
     return {
-      id: uuidv4(),
-      title,
+      id: jobId,
+      sourceFileKey,
       clips,
       createdAt: Date.now(),
     };

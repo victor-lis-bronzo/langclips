@@ -8,7 +8,7 @@ export interface Clip {
 
 export interface Deck {
   id: string;
-  title: string;
-  clips: Clip[];
+  sourceFileKey: string;
+  clips: Omit<Clip, "startTime" | "endTime">[];
   createdAt: number;
 }

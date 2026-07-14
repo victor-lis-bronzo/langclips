@@ -2,6 +2,7 @@ import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { ProcessVideoDto } from './dtos/process-video.dto';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
+import { randomUUID } from 'crypto';
 
 @Controller('videos')
 export class VideosController {
@@ -12,9 +13,15 @@ export class VideosController {
   @Post('process')
   @HttpCode(HttpStatus.ACCEPTED)
   async process(@Body() body: ProcessVideoDto) {
-    const job = await this.videoQueue.add('extract-audio-and-transcribe', {
-      fileKey: body.fileKey,
-    });
+    const job = await this.videoQueue.add(
+      'extract-audio-and-transcribe',
+      {
+        fileKey: body.fileKey,
+      },
+      {
+        jobId: randomUUID(),
+      },
+    );
 
     return {
       message: 'Upload acknowledged and job queued.',

@@ -11,9 +11,8 @@ export interface IDeckBuilderService {
    * Constrói um Deck a partir do título, dados de transcrição e clipes enviados.
    */
   build(params: {
-    title: string;
+    jobId: string;
     sourceFileKey: string;
-    transcriptionData: TranscriptionSegment[];
     uploadedClips: Clip[];
   }): Deck;
 }
