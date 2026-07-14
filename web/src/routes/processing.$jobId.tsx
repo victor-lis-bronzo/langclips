@@ -1,7 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useVideoProcessing } from "#/features/processing/hooks/use-video-processing";
 import { ProcessingHeader } from "#/features/processing/components/processing-header";
-import { ProcessingStepper, PROCESS_STEPS } from "#/features/processing/components/processing-stepper";
+import {
+  ProcessingStepper,
+  PROCESS_STEPS,
+} from "#/features/processing/components/processing-stepper";
 import { ProcessingErrorCard } from "#/features/processing/components/processing-error-card";
 
 export const Route = createFileRoute("/processing/$jobId")({
@@ -18,7 +21,8 @@ function ProcessingRoute() {
 }
 
 export function ProcessingScreen({ jobId }: { jobId: string }) {
-  const { progress, currentStep, status, result, error } = useVideoProcessing(jobId);
+  const { progress, currentStep, status, result, error } =
+    useVideoProcessing(jobId);
 
   if (status === "failed") {
     return <ProcessingErrorCard error={error} />;
@@ -27,6 +31,8 @@ export function ProcessingScreen({ jobId }: { jobId: string }) {
   // Obter label do passo atual para subtítulo dinâmico no cabeçalho
   const activeStep = PROCESS_STEPS.find((s) => s.id === currentStep);
   const currentStepLabel = activeStep ? activeStep.label : null;
+
+  console.log({ result });
 
   return (
     <div className="w-full max-w-xl mx-auto flex flex-col gap-6">
@@ -39,7 +45,7 @@ export function ProcessingScreen({ jobId }: { jobId: string }) {
       <ProcessingStepper
         currentStep={currentStep}
         status={status}
-        result={result}
+        result={result?.deck ?? null}
       />
     </div>
   );

@@ -23,7 +23,9 @@ export function ProcessingStepper({
   status,
   result,
 }: ProcessingStepperProps) {
-  const getStepState = (stepId: string): "completed" | "processing" | "pending" => {
+  const getStepState = (
+    stepId: string,
+  ): "completed" | "processing" | "pending" => {
     if (status === "completed") return "completed";
 
     const currentIndex = PROCESS_STEPS.findIndex((s) => s.id === currentStep);
@@ -38,17 +40,19 @@ export function ProcessingStepper({
     return "pending";
   };
 
-  const activeIndex = status === "completed"
-    ? PROCESS_STEPS.length
-    : PROCESS_STEPS.findIndex((s) => s.id === currentStep);
+  const activeIndex =
+    status === "completed"
+      ? PROCESS_STEPS!.length
+      : PROCESS_STEPS.findIndex((s) => s.id === currentStep);
 
   const resolvedActiveIndex = activeIndex === -1 ? 0 : activeIndex;
-  
+
   // Altura dinâmica: 1 card (80px) ou 2 cards + espaçamento (170px)
   const containerHeight = resolvedActiveIndex === 0 ? "80px" : "170px";
-  
+
   // Deslocamento vertical: (índice_ativo - 1) * (altura + gap)
-  const translateOffset = resolvedActiveIndex === 0 ? 0 : (resolvedActiveIndex - 1) * 90;
+  const translateOffset =
+    resolvedActiveIndex === 0 ? 0 : (resolvedActiveIndex - 1) * 90;
 
   return (
     <div className="flex flex-col gap-3">
@@ -77,9 +81,7 @@ export function ProcessingStepper({
           })}
 
           {/* Card de Sucesso inserido ao final do track de rolagem */}
-          {result && (
-            <ProcessingSuccessCard result={result} />
-          )}
+          {result && <ProcessingSuccessCard result={result} />}
         </div>
       </div>
     </div>
