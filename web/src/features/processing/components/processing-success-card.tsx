@@ -6,7 +6,6 @@ interface ProcessingSuccessCardProps {
 }
 
 export function ProcessingSuccessCard({ result }: ProcessingSuccessCardProps) {
-  console.log({ result });
   const clipsCount = result.clips?.length || 0;
 
   return (
