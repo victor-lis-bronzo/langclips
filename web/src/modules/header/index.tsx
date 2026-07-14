@@ -3,7 +3,7 @@ import HeaderRoot from "./pieces/root";
 import HeaderTitle from "./pieces/title";
 
 export const Header = {
-  Root: HeaderRoot,
-  Title: HeaderTitle,
-  Description: HeaderDescription,
+	Root: HeaderRoot,
+	Title: HeaderTitle,
+	Description: HeaderDescription,
 };
