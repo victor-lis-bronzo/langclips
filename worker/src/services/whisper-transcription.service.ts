@@ -130,6 +130,37 @@ export class WhisperTranscriptionService implements ITranscriptionService {
     }));
   }
 
+  private isSentenceEnd(text: string): boolean {
+    const cleanText = text.trim().replace(/["'"']+$/, "");
+    return /[.!?]$/.test(cleanText);
+  }
+
+  /**
+   * Tenta cortar o texto de um segmento no último ponto de pontuação finalizadora (.!?),
+   * ajustando proporcionalmente o timestamp `end` com base no índice do caractere no texto.
+   * Usamos interpolação de tempo porque o Groq não retorna `words` para whisper-large-v3.
+   */
+  private trimToLastPunctuation(segment: WhisperSegment): WhisperSegment {
+    if (this.isSentenceEnd(segment.text)) return segment;
+
+    const text = segment.text.trim();
+    // Encontra o índice do último . ! ? no texto (ignorando aspas/símbolos após ele)
+    const match = text.match(/^(.*[.!?])[^.!?]*$/);
+    if (!match) return segment; // Nenhuma pontuação encontrada, retorna original
+
+    const trimmedText = match[1].trim();
+    // Interpolação linear: proporcional ao tamanho do texto que foi preservado
+    const ratio = trimmedText.length / text.length;
+    const duration = segment.end - segment.start;
+    const newEnd = segment.start + duration * ratio;
+
+    return {
+      ...segment,
+      text: trimmedText,
+      end: parseFloat(newEnd.toFixed(3)),
+    };
+  }
+
   private consolidateSegments(segments: WhisperSegment[]): WhisperSegment[] {
     if (segments.length === 0) return [];
 
@@ -140,12 +171,6 @@ export class WhisperTranscriptionService implements ITranscriptionService {
     const MIN_DURATION = 5;  // 5 seconds
     const MAX_GAP = 2.0;     // 2 seconds gap of silence
 
-    const isSentenceEnd = (text: string): boolean => {
-      const trimmed = text.trim();
-      const cleanText = trimmed.replace(/["'”’]+$/, "");
-      return /[.!?]$/.test(cleanText);
-    };
-
     for (const seg of segments) {
       if (currentGroup.length > 0) {
         const lastInGroup = currentGroup[currentGroup.length - 1];
@@ -155,7 +180,8 @@ export class WhisperTranscriptionService implements ITranscriptionService {
 
         // Se houver um gap muito grande de silêncio, ou se adicionar este segmento estourar a duração máxima
         if (gap > MAX_GAP || currentDuration > MAX_DURATION) {
-          consolidated.push(this.mergeSegments(currentGroup));
+          // Aplica trim antes de empurrar, para garantir que não fechamos com frase incompleta
+          consolidated.push(this.trimToLastPunctuation(this.mergeSegments(currentGroup)));
           currentGroup = [seg];
           continue;
         }
@@ -165,48 +191,36 @@ export class WhisperTranscriptionService implements ITranscriptionService {
 
       const groupStart = currentGroup[0].start;
       const duration = seg.end - groupStart;
-      const endsWithSentencePunctuation = isSentenceEnd(seg.text);
 
-      if (endsWithSentencePunctuation && duration >= MIN_DURATION) {
+      if (this.isSentenceEnd(seg.text) && duration >= MIN_DURATION) {
         consolidated.push(this.mergeSegments(currentGroup));
         currentGroup = [];
       }
     }
 
     if (currentGroup.length > 0) {
-      const mergedResidual = this.mergeSegments(currentGroup);
+      const mergedResidual = this.trimToLastPunctuation(this.mergeSegments(currentGroup));
       const residualDuration = mergedResidual.end - mergedResidual.start;
-      const hasPunctuation = isSentenceEnd(mergedResidual.text);
+      const hasPunctuation = this.isSentenceEnd(mergedResidual.text);
 
       if (residualDuration >= MIN_DURATION) {
-        // É grande o suficiente, mantemos (mesmo sem pontuação, pois pode ter sido cortado no final)
         consolidated.push(mergedResidual);
-      } else {
-        // Se o grupo residual for menor que a duração mínima
-        if (consolidated.length > 0) {
-          const lastConsolidated = consolidated[consolidated.length - 1];
-          const combinedDuration = mergedResidual.end - lastConsolidated.start;
-          const gap = mergedResidual.start - lastConsolidated.end;
-          
-          const lastHasPunctuation = isSentenceEnd(lastConsolidated.text);
+      } else if (consolidated.length > 0) {
+        const lastConsolidated = consolidated[consolidated.length - 1];
+        const combinedDuration = mergedResidual.end - lastConsolidated.start;
+        const gap = mergedResidual.start - lastConsolidated.end;
+        const lastHasPunctuation = this.isSentenceEnd(lastConsolidated.text);
 
-          // Tenta mesclar para trás. Só mescla se:
-          // 1. Não estourar o limite de tempo e gap.
-          // 2. Não sujar uma frase já perfeitamente pontuada com um fragmento solto (sem pontuação).
-          if (combinedDuration <= MAX_DURATION && gap <= MAX_GAP && (!lastHasPunctuation || hasPunctuation)) {
-            consolidated.pop();
-            consolidated.push(this.mergeSegments([lastConsolidated, mergedResidual]));
-          } else {
-            // Não pode mesclar. Se o fragmento for inútil (sem pontuação e muito curto), nós o descartamos
-            // para não poluir os clips finais gerados.
-            if (hasPunctuation) {
-              consolidated.push(mergedResidual);
-            }
-          }
-        } else {
-          // É o único segmento que temos, então não descartamos.
+        // Só mescla se não sujar uma frase já bem terminada com fragmento sem pontuação
+        if (combinedDuration <= MAX_DURATION && gap <= MAX_GAP && (!lastHasPunctuation || hasPunctuation)) {
+          consolidated.pop();
+          consolidated.push(this.mergeSegments([lastConsolidated, mergedResidual]));
+        } else if (hasPunctuation) {
           consolidated.push(mergedResidual);
         }
+        // else: descarta fragmento solto sem pontuação
+      } else {
+        consolidated.push(mergedResidual);
       }
     }
 
