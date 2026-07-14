@@ -39,7 +39,7 @@ export class VideoProcessingJob {
     try {
       // Passo 1: Download do vídeo bruto do R2
       console.log(`[DOWNLOAD] Baixando ${fileKey}...`);
-      await job.updateProgress(10);
+      await job.updateProgress({ step: "download", percentage: 5 });
       const { success: downloadSucess } = await this.storageService.download({
         fileKey,
         destinationPath: videoPath,
@@ -47,10 +47,10 @@ export class VideoProcessingJob {
       if (!downloadSucess) {
         throw new Error(`Falha ao baixar arquivo ${fileKey}`);
       }
-      await job.updateProgress(15);
 
       // Passo 2: Extração de áudio com FFmpeg
       console.log(`[FFMPEG] Extraindo áudio...`);
+      await job.updateProgress({ step: "audio-extraction", percentage: 20 });
       const { outputPath, success: extractionSuccess } =
         await this.audioExtractor.extract({
           videoPath,
@@ -59,14 +59,14 @@ export class VideoProcessingJob {
       if (!extractionSuccess) {
         throw new Error(`Falha ao extrair áudio do arquivo ${fileKey}`);
       }
-      await job.updateProgress(30);
 
       // Passo 3: Transcrição via Whisper (futuro)
+      console.log(`[WHISPER] Transcrevendo áudio...`);
+      await job.updateProgress({ step: "transcription", percentage: 40 });
       const { transcriptionData } = await this.transcriber.transcribe({
         audioPath,
       });
       console.log(`[WHISPER] Transcrição realizada com sucesso.`);
-      await job.updateProgress(50);
 
       const validRequests = transcriptionData.filter((data) => {
         const duration = data.end - data.start;
@@ -74,6 +74,8 @@ export class VideoProcessingJob {
       });
 
       // Passo 4: Gera os cortes solicitados
+      console.log(`[CLIPPER] Gerando cortes...`);
+      await job.updateProgress({ step: "clip-generation", percentage: 60 });
       const { clips: localClips, success: clipsSuccess } =
         await this.videoClipper.generateClips({
           sourceFilePath: videoPath,
@@ -89,32 +91,30 @@ export class VideoProcessingJob {
         throw new Error(`Falha ao gerar cortes para o arquivo ${fileKey}`);
       }
       console.log(`[CLIPPER] Cortes gerados com sucesso.`);
-      await job.updateProgress(70);
 
+      // Passo 5: Upload dos cortes gerados
+      console.log(`[UPLOAD] Enviando cortes para o R2...`);
+      await job.updateProgress({ step: "clip-upload", percentage: 75 });
       const uploadedClips = await this.clipUploader.upload(localClips);
-      await job.updateProgress(85);
 
-      // Passo 5: Construir o Deck
+      // Passo 6: Construir o Deck
       console.log(`[DECK] Construindo deck...`);
+      await job.updateProgress({ step: "deck-construction", percentage: 85 });
       const deck = this.deckBuilder.build({
         jobId: job.id!,
         sourceFileKey: fileKey,
         uploadedClips,
       });
-      await job.updateProgress(85);
 
-      // Passo 6: Upload do Deck (JSON) para o R2
+      // Passo 7: Upload do Deck (JSON) para o R2
       console.log(`[UPLOAD] Salvando deck no R2...`);
+      await job.updateProgress({ step: "deck-upload", percentage: 95 });
       const deckKey = `decks/${deck.id}.json`;
       await this.storageService.upload({
         fileKey: deckKey,
         body: JSON.stringify(deck),
         contentType: "application/json",
       });
-      await job.updateProgress(90);
-
-      // Passo 7: Deletar vídeo original do R2 (BR03)
-      await job.updateProgress(100);
 
       console.log(`[FIM] Job ${job.id} concluído. Deck: ${deck.id}`);
       return { status: "success", deck };

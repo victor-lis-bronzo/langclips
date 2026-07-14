@@ -7,6 +7,7 @@ type JobStatus = "idle" | "processing" | "completed" | "failed";
 
 export function useVideoProcessing(jobId: string | null) {
 	const [progress, setProgress] = useState(0);
+	const [currentStep, setCurrentStep] = useState<string | null>(null);
 	const [status, setStatus] = useState<JobStatus>("idle");
 	const [result, setResult] = useState<Deck | null>(null);
 	const [error, setError] = useState<string | null>(null);
@@ -24,19 +25,26 @@ export function useVideoProcessing(jobId: string | null) {
 			const payload = JSON.parse(event.data);
 
 			if (payload.status === "processing") {
-				setProgress(payload.progress || 0);
+				if (typeof payload.progress === "object" && payload.progress !== null) {
+					setProgress(payload.progress.percentage ?? 0);
+					setCurrentStep(payload.progress.step ?? null);
+				} else {
+					setProgress(payload.progress ?? 0);
+				}
 			}
 
 			if (payload.status === "completed") {
 				setStatus("completed");
 				setResult(payload.result);
 				setProgress(100);
+				setCurrentStep(null);
 				eventSource.close();
 			}
 
 			if (payload.status === "failed") {
 				setStatus("failed");
 				setError(payload.error);
+				setCurrentStep(null);
 				eventSource.close();
 			}
 		};
@@ -50,5 +58,5 @@ export function useVideoProcessing(jobId: string | null) {
 		};
 	}, [jobId]);
 
-	return { progress, status, result, error };
+	return { progress, currentStep, status, result, error };
 }

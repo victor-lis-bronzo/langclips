@@ -44,6 +44,15 @@ export class VideoEventsService implements OnModuleDestroy {
             });
             subscriber.complete();
             return;
+          } else {
+            if (job.progress) {
+              subscriber.next({
+                data: {
+                  status: 'processing',
+                  progress: job.progress,
+                },
+              });
+            }
           }
         });
       });
