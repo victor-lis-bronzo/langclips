@@ -176,22 +176,37 @@ export class WhisperTranscriptionService implements ITranscriptionService {
     if (currentGroup.length > 0) {
       const mergedResidual = this.mergeSegments(currentGroup);
       const residualDuration = mergedResidual.end - mergedResidual.start;
+      const hasPunctuation = isSentenceEnd(mergedResidual.text);
 
-      // Se o grupo residual for menor que a duração mínima e já temos outros consolidados,
-      // tentamos mesclar com o último consolidado se a duração combinada não passar de MAX_DURATION.
-      if (residualDuration < MIN_DURATION && consolidated.length > 0) {
-        const lastConsolidated = consolidated[consolidated.length - 1];
-        const combinedDuration = mergedResidual.end - lastConsolidated.start;
-        const gap = mergedResidual.start - lastConsolidated.end;
+      if (residualDuration >= MIN_DURATION) {
+        // É grande o suficiente, mantemos (mesmo sem pontuação, pois pode ter sido cortado no final)
+        consolidated.push(mergedResidual);
+      } else {
+        // Se o grupo residual for menor que a duração mínima
+        if (consolidated.length > 0) {
+          const lastConsolidated = consolidated[consolidated.length - 1];
+          const combinedDuration = mergedResidual.end - lastConsolidated.start;
+          const gap = mergedResidual.start - lastConsolidated.end;
+          
+          const lastHasPunctuation = isSentenceEnd(lastConsolidated.text);
 
-        if (combinedDuration <= MAX_DURATION && gap <= MAX_GAP) {
-          consolidated.pop();
-          consolidated.push(this.mergeSegments([lastConsolidated, mergedResidual]));
+          // Tenta mesclar para trás. Só mescla se:
+          // 1. Não estourar o limite de tempo e gap.
+          // 2. Não sujar uma frase já perfeitamente pontuada com um fragmento solto (sem pontuação).
+          if (combinedDuration <= MAX_DURATION && gap <= MAX_GAP && (!lastHasPunctuation || hasPunctuation)) {
+            consolidated.pop();
+            consolidated.push(this.mergeSegments([lastConsolidated, mergedResidual]));
+          } else {
+            // Não pode mesclar. Se o fragmento for inútil (sem pontuação e muito curto), nós o descartamos
+            // para não poluir os clips finais gerados.
+            if (hasPunctuation) {
+              consolidated.push(mergedResidual);
+            }
+          }
         } else {
+          // É o único segmento que temos, então não descartamos.
           consolidated.push(mergedResidual);
         }
-      } else {
-        consolidated.push(mergedResidual);
       }
     }
 
