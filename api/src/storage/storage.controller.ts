@@ -5,7 +5,7 @@ import { StorageService } from './storage.service';
 export class StorageController {
   constructor(private readonly storageService: StorageService) {}
 
-  @Get('download-url/')
+  @Get('download-url')
   async getDownloadUrl(@Query('fileKey') fileKey: string) {
     const downloadUrl = await this.storageService.generateDownloadUrl(fileKey);
     return { downloadUrl };
