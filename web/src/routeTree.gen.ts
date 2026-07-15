@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProcessingJobIdRouteImport } from './routes/processing.$jobId'
+import { Route as ExercisesDeckDeckIdClipClipIdRouteImport } from './routes/exercises.deck.$deckId.clip.$clipId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +23,45 @@ const ProcessingJobIdRoute = ProcessingJobIdRouteImport.update({
   path: '/processing/$jobId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExercisesDeckDeckIdClipClipIdRoute =
+  ExercisesDeckDeckIdClipClipIdRouteImport.update({
+    id: '/exercises/deck/$deckId/clip/$clipId',
+    path: '/exercises/deck/$deckId/clip/$clipId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/processing/$jobId': typeof ProcessingJobIdRoute
+  '/exercises/deck/$deckId/clip/$clipId': typeof ExercisesDeckDeckIdClipClipIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/processing/$jobId': typeof ProcessingJobIdRoute
+  '/exercises/deck/$deckId/clip/$clipId': typeof ExercisesDeckDeckIdClipClipIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/processing/$jobId': typeof ProcessingJobIdRoute
+  '/exercises/deck/$deckId/clip/$clipId': typeof ExercisesDeckDeckIdClipClipIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/processing/$jobId'
+  fullPaths: '/' | '/processing/$jobId' | '/exercises/deck/$deckId/clip/$clipId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/processing/$jobId'
-  id: '__root__' | '/' | '/processing/$jobId'
+  to: '/' | '/processing/$jobId' | '/exercises/deck/$deckId/clip/$clipId'
+  id:
+    | '__root__'
+    | '/'
+    | '/processing/$jobId'
+    | '/exercises/deck/$deckId/clip/$clipId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProcessingJobIdRoute: typeof ProcessingJobIdRoute
+  ExercisesDeckDeckIdClipClipIdRoute: typeof ExercisesDeckDeckIdClipClipIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +80,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProcessingJobIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/exercises/deck/$deckId/clip/$clipId': {
+      id: '/exercises/deck/$deckId/clip/$clipId'
+      path: '/exercises/deck/$deckId/clip/$clipId'
+      fullPath: '/exercises/deck/$deckId/clip/$clipId'
+      preLoaderRoute: typeof ExercisesDeckDeckIdClipClipIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProcessingJobIdRoute: ProcessingJobIdRoute,
+  ExercisesDeckDeckIdClipClipIdRoute: ExercisesDeckDeckIdClipClipIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

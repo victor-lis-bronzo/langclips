@@ -1,6 +1,7 @@
 import { ProcessingStepCard } from "./processing-step-card";
 import { ProcessingSuccessCard } from "./processing-success-card";
 import type { Deck } from "../types/deck.types";
+import { useNavigate } from "@tanstack/react-router";
 
 interface ProcessingStepperProps {
   currentStep: string | null;
@@ -24,6 +25,15 @@ export function ProcessingStepper({
   status,
   result,
 }: ProcessingStepperProps) {
+  const navigate = useNavigate();
+
+  if (status === "saved" && result) {
+    navigate({
+      to: "/exercises/deck/$deckId/clip/$clipId",
+      params: { deckId: result.id, clipId: result.clips?.[0]?.id },
+    });
+  }
+
   const getStepState = (
     stepId: string,
   ): "completed" | "processing" | "pending" => {
@@ -83,13 +93,12 @@ export function ProcessingStepper({
           })}
 
           {/* Card de Sucesso inserido ao final do track de rolagem */}
-          {status === "saved" && result && (
+          {/* {status === "saved" && result && (
             <ProcessingSuccessCard result={result} />
-          )}
+          )} */}
         </div>
       </div>
     </div>
   );
 }
 export { PROCESS_STEPS };
-
