@@ -4,6 +4,8 @@ import {
   PutObjectCommand,
   ListObjectsV2Command,
   ListObjectsV2CommandOutput,
+  GetObjectCommand,
+  DeleteObjectsCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { randomUUID } from 'crypto';
@@ -73,5 +75,29 @@ export class StorageService {
     });
 
     return { uploadUrl, fileKey };
+  }
+
+  async generateDownloadUrl(fileKey: string): Promise<string> {
+    const command = new GetObjectCommand({
+      Bucket: process.env.STORAGE_BUCKET_NAME,
+      Key: fileKey,
+    });
+
+    const downloadUrl = await getSignedUrl(this.client, command, {
+      expiresIn: 300,
+    });
+
+    return downloadUrl;
+  }
+
+  async deleteMany(fileKeys: string[]) {
+    const command = new DeleteObjectsCommand({
+      Bucket: process.env.STORAGE_BUCKET_NAME,
+      Delete: {
+        Objects: fileKeys.map((key) => ({ Key: key })),
+      },
+    });
+
+    await this.client.send(command);
   }
 }

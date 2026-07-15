@@ -2,6 +2,7 @@ import { Module, Global } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config'
 import { S3Client } from '@aws-sdk/client-s3';
 import { StorageService } from './storage.service';
+import { StorageController } from './storage.controller';
 
 @Global()
 @Module({
@@ -32,5 +33,6 @@ import { StorageService } from './storage.service';
     StorageService,
   ],
   exports: [StorageService, S3Client],
+  controllers: [StorageController],
 })
 export class StorageModule {}
