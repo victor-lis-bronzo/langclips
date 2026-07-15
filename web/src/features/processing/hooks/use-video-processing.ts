@@ -96,6 +96,7 @@ export function useVideoProcessing(jobId: string | null) {
                 : "Falha ao salvar o deck localmente.",
             );
             setCurrentStep(null);
+            eventSource.close();
           }
         })();
       }

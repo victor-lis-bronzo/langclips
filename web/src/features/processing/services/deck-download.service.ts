@@ -22,7 +22,7 @@ export class DeckDownloadService {
     const downloadPromises = deck.clips.map(async (clip) => {
       // 1. Obter a URL presignada de leitura na API NestJS
       const response = await axios.get<{ downloadUrl: string }>(
-        `${API_BASE_URL}/storage/download-url/`,
+        `${API_BASE_URL}/storage/download-url`,
         {
           params: { fileKey: clip.sourceFileKey },
         },

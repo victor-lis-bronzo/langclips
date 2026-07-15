@@ -24,15 +24,14 @@ export function ProcessingScreen({ jobId }: { jobId: string }) {
   const { progress, currentStep, status, result, error } =
     useVideoProcessing(jobId);
 
+  console.log({ progress, currentStep, status });
+
   if (status === "failed" || status === "download-failed") {
     return <ProcessingErrorCard error={error} />;
   }
 
-  // Obter label do passo atual para subtítulo dinâmico no cabeçalho
   const activeStep = PROCESS_STEPS.find((s) => s.id === currentStep);
   const currentStepLabel = activeStep ? activeStep.label : null;
-
-  console.log({ result });
 
   return (
     <div className="w-full max-w-xl mx-auto flex flex-col gap-6">
