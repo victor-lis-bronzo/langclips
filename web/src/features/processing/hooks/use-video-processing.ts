@@ -72,6 +72,7 @@ export function useVideoProcessing(jobId: string | null) {
               await downloadService.downloadDeckAssets(deck);
 
             // 2. Salvar no IndexedDB
+            await storageRepository.cleanUp();
             await storageRepository.saveDeck(deckRecord);
             for (const clipRecord of clipRecords) {
               await storageRepository.saveClip(clipRecord);

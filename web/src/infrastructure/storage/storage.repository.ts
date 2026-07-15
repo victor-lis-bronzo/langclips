@@ -8,4 +8,5 @@ export interface IDeckStorageRepository {
   getClipBlob(sourceFileKey: string): Promise<Blob | null>;
   deleteDeck(deckId: string): Promise<void>;
   deleteClipsByDeck(deckId: string): Promise<void>;
+  cleanUp(): Promise<void>;
 }

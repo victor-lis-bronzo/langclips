@@ -49,4 +49,10 @@ export class IndexedDbStorageRepository implements IDeckStorageRepository {
 
     await tx.done;
   }
+
+  async cleanUp(): Promise<void> {
+    const db = await getDatabase();
+    await db.clear("decks");
+    await db.clear("clips");
+  }
 }
