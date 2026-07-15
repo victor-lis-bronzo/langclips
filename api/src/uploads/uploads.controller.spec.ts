@@ -29,7 +29,7 @@ describe('UploadsController', () => {
 
   it('should call generatePresignedUrl on storageService', async () => {
     const mockUrl = 'https://s3.amazonaws.com/bucket/file.mp4';
-    jest.spyOn(service, 'generatePresignedUrl').mockResolvedValue(mockUrl);
+    jest.spyOn(service, 'generatePresignedUrl').mockResolvedValue({ uploadUrl: mockUrl, fileKey: 'videos/uuid-video.mp4' });
 
     const dto = {
       filename: 'video.mp4',
@@ -38,7 +38,7 @@ describe('UploadsController', () => {
 
     const result = await controller.generatePresignedUrl(dto);
 
-    expect(result).toEqual({ uploadUrl: mockUrl });
+    expect(result).toEqual({ uploadUrl: mockUrl, fileKey: 'videos/uuid-video.mp4' });
     expect(service.generatePresignedUrl).toHaveBeenCalledWith('video.mp4', 'video/mp4');
   });
 });

@@ -46,9 +46,10 @@ describe('StorageService', () => {
       IsTruncated: false,
     });
 
-    const url = await service.generatePresignedUrl('video.mp4', 'video/mp4');
+    const result = await service.generatePresignedUrl('video.mp4', 'video/mp4');
 
-    expect(url).toBe('https://mocked-url.com');
+    expect(result.uploadUrl).toBe('https://mocked-url.com');
+    expect(result.fileKey).toBeDefined();
     expect(getSignedUrl).toHaveBeenCalledWith(
       s3ClientMock,
       expect.any(PutObjectCommand),

@@ -16,7 +16,7 @@ import { Queue } from 'bullmq';
 import { randomUUID } from 'crypto';
 import { Observable } from 'rxjs';
 import { VideoEventsService } from './video-events.service';
-import { StorageService } from 'src/storage/storage.service';
+import { StorageService } from '../storage/storage.service';
 import { AcknowledgeDownloadDto } from './dtos/acknowledge-download.dto';
 
 @Controller('videos')
