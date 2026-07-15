@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import axios from "axios";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3333";
@@ -9,7 +10,7 @@ export function useAcknowledgeDownload() {
    *
    * @param fileKeys Lista de chaves (s3 keys) a serem excluídas.
    */
-  async function acknowledge(fileKeys: string[]): Promise<void> {
+  const acknowledge = useCallback(async (fileKeys: string[]): Promise<void> => {
     try {
       await axios.post(`${API_BASE_URL}/videos/acknowledge-download`, {
         fileKeys,
@@ -23,7 +24,7 @@ export function useAcknowledgeDownload() {
       // Não lançamos o erro para não interromper a experiência do usuário,
       // já que a persistência local foi concluída com sucesso.
     }
-  }
+  }, []);
 
   return { acknowledge };
 }
