@@ -1,5 +1,5 @@
 import { getDatabase } from "../indexed-db/indexed-db.provider";
-import type { DeckRecord, ClipRecord } from "../indexed-db/indexed-db.types";
+import type { DeckRecord, ClipMetadata } from "../indexed-db/indexed-db.types";
 import type { IDeckStorageRepository } from "./storage.repository";
 
 export class IndexedDbStorageRepository implements IDeckStorageRepository {
@@ -8,7 +8,7 @@ export class IndexedDbStorageRepository implements IDeckStorageRepository {
     await db.put("decks", deck);
   }
 
-  async saveClip(clip: ClipRecord): Promise<void> {
+  async saveClip(clip: ClipMetadata): Promise<void> {
     const db = await getDatabase();
     await db.put("clips", clip);
   }
@@ -19,7 +19,7 @@ export class IndexedDbStorageRepository implements IDeckStorageRepository {
     return deck || null;
   }
 
-  async getClip(sourceFileKey: string): Promise<ClipRecord | null> {
+  async getClip(sourceFileKey: string): Promise<ClipMetadata | null> {
     const db = await getDatabase();
     const clip = await db.get("clips", sourceFileKey);
     return clip || null;
@@ -38,11 +38,12 @@ export class IndexedDbStorageRepository implements IDeckStorageRepository {
   async deleteClipsByDeck(deckId: string): Promise<void> {
     const db = await getDatabase();
     const tx = db.transaction("clips", "readwrite");
-    const index = tx.store.index("by-deck");
-    let cursor = await index.openCursor(IDBKeyRange.only(deckId));
+    let cursor = await tx.store.openCursor();
 
     while (cursor) {
-      await cursor.delete();
+      if (cursor.value.deckId === deckId) {
+        await cursor.delete();
+      }
       cursor = await cursor.continue();
     }
 

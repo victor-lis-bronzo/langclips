@@ -1,5 +1,5 @@
 import { openDB, type DBSchema, type IDBPDatabase } from "idb";
-import type { DeckRecord, ClipRecord } from "./indexed-db.types";
+import type { ClipMetadata, DeckRecord } from "./indexed-db.types";
 
 export interface LangClipsDB extends DBSchema {
   decks: {
@@ -8,8 +8,7 @@ export interface LangClipsDB extends DBSchema {
   };
   clips: {
     key: string;
-    value: ClipRecord;
-    indexes: { "by-deck": string };
+    value: ClipMetadata;
   };
 }
 
@@ -30,10 +29,9 @@ export function getDatabase(): Promise<IDBPDatabase<LangClipsDB>> {
         db.createObjectStore("decks", { keyPath: "id" });
       }
       if (!db.objectStoreNames.contains("clips")) {
-        const clipStore = db.createObjectStore("clips", {
+        db.createObjectStore("clips", {
           keyPath: "sourceFileKey",
         });
-        clipStore.createIndex("by-deck", "deckId");
       }
     },
   });

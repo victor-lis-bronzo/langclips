@@ -2,7 +2,7 @@ import axios from "axios";
 import type { Deck } from "../types/deck.types";
 import type {
   DeckRecord,
-  ClipRecord,
+  ClipMetadata,
 } from "../../../infrastructure/indexed-db/indexed-db.types";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3333";
@@ -14,9 +14,9 @@ export class DeckDownloadService {
    */
   async downloadDeckAssets(deck: Deck): Promise<{
     deckRecord: DeckRecord;
-    clipRecords: ClipRecord[];
+    clipRecords: ClipMetadata[];
   }> {
-    const clipRecords: ClipRecord[] = [];
+    const clipRecords: ClipMetadata[] = [];
 
     // Fazer download de todos os clipes de vídeo em paralelo para melhor performance
     const downloadPromises = deck.clips.map(async (clip) => {
@@ -40,6 +40,8 @@ export class DeckDownloadService {
       const blob = await blobResponse.blob();
 
       clipRecords.push({
+        id: clip.id,
+        transcription: clip.transcription,
         sourceFileKey: clip.sourceFileKey,
         deckId: deck.id,
         blob,
@@ -52,11 +54,7 @@ export class DeckDownloadService {
     const deckRecord: DeckRecord = {
       id: deck.id,
       sourceFileKey: deck.sourceFileKey,
-      clips: deck.clips.map((clip) => ({
-        id: clip.id,
-        transcription: clip.transcription,
-        sourceFileKey: clip.sourceFileKey,
-      })),
+      clips: clipRecords.map(({ blob, mimeType, ...rest }) => rest),
       createdAt: deck.createdAt,
       downloadedAt: Date.now(),
     };
