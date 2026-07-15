@@ -9,18 +9,22 @@ export function ProcessingHeader({
   progress,
   currentStepLabel,
 }: ProcessingHeaderProps) {
+  const isFinished = status === "completed" || status === "saved";
+
   return (
     <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-3xl p-6 md:p-8 shadow-2xl backdrop-blur-md flex flex-col items-center">
       <h2 className="text-2xl font-bold text-zinc-100 mb-2 tracking-tight">
-        {status === "completed" ? "Processamento Concluído!" : "Processando seu Vídeo"}
+        {isFinished ? "Processamento Concluído!" : "Processando seu Vídeo"}
       </h2>
       
       <p className="text-zinc-400 text-sm text-center mb-6 max-w-sm h-5 overflow-hidden text-ellipsis whitespace-nowrap">
-        {status === "completed" 
-          ? "O deck de estudos foi gerado e salvo com sucesso." 
-          : currentStepLabel 
-            ? `Executando: ${currentStepLabel}` 
-            : "Iniciando a fila de processamento..."}
+        {isFinished 
+          ? "O deck de estudos foi gerado e salvo com sucesso no seu dispositivo." 
+          : status === "downloading"
+            ? "Salvando arquivos localmente para uso offline..."
+            : currentStepLabel 
+              ? `Executando: ${currentStepLabel}` 
+              : "Iniciando a fila de processamento..."}
       </p>
 
       {/* Progresso Geral */}

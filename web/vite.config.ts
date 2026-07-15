@@ -9,11 +9,11 @@ const config = defineConfig({
 	resolve: { tsconfigPaths: true },
 	plugins: [
 		devtools(),
-		cloudflare({ viteEnvironment: { name: "ssr" } }),
+		!process.env.VITEST && cloudflare({ viteEnvironment: { name: "ssr" } }),
 		tailwindcss(),
 		tanstackStart(),
 		viteReact(),
-	],
+	].filter(Boolean),
 });
 
 export default config;

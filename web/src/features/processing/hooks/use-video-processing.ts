@@ -1,9 +1,22 @@
 import { useEffect, useState } from "react";
-import type { Deck } from "../types/deck.types";
+import type { Clip, Deck } from "../types/deck.types";
+import { DeckDownloadService } from "../services/deck-download.service";
+import { IndexedDbStorageRepository } from "../../../infrastructure/storage/indexed-db-storage.repository";
+import { useAcknowledgeDownload } from "./use-acknowledge-download";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3333";
 
-type JobStatus = "idle" | "processing" | "completed" | "failed";
+export type JobStatus =
+  | "idle"
+  | "processing"
+  | "completed"
+  | "downloading"
+  | "saved"
+  | "download-failed"
+  | "failed";
+
+const downloadService = new DeckDownloadService();
+const storageRepository = new IndexedDbStorageRepository();
 
 export function useVideoProcessing(jobId: string | null) {
   const [progress, setProgress] = useState(0);
@@ -13,6 +26,7 @@ export function useVideoProcessing(jobId: string | null) {
     null,
   );
   const [error, setError] = useState<string | null>(null);
+  const { acknowledge } = useAcknowledgeDownload();
 
   useEffect(() => {
     if (!jobId) return;
@@ -36,11 +50,54 @@ export function useVideoProcessing(jobId: string | null) {
       }
 
       if (payload.status === "completed") {
-        setStatus("completed");
+        const deck = payload.result?.deck;
+        if (!deck) {
+          setStatus("failed");
+          setError("Deck não recebido no payload de conclusão.");
+          eventSource.close();
+          return;
+        }
+
         setResult(payload.result);
         setProgress(100);
-        setCurrentStep(null);
+        setCurrentStep("local-save");
+        setStatus("downloading");
         eventSource.close();
+
+        // Executar o download dos assets e salvamento no IndexedDB localmente
+        (async () => {
+          try {
+            // 1. Baixar os vídeos (clips) e montar registros do banco
+            const { deckRecord, clipRecords } =
+              await downloadService.downloadDeckAssets(deck);
+
+            // 2. Salvar no IndexedDB
+            await storageRepository.saveDeck(deckRecord);
+            for (const clipRecord of clipRecords) {
+              await storageRepository.saveClip(clipRecord);
+            }
+
+            // 3. Notificar a API para exclusão no R2
+            const fileKeys = [
+              deck.sourceFileKey,
+              ...deck.clips.map((c: Clip) => c.sourceFileKey),
+            ];
+            await acknowledge(fileKeys);
+
+            // 4. Transição de estado para concluído localmente (offline-ready)
+            setStatus("saved");
+            setCurrentStep(null);
+          } catch (err) {
+            console.error("Erro na persistência local do deck:", err);
+            setStatus("download-failed");
+            setError(
+              err instanceof Error
+                ? err.message
+                : "Falha ao salvar o deck localmente.",
+            );
+            setCurrentStep(null);
+          }
+        })();
       }
 
       if (payload.status === "failed") {
@@ -58,7 +115,7 @@ export function useVideoProcessing(jobId: string | null) {
     return () => {
       eventSource.close();
     };
-  }, [jobId]);
+  }, [jobId, acknowledge]);
 
   return { progress, currentStep, status, result, error };
 }

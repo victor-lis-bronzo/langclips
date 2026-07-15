@@ -16,6 +16,7 @@ const PROCESS_STEPS = [
   { id: "clip-upload", label: "Upload dos cortes gerados" },
   { id: "deck-construction", label: "Construção do deck" },
   { id: "deck-upload", label: "Salvando deck finalizado" },
+  { id: "local-save", label: "Salvando offline no dispositivo" },
 ];
 
 export function ProcessingStepper({
@@ -26,12 +27,13 @@ export function ProcessingStepper({
   const getStepState = (
     stepId: string,
   ): "completed" | "processing" | "pending" => {
-    if (status === "completed") return "completed";
+    if (status === "saved") return "completed";
 
     const currentIndex = PROCESS_STEPS.findIndex((s) => s.id === currentStep);
     const stepIndex = PROCESS_STEPS.findIndex((s) => s.id === stepId);
 
     if (currentIndex === -1) {
+      // Se não há etapa ativa identificada e não terminou, assume a primeira etapa
       return stepIndex === 0 ? "processing" : "pending";
     }
 
@@ -41,8 +43,8 @@ export function ProcessingStepper({
   };
 
   const activeIndex =
-    status === "completed"
-      ? PROCESS_STEPS!.length
+    status === "saved"
+      ? PROCESS_STEPS.length
       : PROCESS_STEPS.findIndex((s) => s.id === currentStep);
 
   const resolvedActiveIndex = activeIndex === -1 ? 0 : activeIndex;
@@ -80,11 +82,14 @@ export function ProcessingStepper({
             );
           })}
 
-          {/* Card de Sucesso inserido ao final do track de rolagem
-          {result && <ProcessingSuccessCard result={result} />} */}
+          {/* Card de Sucesso inserido ao final do track de rolagem */}
+          {status === "saved" && result && (
+            <ProcessingSuccessCard result={result} />
+          )}
         </div>
       </div>
     </div>
   );
 }
 export { PROCESS_STEPS };
+
