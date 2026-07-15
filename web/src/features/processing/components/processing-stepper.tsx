@@ -80,8 +80,8 @@ export function ProcessingStepper({
             );
           })}
 
-          {/* Card de Sucesso inserido ao final do track de rolagem */}
-          {result && <ProcessingSuccessCard result={result} />}
+          {/* Card de Sucesso inserido ao final do track de rolagem
+          {result && <ProcessingSuccessCard result={result} />} */}
         </div>
       </div>
     </div>
