@@ -9,16 +9,11 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as DifficultyRouteImport } from './routes/difficulty'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProcessingJobIdRouteImport } from './routes/processing.$jobId'
+import { Route as DifficultyDeckIdRouteImport } from './routes/difficulty.$deckId'
 import { Route as ExercisesDeckDeckIdClipClipIdRouteImport } from './routes/exercises.deck.$deckId.clip.$clipId'
 
-const DifficultyRoute = DifficultyRouteImport.update({
-  id: '/difficulty',
-  path: '/difficulty',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -27,6 +22,11 @@ const IndexRoute = IndexRouteImport.update({
 const ProcessingJobIdRoute = ProcessingJobIdRouteImport.update({
   id: '/processing/$jobId',
   path: '/processing/$jobId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DifficultyDeckIdRoute = DifficultyDeckIdRouteImport.update({
+  id: '/difficulty/$deckId',
+  path: '/difficulty/$deckId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExercisesDeckDeckIdClipClipIdRoute =
@@ -38,20 +38,20 @@ const ExercisesDeckDeckIdClipClipIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/difficulty': typeof DifficultyRoute
+  '/difficulty/$deckId': typeof DifficultyDeckIdRoute
   '/processing/$jobId': typeof ProcessingJobIdRoute
   '/exercises/deck/$deckId/clip/$clipId': typeof ExercisesDeckDeckIdClipClipIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/difficulty': typeof DifficultyRoute
+  '/difficulty/$deckId': typeof DifficultyDeckIdRoute
   '/processing/$jobId': typeof ProcessingJobIdRoute
   '/exercises/deck/$deckId/clip/$clipId': typeof ExercisesDeckDeckIdClipClipIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/difficulty': typeof DifficultyRoute
+  '/difficulty/$deckId': typeof DifficultyDeckIdRoute
   '/processing/$jobId': typeof ProcessingJobIdRoute
   '/exercises/deck/$deckId/clip/$clipId': typeof ExercisesDeckDeckIdClipClipIdRoute
 }
@@ -59,39 +59,32 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/difficulty'
+    | '/difficulty/$deckId'
     | '/processing/$jobId'
     | '/exercises/deck/$deckId/clip/$clipId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/difficulty'
+    | '/difficulty/$deckId'
     | '/processing/$jobId'
     | '/exercises/deck/$deckId/clip/$clipId'
   id:
     | '__root__'
     | '/'
-    | '/difficulty'
+    | '/difficulty/$deckId'
     | '/processing/$jobId'
     | '/exercises/deck/$deckId/clip/$clipId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DifficultyRoute: typeof DifficultyRoute
+  DifficultyDeckIdRoute: typeof DifficultyDeckIdRoute
   ProcessingJobIdRoute: typeof ProcessingJobIdRoute
   ExercisesDeckDeckIdClipClipIdRoute: typeof ExercisesDeckDeckIdClipClipIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/difficulty': {
-      id: '/difficulty'
-      path: '/difficulty'
-      fullPath: '/difficulty'
-      preLoaderRoute: typeof DifficultyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -106,6 +99,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProcessingJobIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/difficulty/$deckId': {
+      id: '/difficulty/$deckId'
+      path: '/difficulty/$deckId'
+      fullPath: '/difficulty/$deckId'
+      preLoaderRoute: typeof DifficultyDeckIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/exercises/deck/$deckId/clip/$clipId': {
       id: '/exercises/deck/$deckId/clip/$clipId'
       path: '/exercises/deck/$deckId/clip/$clipId'
@@ -118,7 +118,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DifficultyRoute: DifficultyRoute,
+  DifficultyDeckIdRoute: DifficultyDeckIdRoute,
   ProcessingJobIdRoute: ProcessingJobIdRoute,
   ExercisesDeckDeckIdClipClipIdRoute: ExercisesDeckDeckIdClipClipIdRoute,
 }

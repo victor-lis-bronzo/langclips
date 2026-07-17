@@ -1,4 +1,4 @@
-type DifficultyType = "easy" | "medium" | "hard";
+export type DifficultyType = "easy" | "medium" | "hard";
 
 export interface ILocalStorageRepository {
   getDifficulty(): DifficultyType | undefined;
