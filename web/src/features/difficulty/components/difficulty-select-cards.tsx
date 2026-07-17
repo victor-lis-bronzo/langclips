@@ -3,6 +3,7 @@ import type { DifficultyType } from "#/infrastructure/repositories/preferences/p
 import { useState } from "react";
 import { LocalStorageRepository } from "#/infrastructure/repositories/preferences/preferences-local-storage.repository";
 import { useNavigate } from "@tanstack/react-router";
+import { IndexedDbStorageRepository } from "#/infrastructure/repositories/deck/deck-indexed-db.repository";
 
 const cards: Record<
   DifficultyType,
@@ -36,7 +37,13 @@ const cards: Record<
   },
 };
 
-export default function DifficultySelectCards() {
+type DifficultySelectCardsProps = {
+  deckId: string;
+};
+
+export default function DifficultySelectCards({
+  deckId,
+}: DifficultySelectCardsProps) {
   const [selectedDifficulty, setSelectedDifficulty] = useState<
     DifficultyType | undefined
   >(undefined);
@@ -46,8 +53,29 @@ export default function DifficultySelectCards() {
   async function handleConfirm() {
     const localStorageRepository = new LocalStorageRepository();
     await localStorageRepository.setDifficulty(selectedDifficulty!);
+
+    const deckRepository = new IndexedDbStorageRepository();
+    const deck = await deckRepository.getDeck(deckId);
+    if (!deck) {
+      navigate({
+        to: "/",
+      });
+      return;
+    }
+
+    const firstClip = deck.clips[0];
+    if (!firstClip) {
+      navigate({
+        to: "/",
+      });
+      return;
+    }
     navigate({
-      to: "/",
+      to: "/exercises/deck/$deckId/clip/$clipId",
+      params: {
+        deckId: deckId,
+        clipId: firstClip.id,
+      },
     });
   }
 
@@ -72,7 +100,9 @@ export default function DifficultySelectCards() {
               onClick={() => setSelectedDifficulty(difficulty)}
             >
               <div className="flex flex-col gap-2 p-4">
-                <h2 className={cn("text-lg font-bold", card.textColorClassName)}>
+                <h2
+                  className={cn("text-lg font-bold", card.textColorClassName)}
+                >
                   {card.title}
                 </h2>
                 <p>{card.description}</p>

@@ -27,8 +27,7 @@ export function ProcessingStepper({
 }: ProcessingStepperProps) {
   const navigate = useNavigate();
 
-  const isNavigating =
-    status === "saved" && result && currentStep === "local-save";
+  const isNavigating = status === "saved" && result;
 
   if (isNavigating) {
     navigate({ to: "/difficulty/$deckId", params: { deckId: result.id } });

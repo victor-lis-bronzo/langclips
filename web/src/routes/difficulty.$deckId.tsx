@@ -13,7 +13,7 @@ function RouteComponent() {
     <div className="flex min-h-screen items-center justify-center bg-background text-foreground p-4 md:p-8">
       <div className="flex flex-col w-full md:max-w-1/2 lg:max-w-1/3 gap-2">
         <ClipsGeneralInfo deckId={deckId} />
-        <DifficultySelectCards />
+        <DifficultySelectCards deckId={deckId} />
       </div>
     </div>
   );
