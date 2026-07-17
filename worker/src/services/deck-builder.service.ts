@@ -11,12 +11,14 @@ export class DeckBuilderService implements IDeckBuilderService {
     sourceFileKey: string;
     uploadedClips: Clip[];
   }): Deck {
-    const clips: Omit<Clip, "startTime" | "endTime">[] = uploadedClips.map(
+    const clips: Clip[] = uploadedClips.map(
       (clip) => {
         return {
           id: clip.id,
           transcription: clip.transcription,
           sourceFileKey: clip.sourceFileKey,
+          startTime: clip.startTime,
+          endTime: clip.endTime,
         };
       },
     );

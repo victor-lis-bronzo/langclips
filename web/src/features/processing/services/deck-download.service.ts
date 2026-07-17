@@ -46,6 +46,8 @@ export class DeckDownloadService {
         deckId: deck.id,
         blob,
         mimeType: blob.type || "video/mp4",
+        startTime: clip.startTime,
+        endTime: clip.endTime,
       });
     });
 
@@ -57,6 +59,11 @@ export class DeckDownloadService {
       clips: clipRecords.map(({ blob, mimeType, ...rest }) => rest),
       createdAt: deck.createdAt,
       downloadedAt: Date.now(),
+      totalSeconds:
+        clipRecords.reduce((acc, clip) => {
+          const duration = (clip.endTime ?? 0) - (clip.startTime ?? 0);
+          return acc + (duration > 0 ? duration : 0);
+        }, 0) ?? 0,
     };
 
     return { deckRecord, clipRecords };

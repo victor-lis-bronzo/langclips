@@ -5,6 +5,8 @@ export interface ClipMetadata {
   sourceFileKey: string;
   blob: Blob;
   mimeType: string;
+  startTime: number;
+  endTime: number;
 }
 
 export interface DeckRecord {
@@ -13,4 +15,5 @@ export interface DeckRecord {
   clips: Omit<ClipMetadata, "blob" | "mimeType">[];
   createdAt: number;
   downloadedAt: number;
+  totalSeconds: number;
 }
