@@ -3,7 +3,7 @@ import type { Deck } from "../types/deck.types";
 import type {
   DeckRecord,
   ClipMetadata,
-} from "../../../infrastructure/indexed-db/indexed-db.types";
+} from "../../../infrastructure/database/indexed-db.types";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3333";
 

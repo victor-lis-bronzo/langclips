@@ -1,4 +1,7 @@
-import type { DeckRecord, ClipMetadata } from "../indexed-db/indexed-db.types";
+import type {
+  ClipMetadata,
+  DeckRecord,
+} from "#/infrastructure/database/indexed-db.types";
 
 export interface IDeckStorageRepository {
   saveDeck(deck: DeckRecord): Promise<void>;

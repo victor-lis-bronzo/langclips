@@ -28,10 +28,7 @@ export function ProcessingStepper({
   const navigate = useNavigate();
 
   if (status === "saved" && result) {
-    navigate({
-      to: "/exercises/deck/$deckId/clip/$clipId",
-      params: { deckId: result.id, clipId: result.clips?.[0]?.id },
-    });
+    navigate({ to: "/difficulty" });
   }
 
   const getStepState = (
@@ -59,10 +56,8 @@ export function ProcessingStepper({
 
   const resolvedActiveIndex = activeIndex === -1 ? 0 : activeIndex;
 
-  // Altura dinâmica: 1 card (80px) ou 2 cards + espaçamento (170px)
   const containerHeight = resolvedActiveIndex === 0 ? "80px" : "170px";
 
-  // Deslocamento vertical: (índice_ativo - 1) * (altura + gap)
   const translateOffset =
     resolvedActiveIndex === 0 ? 0 : (resolvedActiveIndex - 1) * 90;
 

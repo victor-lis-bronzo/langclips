@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as DifficultyRouteImport } from './routes/difficulty'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProcessingJobIdRouteImport } from './routes/processing.$jobId'
 import { Route as ExercisesDeckDeckIdClipClipIdRouteImport } from './routes/exercises.deck.$deckId.clip.$clipId'
 
+const DifficultyRoute = DifficultyRouteImport.update({
+  id: '/difficulty',
+  path: '/difficulty',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -32,40 +38,60 @@ const ExercisesDeckDeckIdClipClipIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/difficulty': typeof DifficultyRoute
   '/processing/$jobId': typeof ProcessingJobIdRoute
   '/exercises/deck/$deckId/clip/$clipId': typeof ExercisesDeckDeckIdClipClipIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/difficulty': typeof DifficultyRoute
   '/processing/$jobId': typeof ProcessingJobIdRoute
   '/exercises/deck/$deckId/clip/$clipId': typeof ExercisesDeckDeckIdClipClipIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/difficulty': typeof DifficultyRoute
   '/processing/$jobId': typeof ProcessingJobIdRoute
   '/exercises/deck/$deckId/clip/$clipId': typeof ExercisesDeckDeckIdClipClipIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/processing/$jobId' | '/exercises/deck/$deckId/clip/$clipId'
+  fullPaths:
+    | '/'
+    | '/difficulty'
+    | '/processing/$jobId'
+    | '/exercises/deck/$deckId/clip/$clipId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/processing/$jobId' | '/exercises/deck/$deckId/clip/$clipId'
+  to:
+    | '/'
+    | '/difficulty'
+    | '/processing/$jobId'
+    | '/exercises/deck/$deckId/clip/$clipId'
   id:
     | '__root__'
     | '/'
+    | '/difficulty'
     | '/processing/$jobId'
     | '/exercises/deck/$deckId/clip/$clipId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DifficultyRoute: typeof DifficultyRoute
   ProcessingJobIdRoute: typeof ProcessingJobIdRoute
   ExercisesDeckDeckIdClipClipIdRoute: typeof ExercisesDeckDeckIdClipClipIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/difficulty': {
+      id: '/difficulty'
+      path: '/difficulty'
+      fullPath: '/difficulty'
+      preLoaderRoute: typeof DifficultyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -92,6 +118,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DifficultyRoute: DifficultyRoute,
   ProcessingJobIdRoute: ProcessingJobIdRoute,
   ExercisesDeckDeckIdClipClipIdRoute: ExercisesDeckDeckIdClipClipIdRoute,
 }

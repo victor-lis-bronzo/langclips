@@ -24,8 +24,6 @@ export function ProcessingScreen({ jobId }: { jobId: string }) {
   const { progress, currentStep, status, result, error } =
     useVideoProcessing(jobId);
 
-  console.log({ progress, currentStep, status });
-
   if (status === "failed" || status === "download-failed") {
     return <ProcessingErrorCard error={error} />;
   }

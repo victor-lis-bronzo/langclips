@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import type { Clip, Deck } from "../types/deck.types";
 import { DeckDownloadService } from "../services/deck-download.service";
-import { IndexedDbStorageRepository } from "../../../infrastructure/storage/indexed-db-storage.repository";
 import { useAcknowledgeDownload } from "./use-acknowledge-download";
+import { IndexedDbStorageRepository } from "#/infrastructure/repositories/deck/deck-indexed-db.repository";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3333";
 

@@ -1,6 +1,9 @@
-import { getDatabase } from "../indexed-db/indexed-db.provider";
-import type { DeckRecord, ClipMetadata } from "../indexed-db/indexed-db.types";
-import type { IDeckStorageRepository } from "./storage.repository";
+import { getDatabase } from "#/infrastructure/database/indexed-db.provider";
+import type {
+  ClipMetadata,
+  DeckRecord,
+} from "#/infrastructure/database/indexed-db.types";
+import type { IDeckStorageRepository } from "./deck.repository.interface";
 
 export class IndexedDbStorageRepository implements IDeckStorageRepository {
   async saveDeck(deck: DeckRecord): Promise<void> {
