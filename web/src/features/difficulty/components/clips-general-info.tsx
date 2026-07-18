@@ -1,24 +1,19 @@
-import { useEffect, useState } from "react";
 import { IndexedDbStorageRepository } from "#/infrastructure/repositories/deck/deck-indexed-db.repository";
-import type { DeckRecord } from "#/infrastructure/database/indexed-db.types";
+import { useQuery } from "@tanstack/react-query";
 
 type ClipsGeneralInfoProps = {
   deckId: string;
 };
 
 export default function ClipsGeneralInfo({ deckId }: ClipsGeneralInfoProps) {
-  const [deck, setDeck] = useState<DeckRecord | null>(null);
-  const [loading, setLoading] = useState(true);
+  const storageRepository = new IndexedDbStorageRepository();
 
-  useEffect(() => {
-    const storageRepository = new IndexedDbStorageRepository();
-    storageRepository.getDeck(deckId).then((data) => {
-      setDeck(data);
-      setLoading(false);
-    });
-  }, [deckId]);
+  const { data: deck, isLoading } = useQuery({
+    queryKey: ["deck", deckId],
+    queryFn: () => storageRepository.getDeck(deckId),
+  });
 
-  if (loading) {
+  if (!deck || isLoading) {
     return (
       <div className="w-full flex items-center justify-between p-4 h-20 rounded-2xl transition-all duration-300 box-border shrink-0 bg-zinc-800/40 border-zinc-700 border-2 text-zinc-100 shadow-lg animate-pulse" />
     );
