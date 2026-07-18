@@ -23,4 +23,5 @@ export interface IDeckStorageRepository {
   deleteDeck(deckId: string): Promise<void>;
   deleteClipsByDeck(deckId: string): Promise<void>;
   cleanUp(): Promise<void>;
+  getAllDecks(): Promise<DeckRecord[]>;
 }

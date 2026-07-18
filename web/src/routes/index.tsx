@@ -1,13 +1,44 @@
-import { createFileRoute } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  redirect,
+  useNavigate,
+  type NavigateOptions,
+} from "@tanstack/react-router";
 import { Film, Github, Linkedin, Sparkles } from "lucide-react";
 import { Container } from "#/components/container";
 import { DropFileForm } from "#/features/home/components/upload-file-form";
+import { IndexedDbStorageRepository } from "#/infrastructure/repositories/deck/deck-indexed-db.repository";
+import { useQuery } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
 function HomePage() {
+  const navigate = useNavigate();
+  const storageRepository = new IndexedDbStorageRepository();
+
+  const { data: deck, isLoading } = useQuery({
+    queryKey: ["verify-deck-data"],
+    queryFn: () =>
+      storageRepository.getAllDecks().then((decks) => {
+        if (decks.length === 0) {
+          return null;
+        }
+        return decks[0];
+      }),
+  });
+
+  if (deck) {
+    navigate({
+      to: "/exercises/$deckId/$clipId",
+      params: {
+        deckId: deck.id,
+        clipId: deck.clips[0].id,
+      },
+    });
+  }
+
   return (
     <div className="flex flex-col min-h-screen relative overflow-hidden bg-background text-foreground selection:bg-primary/30 selection:text-white">
       <div className="absolute top-[-10%] left-[-10%] w-[45%] h-[45%] rounded-full bg-primary/10 blur-[100px] pointer-events-none" />

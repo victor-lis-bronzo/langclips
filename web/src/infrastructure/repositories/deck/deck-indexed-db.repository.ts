@@ -22,6 +22,12 @@ export class IndexedDbStorageRepository implements IDeckStorageRepository {
     return deck || null;
   }
 
+  async getAllDecks() {
+    const db = await getDatabase();
+    const deck = await db.getAll("decks");
+    return deck;
+  }
+
   async getClipPosition(
     sourceFileKey: string,
   ): Promise<{ position: number; total: number } | null> {
