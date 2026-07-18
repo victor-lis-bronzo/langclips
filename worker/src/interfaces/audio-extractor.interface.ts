@@ -5,5 +5,5 @@ export interface IAudioExtractorService {
   extract(params: {
     videoPath: string;
     outputPath: string;
-  }): Promise<{ outputPath: string; success: boolean }>;
+  }): Promise<{ outputPath: string; success: boolean; startOffset: number }>;
 }

@@ -51,7 +51,7 @@ export class VideoProcessingJob {
       // Passo 2: Extração de áudio com FFmpeg
       console.log(`[FFMPEG] Extraindo áudio...`);
       await job.updateProgress({ step: "audio-extraction", percentage: 20 });
-      const { outputPath, success: extractionSuccess } =
+      const { outputPath, success: extractionSuccess, startOffset } =
         await this.audioExtractor.extract({
           videoPath,
           outputPath: audioPath,
@@ -80,8 +80,8 @@ export class VideoProcessingJob {
         await this.videoClipper.generateClips({
           sourceFilePath: videoPath,
           requests: validRequests.map((data) => ({
-            startTime: data.start,
-            endTime: data.end,
+            startTime: data.start + startOffset,
+            endTime: data.end + startOffset,
             transcription: data.text,
           })),
         });
