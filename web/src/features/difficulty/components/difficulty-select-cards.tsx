@@ -10,7 +10,7 @@ const cards: Record<
   {
     title: string;
     description: string;
-    borderClassName: string;
+    className: string;
     textColorClassName: string;
   }
 > = {
@@ -19,20 +19,23 @@ const cards: Record<
     description:
       "Ideal para iniciantes. Foco em vocabulário básico e estruturas simples.",
     textColorClassName: "text-green-500",
-    borderClassName: "border-green-500/20 hover:border-green-500/60",
+    className:
+      "border-green-500/20 hover:border-green-500/60 hover:shadow-green-500/10",
   },
   medium: {
     title: "Medium",
     description:
       "Ideal para intermediários. Foco em vocabulário intermediário e estruturas médias.",
-    borderClassName: "border-yellow-500/20 hover:border-yellow-500/60",
+    className:
+      "border-yellow-500/20 hover:border-yellow-500/60 hover:shadow-yellow-500/10",
     textColorClassName: "text-yellow-500",
   },
   hard: {
     title: "Hard",
     description:
       "Ideal para avançados. Foco em vocabulário avançado e estruturas complexas.",
-    borderClassName: "border-red-500/20 hover:border-red-500/60",
+    className:
+      "border-red-500/20 hover:border-red-500/60 hover:shadow-red-500/10",
     textColorClassName: "text-red-500",
   },
 };
@@ -71,7 +74,7 @@ export default function DifficultySelectCards({
       return;
     }
     navigate({
-      to: "/exercises/deck/$deckId/clip/$clipId",
+      to: "/exercises/$deckId/$clipId",
       params: {
         deckId: deckId,
         clipId: firstClip.id,
@@ -92,9 +95,9 @@ export default function DifficultySelectCards({
               key={difficulty}
               className={cn(
                 "flex-1 w-full rounded-2xl transition-all duration-300 box-border shrink-0 bg-zinc-800/40 border-2 text-zinc-100 shadow-lg cursor-pointer",
-                card.borderClassName,
+                card.className,
                 selectedDifficulty === difficulty
-                  ? "border-2 border-emerald-500"
+                  ? "border-2 border-emerald-500  bg-emerald-500/5"
                   : "",
               )}
               onClick={() => setSelectedDifficulty(difficulty)}
