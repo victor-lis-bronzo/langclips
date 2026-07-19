@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import ExercisesHeader from "#/features/exercises/components/header";
 import VideoPlayer from "#/features/exercises/components/video-player";
+import AnswerBox from "#/features/exercises/components/answer";
+import useGetDifficulty from "#/features/exercises/hooks/use-get-difficulty";
 
 export const Route = createFileRoute("/exercises/$deckId/$clipId")({
   component: ExercisesRoute,
@@ -16,10 +18,15 @@ function ExercisesRoute() {
 
 function ExercisesComponent() {
   const { deckId, clipId } = Route.useParams();
+  const { data: difficulty } = useGetDifficulty();
+
   return (
-    <div className="w-full max-w-2xl flex flex-col gap-2">
+    <div className="w-full max-w-5xl flex flex-col gap-2">
       <ExercisesHeader deckId={deckId} clipId={clipId} />
-      <VideoPlayer deckId={deckId} clipId={clipId} />
+      <div className="flex w-full flex-col lg:flex-row gap-2">
+        <VideoPlayer deckId={deckId} clipId={clipId} />
+        <AnswerBox variant={difficulty || "easy"} deckId={deckId} clipId={clipId} />
+      </div>
     </div>
   );
 }

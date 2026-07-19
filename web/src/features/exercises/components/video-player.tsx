@@ -173,7 +173,7 @@ export default function VideoPlayer({ deckId, clipId }: VideoPlayerProps) {
         <button
           type="button"
           onClick={handleReplay}
-          className="flex-1 sm:flex-initial flex items-center justify-center gap-2 py-2.5 px-6 border border-white rounded-md bg-white/[0.03] hover:bg-white/[0.08] active:scale-98 transition-all duration-200 text-zinc-200 hover:text-white cursor-pointer group"
+          className="flex-1 flex items-center justify-center gap-2 py-2.5 px-6 border border-white rounded-md bg-white/[0.03] hover:bg-white/[0.08] active:scale-98 transition-all duration-200 text-zinc-200 hover:text-white cursor-pointer group"
         >
           <RotateCcw className="w-4 h-4 text-zinc-300 group-hover:text-white transition-colors duration-300" />
           <span className="text-sm font-caveat font-medium">Replay</span>
@@ -182,7 +182,7 @@ export default function VideoPlayer({ deckId, clipId }: VideoPlayerProps) {
         <button
           type="button"
           onClick={cycleSpeed}
-          className="flex-1 sm:flex-initial flex items-center justify-center gap-2.5 py-2.5 px-5 border border-white rounded-md bg-white/[0.03] hover:bg-white/[0.08] active:scale-98 transition-all duration-200 text-zinc-200 hover:text-white cursor-pointer"
+          className="flex-1 flex items-center justify-center gap-2.5 py-2.5 px-5 border border-white rounded-md bg-white/[0.03] hover:bg-white/[0.08] active:scale-98 transition-all duration-200 text-zinc-200 hover:text-white cursor-pointer"
         >
           {speed.toFixed(2)}x
           <span className="text-sm font-caveat font-medium sm:inline hidden">
