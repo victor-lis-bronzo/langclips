@@ -33,7 +33,7 @@ export function AlertExistentDeckDialog({
   async function handleCancel() {
     const success = await cleanupExistentData();
     if (success) {
-      toast("Deck limpo com sucesso!", {
+      toast.success("Deck limpo com sucesso!", {
         dismissible: true,
         closeButton: true,
         position: "bottom-right",

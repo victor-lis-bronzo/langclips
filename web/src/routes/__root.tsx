@@ -8,7 +8,7 @@ import {
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import indexCss from "#/styles/index.css?url";
 import { TanStackQueryDevtools } from "../integrations/tanstack-query/devtools";
-import { Toaster } from "sonner";
+import { Toaster } from "#/components/ui/sonner";
 
 interface MyRouterContext {
   queryClient: QueryClient;
