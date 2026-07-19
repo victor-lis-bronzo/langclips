@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -8,7 +8,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "#/components/ui/alert-dialog";
 import { useVerifyExistentDecks } from "../hooks/use-verify-decks";
 import { useCleanUpExistentData } from "../hooks/use-cleanup-existent-data";
@@ -26,24 +25,20 @@ export function AlertExistentDeckDialog({
   description = "By continuing, you will go to the existing deck, or you can choose to delete the existing deck by clicking cancel!",
 }: AlertExistentDeckDialogProps) {
   const { data: existentDeck } = useVerifyExistentDecks();
-
-  const [isOpen, setIsOpen] = useState(!!existentDeck);
-  const toggleIsOpen = () => setIsOpen(!isOpen);
-
   const navigate = useNavigate();
   const { mutateAsync: cleanupExistentData } = useCleanUpExistentData();
 
+  if (!existentDeck) return null;
+
   async function handleCancel() {
-    await cleanupExistentData().then((response) => {
-      if (response) {
-        toast("Deck limpo com sucesso!", {
-          dismissible: true,
-          closeButton: true,
-          position: "bottom-right",
-        });
-        toggleIsOpen();
-      }
-    });
+    const success = await cleanupExistentData();
+    if (success) {
+      toast("Deck limpo com sucesso!", {
+        dismissible: true,
+        closeButton: true,
+        position: "bottom-right",
+      });
+    }
   }
 
   async function handleConfirm() {
@@ -54,18 +49,10 @@ export function AlertExistentDeckDialog({
         clipId: existentDeck!.clips[0].id,
       },
     });
-    toggleIsOpen();
   }
 
-  useEffect(() => {
-    setIsOpen(!!existentDeck);
-  }, [existentDeck]);
-
-  if (!existentDeck) return null;
-
   return (
-    <AlertDialog open={isOpen} onOpenChange={toggleIsOpen}>
-      <AlertDialogTrigger></AlertDialogTrigger>
+    <AlertDialog open={true}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
@@ -87,3 +74,4 @@ export function AlertExistentDeckDialog({
     </AlertDialog>
   );
 }
+

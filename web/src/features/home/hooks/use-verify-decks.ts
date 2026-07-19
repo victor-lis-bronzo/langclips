@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { IndexedDbStorageRepository } from "#/infrastructure/repositories/deck/deck-indexed-db.repository";
 
-export function useVerifyExistentDecks() {
-  const storageRepository = new IndexedDbStorageRepository();
+const storageRepository = new IndexedDbStorageRepository();
 
+export function useVerifyExistentDecks() {
   return useQuery({
     queryKey: ["verify-deck-data"],
     queryFn: () =>
@@ -15,3 +15,4 @@ export function useVerifyExistentDecks() {
       }),
   });
 }
+
