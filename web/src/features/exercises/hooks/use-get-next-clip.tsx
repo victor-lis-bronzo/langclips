@@ -10,7 +10,7 @@ const clipIndexDbRepository = new IndexedDbClipRepository();
 
 export default function useGetClipNext({ deckId, clipId }: UseGetClipNextProps) {
   return useQuery({
-    queryKey: ["clip", deckId, clipId],
+    queryKey: ["next-clip", deckId, clipId],
     queryFn: () => clipIndexDbRepository.getNextClipById(deckId, clipId),
     enabled: !!clipId && !!deckId,
   });
