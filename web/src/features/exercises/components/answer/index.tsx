@@ -89,65 +89,70 @@ export default function AnswerBox({ variant, deckId, clipId }: AnswerBoxProps) {
         </p>
       </header>
       <div className="flex flex-col flex-1 gap-2">
-        {step === "writing" ? (
-          <textarea
-            ref={inputRef}
-            className={cn(
-              "w-full flex-1 bg-transparent outline-none resize-none border-l-2 border-white/50 my-4 px-4 font-inter text-base text-zinc-100 placeholder-zinc-500",
-              "scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-white/5",
-            )}
-            placeholder="Type your answer here..."
-            style={{
-              backgroundImage:
-                "repeating-linear-gradient(transparent, transparent 31px, rgba(255, 255, 255, 0.38) 31px, rgba(255, 255, 255, 0.38) 32px)",
-              backgroundSize: "100% 32px",
-              backgroundAttachment: "local",
-              lineHeight: "32px",
-            }}
-          />
-        ) : (
-          <div
-            className={cn(
-              "w-full flex-1 border-l-2 border-white/50 my-4 px-4 font-inter text-base",
-              "scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-white/5 overflow-y-auto",
-            )}
-            style={{
-              backgroundImage:
-                "repeating-linear-gradient(transparent, transparent 31px, rgba(255, 255, 255, 0.38) 31px, rgba(255, 255, 255, 0.38) 32px)",
-              backgroundSize: "100% 32px",
-              backgroundAttachment: "local",
-              lineHeight: "32px",
-            }}
-          >
-            <div className="flex flex-wrap gap-x-1">
-              {resultWords.map((res, idx) => {
-                if (res.status === "exact")
+        <textarea
+          ref={inputRef}
+          readOnly={step === "reveal"}
+          className={cn(
+            "w-full flex-1 bg-transparent outline-none resize-none border-l-2 border-white/50 my-4 px-4 font-inter text-base text-zinc-100 placeholder-zinc-500",
+            "scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-white/5",
+            step === "reveal" && "text-zinc-400 cursor-not-allowed opacity-60"
+          )}
+          placeholder="Type your answer here..."
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(transparent, transparent 31px, rgba(255, 255, 255, 0.38) 31px, rgba(255, 255, 255, 0.38) 32px)",
+            backgroundSize: "100% 32px",
+            backgroundAttachment: "local",
+            lineHeight: "32px",
+          }}
+        />
+        {step === "reveal" && (
+          <div className="flex flex-col gap-2 border-t border-white/10 pt-4 mt-2 max-h-[160px]">
+            <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+              Comparison / Correct Answer
+            </span>
+            <div
+              className={cn(
+                "w-full flex-1 border-l-2 border-primary/50 px-4 py-2 font-inter text-base overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-white/5",
+              )}
+              style={{
+                backgroundImage:
+                  "repeating-linear-gradient(transparent, transparent 31px, rgba(255, 255, 255, 0.2) 31px, rgba(255, 255, 255, 0.2) 32px)",
+                backgroundSize: "100% 32px",
+                backgroundAttachment: "local",
+                lineHeight: "32px",
+              }}
+            >
+              <div className="flex flex-wrap gap-x-1">
+                {resultWords.map((res, idx) => {
+                  if (res.status === "exact")
+                    return (
+                      <span key={idx} className="text-green-500">
+                        {res.word}
+                      </span>
+                    );
+                  if (res.status === "case")
+                    return (
+                      <span key={idx} className="text-yellow-500">
+                        {res.word}
+                      </span>
+                    );
+                  if (res.status === "missing")
+                    return (
+                      <span
+                        key={idx}
+                        className="text-red-500/70 underline decoration-red-500/50"
+                      >
+                        {res.word}
+                      </span>
+                    );
                   return (
-                    <span key={idx} className="text-green-500">
+                    <span key={idx} className="text-red-500">
                       {res.word}
                     </span>
                   );
-                if (res.status === "case")
-                  return (
-                    <span key={idx} className="text-yellow-500">
-                      {res.word}
-                    </span>
-                  );
-                if (res.status === "missing")
-                  return (
-                    <span
-                      key={idx}
-                      className="text-red-500/70 underline decoration-red-500/50"
-                    >
-                      {res.word}
-                    </span>
-                  );
-                return (
-                  <span key={idx} className="text-red-500">
-                    {res.word}
-                  </span>
-                );
-              })}
+                })}
+              </div>
             </div>
           </div>
         )}
