@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { IndexedDbStorageRepository } from "#/infrastructure/repositories/deck/deck-indexed-db.repository";
+import { IndexedDbClipRepository } from "#/infrastructure/repositories/clip/clip-indexed-db.repository";
 
 type UseGetClipBlobProps = {
 	deckId: string;
@@ -10,11 +10,11 @@ export default function useGetClipBlob({
 	deckId,
 	clipId,
 }: UseGetClipBlobProps) {
-	const deckIndexDbRepository = new IndexedDbStorageRepository();
+	const clipIndexDbRepository = new IndexedDbClipRepository();
 
 	return useQuery({
 		queryKey: ["clip-blob", deckId, clipId],
-		queryFn: () => deckIndexDbRepository.getClipBlobById(deckId, clipId),
+		queryFn: () => clipIndexDbRepository.getClipBlobById(deckId, clipId),
 		enabled: !!deckId && !!clipId,
 	});
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { IndexedDbStorageRepository } from "#/infrastructure/repositories/deck/deck-indexed-db.repository";
+import { IndexedDbClipRepository } from "#/infrastructure/repositories/clip/clip-indexed-db.repository";
 import { DeckDownloadService } from "../services/deck-download.service";
 import type { Clip, Deck } from "../types/deck.types";
 import { useAcknowledgeDownload } from "./use-acknowledge-download";
@@ -17,6 +18,7 @@ export type JobStatus =
 
 const downloadService = new DeckDownloadService();
 const storageRepository = new IndexedDbStorageRepository();
+const clipRepository = new IndexedDbClipRepository();
 
 export function useVideoProcessing(jobId: string | null) {
 	const [progress, setProgress] = useState(0);
@@ -75,7 +77,7 @@ export function useVideoProcessing(jobId: string | null) {
 						await storageRepository.cleanUp();
 						await storageRepository.saveDeck(deckRecord);
 						for (const clipRecord of clipRecords) {
-							await storageRepository.saveClip(clipRecord);
+							await clipRepository.saveClip(clipRecord);
 						}
 
 						// 3. Notificar a API para exclusão no R2
