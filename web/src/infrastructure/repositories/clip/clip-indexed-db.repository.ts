@@ -141,4 +141,9 @@ export class IndexedDbClipRepository
 
     await tx.done;
   }
+
+  async cleanUp(): Promise<void> {
+    const db = await this.getDb();
+    await db.clear("clips");
+  }
 }

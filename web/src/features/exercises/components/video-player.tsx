@@ -83,8 +83,6 @@ export default function VideoPlayer({ deckId, clipId }: VideoPlayerProps) {
     }
   };
 
-  console.log({ isError, blob, videoUrl });
-
   if (isLoading) {
     return (
       <div className="flex flex-col gap-4 w-full">

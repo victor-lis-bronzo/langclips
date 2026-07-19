@@ -3,6 +3,7 @@ import ExercisesHeader from "#/features/exercises/components/header";
 import VideoPlayer from "#/features/exercises/components/video-player";
 import AnswerBox from "#/features/exercises/components/answer";
 import useGetDifficulty from "#/features/exercises/hooks/use-get-difficulty";
+import { AlertExistentDeckDialog } from "#/features/home/components/alert-existent-deck-dialog";
 
 export const Route = createFileRoute("/exercises/$deckId/$clipId")({
   component: ExercisesRoute,
