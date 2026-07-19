@@ -2,9 +2,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { IndexedDbExerciseRepository } from "#/infrastructure/repositories/exercise/exercise-indexed-db.repository";
 import type { Exercise } from "#/infrastructure/database/indexed-db.types";
 
+const exerciseIndexDbRepository = new IndexedDbExerciseRepository();
+
 export default function useSaveExercise() {
 	const queryClient = useQueryClient();
-	const exerciseIndexDbRepository = new IndexedDbExerciseRepository();
 
 	return useMutation({
 		mutationFn: (exercise: Exercise) =>
@@ -19,3 +20,4 @@ export default function useSaveExercise() {
 		},
 	});
 }
+

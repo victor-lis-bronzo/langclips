@@ -6,12 +6,13 @@ type UseGetClipNextProps = {
   clipId: string;
 };
 
-export default function useGetClipNext({ deckId, clipId }: UseGetClipNextProps) {
-  const clipIndexDbRepository = new IndexedDbClipRepository();
+const clipIndexDbRepository = new IndexedDbClipRepository();
 
+export default function useGetClipNext({ deckId, clipId }: UseGetClipNextProps) {
   return useQuery({
     queryKey: ["clip", deckId, clipId],
     queryFn: () => clipIndexDbRepository.getNextClipById(deckId, clipId),
     enabled: !!clipId && !!deckId,
   });
 }
+

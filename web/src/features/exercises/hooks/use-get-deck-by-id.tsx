@@ -5,11 +5,12 @@ type useGetDeckByIdProps = {
 	deckId: string;
 };
 
-export default function useGetDeckById({ deckId }: useGetDeckByIdProps) {
-	const deckIndexDbRepository = new IndexedDbStorageRepository();
+const deckIndexDbRepository = new IndexedDbStorageRepository();
 
+export default function useGetDeckById({ deckId }: useGetDeckByIdProps) {
 	return useQuery({
 		queryKey: ["deck", deckId],
 		queryFn: () => deckIndexDbRepository.getDeck(deckId),
 	});
 }
+

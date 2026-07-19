@@ -5,6 +5,9 @@ import type { DifficultyType } from "#/infrastructure/repositories/preferences/p
 import { LocalStorageRepository } from "#/infrastructure/repositories/preferences/preferences-local-storage.repository";
 import { cn } from "#/lib/utils";
 
+const localStorageRepository = new LocalStorageRepository();
+const deckRepository = new IndexedDbStorageRepository();
+
 const cards: Record<
 	DifficultyType,
 	{
@@ -54,10 +57,8 @@ export default function DifficultySelectCards({
 	const navigate = useNavigate();
 
 	async function handleConfirm() {
-		const localStorageRepository = new LocalStorageRepository();
 		await localStorageRepository.setDifficulty(selectedDifficulty!);
 
-		const deckRepository = new IndexedDbStorageRepository();
 		const deck = await deckRepository.getDeck(deckId);
 		if (!deck) {
 			navigate({
@@ -81,6 +82,7 @@ export default function DifficultySelectCards({
 			},
 		});
 	}
+
 
 	return (
 		<main className="flex flex-col gap-2">

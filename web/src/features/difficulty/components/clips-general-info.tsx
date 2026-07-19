@@ -5,13 +5,14 @@ type ClipsGeneralInfoProps = {
 	deckId: string;
 };
 
-export default function ClipsGeneralInfo({ deckId }: ClipsGeneralInfoProps) {
-	const storageRepository = new IndexedDbStorageRepository();
+const storageRepository = new IndexedDbStorageRepository();
 
+export default function ClipsGeneralInfo({ deckId }: ClipsGeneralInfoProps) {
 	const { data: deck, isLoading } = useQuery({
 		queryKey: ["deck", deckId],
 		queryFn: () => storageRepository.getDeck(deckId),
 	});
+
 
 	if (!deck || isLoading) {
 		return (

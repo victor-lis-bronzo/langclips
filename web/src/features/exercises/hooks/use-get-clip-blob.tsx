@@ -6,15 +6,16 @@ type UseGetClipBlobProps = {
 	clipId: string;
 };
 
+const clipIndexDbRepository = new IndexedDbClipRepository();
+
 export default function useGetClipBlob({
 	deckId,
 	clipId,
 }: UseGetClipBlobProps) {
-	const clipIndexDbRepository = new IndexedDbClipRepository();
-
 	return useQuery({
 		queryKey: ["clip-blob", deckId, clipId],
 		queryFn: () => clipIndexDbRepository.getClipBlobById(deckId, clipId),
 		enabled: !!deckId && !!clipId,
 	});
 }
+
