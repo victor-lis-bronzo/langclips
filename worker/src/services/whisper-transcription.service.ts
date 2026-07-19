@@ -7,7 +7,10 @@ import {
   WhisperSegment,
 } from "../interfaces/transcription.interface";
 import { TranscriptionSegment } from "../interfaces/deck-builder.interface";
-import { IAudioChunkerService, AudioChunk } from "../interfaces/audio-chunker.interface";
+import {
+  IAudioChunkerService,
+  AudioChunk,
+} from "../interfaces/audio-chunker.interface";
 
 export class WhisperTranscriptionService implements ITranscriptionService {
   constructor(
@@ -26,12 +29,14 @@ export class WhisperTranscriptionService implements ITranscriptionService {
   }): Promise<{ success: boolean; transcriptionData: TranscriptionSegment[] }> {
     const stat = fs.statSync(audioPath);
     const MAX_FILE_SIZE = 24 * 1024 * 1024; // 24MB limit
-    
+
     let chunks: AudioChunk[] = [];
     let isChunked = false;
 
     if (stat.size > MAX_FILE_SIZE) {
-      console.log(`[transcription.service.ts] Arquivo maior que 24MB. Realizando chunking via AudioChunkerService...`);
+      console.log(
+        `[transcription.service.ts] Arquivo maior que 24MB. Realizando chunking via AudioChunkerService...`,
+      );
       const result = await this.audioChunker.chunkAudio({
         audioPath,
         chunkDurationSeconds: 600, // 10 minutes
@@ -47,15 +52,17 @@ export class WhisperTranscriptionService implements ITranscriptionService {
 
       for (let i = 0; i < chunks.length; i++) {
         const chunk = chunks[i];
-        
+
         if (isChunked) {
-          console.log(`[transcription.service.ts] Transcrevendo chunk ${i + 1}/${chunks.length}...`);
+          console.log(
+            `[transcription.service.ts] Transcrevendo chunk ${i + 1}/${chunks.length}...`,
+          );
         }
 
         const formData = new FormData();
         formData.append("file", fs.createReadStream(chunk.path));
         formData.append("model", "whisper-large-v3");
-        formData.append("response_format", "verbose_json"); 
+        formData.append("response_format", "verbose_json");
         formData.append("timestamp_granularities[]", "word");
         formData.append("timestamp_granularities[]", "segment");
 
@@ -75,11 +82,12 @@ export class WhisperTranscriptionService implements ITranscriptionService {
         const data = response.data;
 
         const consolidatedSegments = this.consolidateSegments(data.segments);
-        const confidentSegments = this.filterConfidentSegments(consolidatedSegments);
+        const confidentSegments =
+          this.filterConfidentSegments(consolidatedSegments);
         let transcriptionData = this.mapToDeckSegments(confidentSegments);
 
         if (chunk.startTimeOffset > 0) {
-          transcriptionData = transcriptionData.map(seg => ({
+          transcriptionData = transcriptionData.map((seg) => ({
             text: seg.text,
             start: seg.start + chunk.startTimeOffset,
             end: seg.end + chunk.startTimeOffset,
@@ -87,7 +95,7 @@ export class WhisperTranscriptionService implements ITranscriptionService {
         }
 
         allTranscriptionData = allTranscriptionData.concat(transcriptionData);
-        
+
         if (isChunked && fs.existsSync(chunk.path)) {
           fs.unlinkSync(chunk.path);
         }
@@ -167,9 +175,9 @@ export class WhisperTranscriptionService implements ITranscriptionService {
     const consolidated: WhisperSegment[] = [];
     let currentGroup: WhisperSegment[] = [];
 
-    const MAX_DURATION = 15; // 15 seconds
-    const MIN_DURATION = 5;  // 5 seconds
-    const MAX_GAP = 2.0;     // 2 seconds gap of silence
+    const MAX_DURATION = 8; // 10 seconds
+    const MIN_DURATION = 3; // 3 seconds
+    const MAX_GAP = 1.0; // 1 seconds gap of silence
 
     for (const seg of segments) {
       if (currentGroup.length > 0) {
@@ -181,7 +189,9 @@ export class WhisperTranscriptionService implements ITranscriptionService {
         // Se houver um gap muito grande de silêncio, ou se adicionar este segmento estourar a duração máxima
         if (gap > MAX_GAP || currentDuration > MAX_DURATION) {
           // Aplica trim antes de empurrar, para garantir que não fechamos com frase incompleta
-          consolidated.push(this.trimToLastPunctuation(this.mergeSegments(currentGroup)));
+          consolidated.push(
+            this.trimToLastPunctuation(this.mergeSegments(currentGroup)),
+          );
           currentGroup = [seg];
           continue;
         }
@@ -199,7 +209,9 @@ export class WhisperTranscriptionService implements ITranscriptionService {
     }
 
     if (currentGroup.length > 0) {
-      const mergedResidual = this.trimToLastPunctuation(this.mergeSegments(currentGroup));
+      const mergedResidual = this.trimToLastPunctuation(
+        this.mergeSegments(currentGroup),
+      );
       const residualDuration = mergedResidual.end - mergedResidual.start;
       const hasPunctuation = this.isSentenceEnd(mergedResidual.text);
 
@@ -212,9 +224,15 @@ export class WhisperTranscriptionService implements ITranscriptionService {
         const lastHasPunctuation = this.isSentenceEnd(lastConsolidated.text);
 
         // Só mescla se não sujar uma frase já bem terminada com fragmento sem pontuação
-        if (combinedDuration <= MAX_DURATION && gap <= MAX_GAP && (!lastHasPunctuation || hasPunctuation)) {
+        if (
+          combinedDuration <= MAX_DURATION &&
+          gap <= MAX_GAP &&
+          (!lastHasPunctuation || hasPunctuation)
+        ) {
           consolidated.pop();
-          consolidated.push(this.mergeSegments([lastConsolidated, mergedResidual]));
+          consolidated.push(
+            this.mergeSegments([lastConsolidated, mergedResidual]),
+          );
         } else if (hasPunctuation) {
           consolidated.push(mergedResidual);
         }
