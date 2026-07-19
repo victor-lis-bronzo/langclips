@@ -1,8 +1,13 @@
 import type { DifficultyType } from "#/infrastructure/repositories/preferences/preferences.repository.interface";
 import { cn } from "#/lib/utils";
 import { useEffect, useRef, useState } from "react";
-import useGetClip from "../hooks/use-get-clip";
-import useSaveExercise from "../hooks/use-save-exercise";
+import useGetClip from "../../hooks/use-get-clip";
+import useSaveExercise from "../../hooks/use-save-exercise";
+import useGetClipNext from "../../hooks/use-get-next-clip";
+import { useNavigate } from "@tanstack/react-router";
+import { evaluateAttempt } from "./functions/handle-attempt";
+import { handleNextExercise as navigateToNext } from "./functions/handle-next-exercise";
+import type { WordResult } from "./types/word-result";
 
 type AnswerBoxProps = {
   variant: DifficultyType;
@@ -10,15 +15,13 @@ type AnswerBoxProps = {
   clipId: string;
 };
 
-type WordResult = {
-  word: string;
-  status: "exact" | "case" | "wrong" | "missing";
-};
-
 export default function AnswerBox({ variant, deckId, clipId }: AnswerBoxProps) {
   const [step, setStep] = useState<"writing" | "reveal">("writing");
   const [startTime] = useState<number>(Date.now());
   const [resultWords, setResultWords] = useState<WordResult[]>([]);
+
+  const { data: nextClip } = useGetClipNext({ clipId });
+  const navigate = useNavigate();
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -33,55 +36,17 @@ export default function AnswerBox({ variant, deckId, clipId }: AnswerBoxProps) {
 
   async function handleAttempt() {
     const input = inputRef.current;
-    if (!input) return;
-
-    const value = input.value;
-    if (!value) return;
+    const value = input?.value;
+    if (!input || !value) return;
 
     setStep("reveal");
 
-    const cleanString = (str: string) =>
-      str
-        .replace(/[.,!?()[\]{}"':;]/g, "")
-        .trim()
-        .split(/\s+/)
-        .filter(Boolean);
-
-    const originalWords = cleanString(clip?.transcription || "");
-    const userWords = cleanString(value);
-
-    const maxLength = Math.max(originalWords.length, userWords.length);
-    const results: WordResult[] = [];
-
-    let greens = 0;
-    let yellows = 0;
-    let reds = 0;
-
-    for (let i = 0; i < maxLength; i++) {
-      const originalWord = originalWords[i] || "";
-      const userWord = userWords[i] || "";
-
-      if (!userWord) {
-        results.push({ word: originalWord, status: "missing" });
-        reds++;
-      } else if (!originalWord) {
-        results.push({ word: userWord, status: "wrong" });
-        reds++;
-      } else if (originalWord === userWord) {
-        results.push({ word: userWord, status: "exact" });
-        greens++;
-      } else if (originalWord.toLowerCase() === userWord.toLowerCase()) {
-        results.push({ word: userWord, status: "case" });
-        yellows++;
-      } else {
-        results.push({ word: userWord, status: "wrong" });
-        reds++;
-      }
-    }
-
+    const { results, isHit } = evaluateAttempt(
+      value,
+      clip?.transcription || "",
+    );
     setResultWords(results);
 
-    const isHit = greens + yellows >= reds;
     const timeSpentMs = Date.now() - startTime;
 
     saveExercise({
@@ -96,9 +61,15 @@ export default function AnswerBox({ variant, deckId, clipId }: AnswerBoxProps) {
     });
   }
 
+  async function handleNextExercise() {
+    setStep("writing");
+    setResultWords([]);
+    navigateToNext(nextClip, navigate);
+  }
+
   async function handleSubmit() {
     if (step === "reveal") {
-      // Maybe move to next clip? Not specified yet, just keep it disabled for now
+      handleNextExercise();
     } else {
       handleAttempt();
     }
@@ -180,11 +151,10 @@ export default function AnswerBox({ variant, deckId, clipId }: AnswerBoxProps) {
         <button
           type="button"
           onClick={handleSubmit}
-          disabled={step === "reveal"}
           className="w-full flex items-center justify-center gap-2 py-2.5 px-6 rounded-md bg-primary/25 hover:bg-primary/40 active:scale-98 transition-all duration-200 text-zinc-200 hover:text-white cursor-pointer group disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span className="text-sm font-caveat font-bold uppercase">
-            {step === "reveal" ? "Recorded" : "Check answer"}
+            {step === "reveal" ? "Next" : "Check answer"}
           </span>
         </button>
       </div>

@@ -25,7 +25,11 @@ function ExercisesComponent() {
       <ExercisesHeader deckId={deckId} clipId={clipId} />
       <div className="flex w-full flex-col lg:flex-row gap-2">
         <VideoPlayer deckId={deckId} clipId={clipId} />
-        <AnswerBox variant={difficulty || "easy"} deckId={deckId} clipId={clipId} />
+        <AnswerBox
+          variant={difficulty || "easy"}
+          deckId={deckId}
+          clipId={clipId}
+        />
       </div>
     </div>
   );
