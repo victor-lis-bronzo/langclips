@@ -20,7 +20,7 @@ export default function AnswerBox({ variant, deckId, clipId }: AnswerBoxProps) {
   const [startTime] = useState<number>(Date.now());
   const [resultWords, setResultWords] = useState<WordResult[]>([]);
 
-  const { data: nextClip } = useGetClipNext({ clipId });
+  const { data: nextClip } = useGetClipNext({ deckId, clipId });
   const navigate = useNavigate();
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -64,6 +64,9 @@ export default function AnswerBox({ variant, deckId, clipId }: AnswerBoxProps) {
   async function handleNextExercise() {
     setStep("writing");
     setResultWords([]);
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
     navigateToNext(nextClip, navigate);
   }
 

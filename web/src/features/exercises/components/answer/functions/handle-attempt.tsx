@@ -15,28 +15,29 @@ export function evaluateAttempt(
   let yellows = 0;
   let reds = 0;
 
-  for (let i = 0; i < maxLength; i++) {
+  for (let i = 0; i < originalWords.length; i++) {
     const originalWord = originalWords[i] || "";
     const userWord = userWords[i] || "";
 
     if (!userWord) {
       results.push({ word: originalWord, status: "missing" });
       reds++;
-    } else if (!originalWord) {
-      results.push({ word: userWord, status: "wrong" });
-      reds++;
     } else if (originalWord === userWord) {
-      results.push({ word: userWord, status: "exact" });
+      results.push({ word: originalWord, status: "exact" });
       greens++;
     } else if (originalWord.toLowerCase() === userWord.toLowerCase()) {
-      results.push({ word: userWord, status: "case" });
+      results.push({ word: originalWord, status: "case" });
       yellows++;
     } else {
-      results.push({ word: userWord, status: "wrong" });
+      results.push({ word: originalWord, status: "wrong" });
       reds++;
     }
   }
 
-  const isHit = greens + yellows >= reds;
+  for (let i = originalWords.length; i < userWords.length; i++) {
+    reds++;
+  }
+
+  const isHit = greens + yellows > reds;
   return { results, isHit };
 }

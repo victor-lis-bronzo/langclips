@@ -20,5 +20,9 @@ export interface IClipStorageRepository {
 		clipId: string,
 	): Promise<(ClipMetadata & ClipPositionDetails) | null>;
 	getClipBlobById(deckId: string, clipId: string): Promise<Blob | null>;
+	getNextClipById(
+		deckId: string,
+		clipId: string,
+	): Promise<Omit<ClipMetadata, "blob" | "mimeType"> | null>;
 	deleteClipsByDeck(deckId: string): Promise<void>;
 }
