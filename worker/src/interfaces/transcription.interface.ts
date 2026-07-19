@@ -14,12 +14,19 @@ export type WhisperSegment = {
   words?: Array<{ word: string; start: number; end: number }>;
 };
 
+export type WhisperWord = {
+  word: string;
+  start: number;
+  end: number;
+};
+
 export type WhisperResponse = {
   task: string;
   language: string;
   duration: number;
   text: string;
   segments: WhisperSegment[];
+  words?: WhisperWord[];
 };
 
 export interface ITranscriptionService {

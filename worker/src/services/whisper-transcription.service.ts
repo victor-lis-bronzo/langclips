@@ -5,6 +5,7 @@ import {
   ITranscriptionService,
   WhisperResponse,
   WhisperSegment,
+  WhisperWord,
 } from "../interfaces/transcription.interface";
 import { TranscriptionSegment } from "../interfaces/deck-builder.interface";
 import {
@@ -80,11 +81,22 @@ export class WhisperTranscriptionService implements ITranscriptionService {
         );
 
         const data = response.data;
+        let transcriptionData: TranscriptionSegment[];
 
-        const consolidatedSegments = this.consolidateSegments(data.segments);
-        const confidentSegments =
-          this.filterConfidentSegments(consolidatedSegments);
-        let transcriptionData = this.mapToDeckSegments(confidentSegments);
+        if (data.words && data.words.length > 0) {
+          console.log(
+            `[transcription.service.ts] Usando word-level timestamps (${data.words.length} palavras) para consolidação.`,
+          );
+          transcriptionData = this.buildSegmentsFromWords(data.words);
+        } else {
+          console.log(
+            `[transcription.service.ts] Fallback para segment-level timestamps.`,
+          );
+          const consolidatedSegments = this.consolidateSegments(data.segments);
+          const confidentSegments =
+            this.filterConfidentSegments(consolidatedSegments);
+          transcriptionData = this.mapToDeckSegments(confidentSegments);
+        }
 
         if (chunk.startTimeOffset > 0) {
           transcriptionData = transcriptionData.map((seg) => ({
@@ -299,6 +311,91 @@ export class WhisperTranscriptionService implements ITranscriptionService {
       compression_ratio: compressionRatio,
       no_speech_prob: noSpeechProb,
       words: mergedWords,
+    };
+  }
+
+  private buildSegmentsFromWords(words: WhisperWord[]): TranscriptionSegment[] {
+    if (words.length === 0) return [];
+
+    const segments: TranscriptionSegment[] = [];
+    let currentWords: WhisperWord[] = [];
+
+    const MIN_DURATION = 3.0;
+    const MAX_DURATION = 8.0;
+    const MAX_GAP = 1.0;
+
+    for (let i = 0; i < words.length; i++) {
+      const wordObj = words[i];
+
+      if (currentWords.length > 0) {
+        const lastWord = currentWords[currentWords.length - 1];
+        const gap = wordObj.start - lastWord.end;
+        const groupStart = currentWords[0].start;
+        const currentDuration = wordObj.end - groupStart;
+
+        // Se houver um gap muito grande de silêncio ou se a frase estourar a duração máxima
+        if (gap > MAX_GAP || currentDuration > MAX_DURATION) {
+          segments.push(this.createSegmentFromWords(currentWords));
+          currentWords = [wordObj];
+          continue;
+        }
+      }
+
+      currentWords.push(wordObj);
+
+      const groupStart = currentWords[0].start;
+      const duration = wordObj.end - groupStart;
+
+      // Se for fim de frase (pontuação) e atingiu a duração mínima, fecha o segmento
+      if (this.isSentenceEnd(wordObj.word) && duration >= MIN_DURATION) {
+        segments.push(this.createSegmentFromWords(currentWords));
+        currentWords = [];
+      }
+    }
+
+    // Processa resíduo se sobrar
+    if (currentWords.length > 0) {
+      const residualSeg = this.createSegmentFromWords(currentWords);
+      const residualDuration = residualSeg.end - residualSeg.start;
+      const hasPunctuation = this.isSentenceEnd(
+        currentWords[currentWords.length - 1].word,
+      );
+
+      if (residualDuration >= MIN_DURATION) {
+        segments.push(residualSeg);
+      } else if (segments.length > 0) {
+        const lastSeg = segments[segments.length - 1];
+        const combinedDuration = residualSeg.end - lastSeg.start;
+        const lastWords = lastSeg.text.split(" ");
+        const gap = residualSeg.start - lastSeg.end;
+        const lastHasPunctuation = this.isSentenceEnd(
+          lastWords[lastWords.length - 1],
+        );
+
+        // Mescla se não estourar MAX_DURATION e gap <= MAX_GAP
+        if (combinedDuration <= MAX_DURATION && gap <= MAX_GAP) {
+          segments[segments.length - 1] = {
+            text: `${lastSeg.text} ${residualSeg.text}`,
+            start: lastSeg.start,
+            end: residualSeg.end,
+          };
+        } else if (hasPunctuation || residualDuration >= 1.5) {
+          segments.push(residualSeg);
+        }
+      } else {
+        segments.push(residualSeg);
+      }
+    }
+
+    return segments;
+  }
+
+  private createSegmentFromWords(words: WhisperWord[]): TranscriptionSegment {
+    const text = words.map((w) => w.word.trim()).join(" ");
+    return {
+      text,
+      start: parseFloat(words[0].start.toFixed(3)),
+      end: parseFloat(words[words.length - 1].end.toFixed(3)),
     };
   }
 }
