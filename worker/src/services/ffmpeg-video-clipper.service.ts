@@ -36,8 +36,9 @@ export class FFmpegVideoClipperService implements IVideoClipperService {
             .setStartTime(request.startTime)
             .setDuration(request.endTime - request.startTime)
             .outputOptions([
-              "-c:v copy",
-              "-c:a copy",
+              "-c:v libx264",
+              "-preset superfast",
+              "-c:a aac",
               "-avoid_negative_ts",
               "make_zero",
             ])
