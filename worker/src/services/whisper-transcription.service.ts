@@ -160,7 +160,12 @@ export class WhisperTranscriptionService implements ITranscriptionService {
     // Interpolação linear: proporcional ao tamanho do texto que foi preservado
     const ratio = trimmedText.length / text.length;
     const duration = segment.end - segment.start;
-    const newEnd = segment.start + duration * ratio;
+    const rawEnd = segment.start + duration * ratio;
+    
+    // Adiciona uma margem de segurança de 15% do tempo restante para garantir que a última palavra não seja cortada
+    const remainingDuration = segment.end - rawEnd;
+    const padding = remainingDuration * 0.15;
+    const newEnd = Math.min(rawEnd + padding, segment.end);
 
     return {
       ...segment,
