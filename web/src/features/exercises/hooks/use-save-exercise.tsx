@@ -5,19 +5,21 @@ import type { Exercise } from "#/infrastructure/database/indexed-db.types";
 const exerciseIndexDbRepository = new IndexedDbExerciseRepository();
 
 export default function useSaveExercise() {
-	const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
-	return useMutation({
-		mutationFn: (exercise: Exercise) =>
-			exerciseIndexDbRepository.saveExercise(exercise),
-		onSuccess: (_, variables) => {
-			queryClient.invalidateQueries({
-				queryKey: ["exercises", variables.deckId],
-			});
-			queryClient.invalidateQueries({
-				queryKey: ["exercises", variables.clipId],
-			});
-		},
-	});
+  return useMutation({
+    mutationFn: (exercise: Exercise) =>
+      exerciseIndexDbRepository.saveExercise(exercise),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["deck-exercises", variables.deckId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["exercises", variables.deckId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["exercises", variables.clipId],
+      });
+    },
+  });
 }
-
