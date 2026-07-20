@@ -3,7 +3,8 @@ import ExercisesHeader from "#/features/exercises/components/header";
 import VideoPlayer from "#/features/exercises/components/video-player";
 import AnswerBox from "#/features/exercises/components/answer";
 import useGetDifficulty from "#/features/exercises/hooks/use-get-difficulty";
-import { AlertExistentDeckDialog } from "#/features/home/components/alert-existent-deck-dialog";
+import { useEffect } from "react";
+import useCleanUpOldGuesses from "#/features/exercises/hooks/use-clean-up-old-guesses";
 
 export const Route = createFileRoute("/exercises/$deckId/$clipId")({
   component: ExercisesRoute,
@@ -20,6 +21,14 @@ function ExercisesRoute() {
 function ExercisesComponent() {
   const { deckId, clipId } = Route.useParams();
   const { data: difficulty } = useGetDifficulty();
+  const { mutate: cleanUpOldGuesses } = useCleanUpOldGuesses({
+    deckId,
+    clipId,
+  });
+
+  useEffect(() => {
+    cleanUpOldGuesses();
+  }, []);
 
   return (
     <div className="w-full max-w-5xl flex flex-col gap-2">

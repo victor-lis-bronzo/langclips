@@ -44,7 +44,7 @@ export default function PrecisionCircle({ deckId }: PrecisionCircleProps) {
     circumference - (correctPercentage / 100) * circumference;
 
   return (
-    <div className="flex flex-col items-center justify-center p-8 bg-card border border-white/10 rounded-[20px] w-full max-w-[280px]">
+    <div className="flex flex-col items-center justify-center p-8 bg-card border border-white/10 rounded-[20px] flex-1">
       <div className="relative flex items-center justify-center">
         <svg
           width={size}
@@ -82,7 +82,7 @@ export default function PrecisionCircle({ deckId }: PrecisionCircleProps) {
             {correctPercentage}%
           </span>
           <span className="text-[10px] text-muted-foreground font-inter uppercase tracking-[0.2em] mt-2 ml-1">
-            Precisão
+            Precision
           </span>
         </div>
       </div>
