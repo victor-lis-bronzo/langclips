@@ -67,7 +67,11 @@ export default function AnswerBox({ variant, deckId, clipId }: AnswerBoxProps) {
     if (inputRef.current) {
       inputRef.current.value = "";
     }
-    navigateToNext(nextClip, navigate);
+    if (nextClip) {
+      navigateToNext(nextClip, navigate);
+    } else {
+      navigate({ to: `/results/$deckId`, params: { deckId } });
+    }
   }
 
   async function handleSubmit() {
@@ -95,7 +99,7 @@ export default function AnswerBox({ variant, deckId, clipId }: AnswerBoxProps) {
           className={cn(
             "w-full flex-1 bg-transparent outline-none resize-none border-l-2 border-white/50 my-4 px-4 font-inter text-base text-zinc-100 placeholder-zinc-500",
             "scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-white/5",
-            step === "reveal" && "text-zinc-400 cursor-not-allowed opacity-60"
+            step === "reveal" && "text-zinc-400 cursor-not-allowed opacity-60",
           )}
           placeholder="Type your answer here..."
           style={{
