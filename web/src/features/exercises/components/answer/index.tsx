@@ -83,7 +83,7 @@ export default function AnswerBox({ variant, deckId, clipId }: AnswerBoxProps) {
   }
 
   return (
-    <div className="max-w-1/3 w-full rounded-2xl border border-white min-h-full p-4 flex flex-col gap-2">
+    <div className="lg:max-w-1/3 w-full rounded-2xl border border-white min-h-full p-4 flex flex-col gap-2">
       <header className="my-2">
         <h3 className="font-caveat text-4xl font-bold text-white mb-2">
           Dictation

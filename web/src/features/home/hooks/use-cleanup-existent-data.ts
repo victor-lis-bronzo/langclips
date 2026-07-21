@@ -19,6 +19,9 @@ export function useCleanUpExistentData() {
       ])
         .then(() => {
           queryClient.invalidateQueries({ queryKey: ["verify-deck-data"] });
+          queryClient.invalidateQueries({ queryKey: ["decks"] });
+          queryClient.invalidateQueries({ queryKey: ["clips"] });
+          queryClient.invalidateQueries({ queryKey: ["exercises"] });
           return true;
         })
         .catch((error) => {
@@ -28,4 +31,3 @@ export function useCleanUpExistentData() {
     },
   });
 }
-
