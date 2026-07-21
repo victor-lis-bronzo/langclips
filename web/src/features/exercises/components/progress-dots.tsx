@@ -43,7 +43,7 @@ export function ProgressDots({
   return (
     <div
       className="relative overflow-hidden p-2"
-      style={{ width: `${viewportWidth + 8}px` }} // +8px padding para o ring/shadow não ser cortado
+      style={{ width: `${viewportWidth + 16}px` }} // +8px padding para o ring/shadow não ser cortado
     >
       <div
         className="flex items-center gap-2 transition-transform duration-300 ease-in-out"
