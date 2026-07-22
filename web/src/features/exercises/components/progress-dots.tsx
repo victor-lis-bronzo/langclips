@@ -50,7 +50,6 @@ export function ProgressDots({
         style={{ transform: `translateX(${translateX}px)` }}
       >
         {allDots.map((dotNum) => {
-          console.log({ dotNum, current });
           const isCurrent = dotNum === current;
           const dotStatus =
             statuses.find((s) => s.num === dotNum)?.status ?? "unanswered";
