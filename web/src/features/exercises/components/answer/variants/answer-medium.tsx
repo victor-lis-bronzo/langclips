@@ -103,7 +103,9 @@ export default function AnswerMedium({
 					return (
 						<input
 							key={token.index}
-							ref={(el) => (inputsRef.current[idx] = el)}
+							ref={(el) => {
+								inputsRef.current[idx] = el;
+							}}
 							type="text"
 							disabled={disabled}
 							value={currentVal}
