@@ -43,10 +43,9 @@ export function AlertExistentDeckDialog({
 
   async function handleConfirm() {
     navigate({
-      to: "/exercises/$deckId/$clipId",
+      to: "/difficulty/$deckId",
       params: {
         deckId: existentDeck!.id,
-        clipId: existentDeck!.clips[0].id,
       },
     });
   }
@@ -74,4 +73,3 @@ export function AlertExistentDeckDialog({
     </AlertDialog>
   );
 }
-
