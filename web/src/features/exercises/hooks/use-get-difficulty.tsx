@@ -6,10 +6,9 @@ type UseGetDifficultyProps = {};
 const preferencesRepository = new LocalStorageRepository();
 
 export default function useGetDifficulty({}: UseGetDifficultyProps = {}) {
-  return useQuery<"easy" | "medium" | "hard" | undefined>({
-    queryKey: ["difficulty"],
-    queryFn: () => preferencesRepository.getDifficulty(),
-    enabled: true,
-  });
+	return useQuery<"easy" | "medium" | "hard" | undefined>({
+		queryKey: ["difficulty"],
+		queryFn: () => preferencesRepository.getDifficulty(),
+		enabled: true,
+	});
 }
-

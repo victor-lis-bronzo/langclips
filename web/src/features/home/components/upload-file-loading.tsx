@@ -13,10 +13,10 @@ export function UploadFileLoading() {
 
 						<div className="flex flex-col">
 							<span className="text-sm font-medium tracking-wide">
-								Enviando vídeo para a nuvem
+								Uploading video to the cloud
 							</span>
 							<span className="text-[11px] mt-0.5 font-medium font-mono text-emerald-400 animate-pulse">
-								Aguarde, pode levar alguns segundos...
+								Please wait, it may take a few seconds...
 							</span>
 						</div>
 					</div>

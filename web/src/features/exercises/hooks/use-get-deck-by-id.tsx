@@ -13,4 +13,3 @@ export default function useGetDeckById({ deckId }: useGetDeckByIdProps) {
 		queryFn: () => deckIndexDbRepository.getDeck(deckId),
 	});
 }
-

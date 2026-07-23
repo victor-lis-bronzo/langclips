@@ -67,9 +67,9 @@ export function ProcessingStepCard({
 									: "text-zinc-600"
 						}`}
 					>
-						{stepState === "completed" && "Concluída"}
-						{stepState === "processing" && "Processando agora..."}
-						{stepState === "pending" && "Pendente"}
+						{stepState === "completed" && "Completed"}
+						{stepState === "processing" && "Processing now..."}
+						{stepState === "pending" && "Pending"}
 					</span>
 				</div>
 			</div>
@@ -78,7 +78,7 @@ export function ProcessingStepCard({
 			<div>
 				{stepState === "completed" && (
 					<span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">
-						Feito
+						Done
 					</span>
 				)}
 				{stepState === "processing" && (

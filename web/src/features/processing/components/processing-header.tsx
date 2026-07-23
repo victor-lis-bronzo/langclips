@@ -14,23 +14,23 @@ export function ProcessingHeader({
 	return (
 		<div className="bg-zinc-900/40 border border-zinc-800/80 rounded-3xl p-6 md:p-8 shadow-2xl backdrop-blur-md flex flex-col items-center">
 			<h2 className="text-2xl font-bold text-zinc-100 mb-2 tracking-tight">
-				{isFinished ? "Processamento Concluído!" : "Processando seu Vídeo"}
+				{isFinished ? "Processing Completed!" : "Processing your Video"}
 			</h2>
 
 			<p className="text-zinc-400 text-sm text-center mb-6 max-w-sm h-5 overflow-hidden text-ellipsis whitespace-nowrap">
 				{isFinished
-					? "O deck de estudos foi gerado e salvo com sucesso no seu dispositivo."
+					? "The study deck was successfully generated and saved to your device."
 					: status === "downloading"
-						? "Salvando arquivos localmente para uso offline..."
+						? "Saving files locally for offline use..."
 						: currentStepLabel
-							? `Executando: ${currentStepLabel}`
-							: "Iniciando a fila de processamento..."}
+							? `Executing: ${currentStepLabel}`
+							: "Starting processing queue..."}
 			</p>
 
 			{/* Progresso Geral */}
 			<div className="w-full mb-2">
 				<div className="flex justify-between items-center text-xs font-mono text-zinc-400 mb-2">
-					<span>Progresso Geral</span>
+					<span>Overall Progress</span>
 					<span className="font-semibold text-emerald-400">
 						{Math.round(progress)}%
 					</span>

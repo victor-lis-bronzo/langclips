@@ -8,14 +8,10 @@ type UseGetClipProps = {
 
 const clipIndexDbRepository = new IndexedDbClipRepository();
 
-export default function useGetClip({
-	deckId,
-	clipId,
-}: UseGetClipProps) {
+export default function useGetClip({ deckId, clipId }: UseGetClipProps) {
 	return useQuery({
 		queryKey: ["clip", deckId, clipId],
 		queryFn: () => clipIndexDbRepository.getClipById(deckId, clipId),
 		enabled: !!deckId && !!clipId,
 	});
 }
-

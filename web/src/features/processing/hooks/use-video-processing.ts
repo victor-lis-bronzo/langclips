@@ -55,7 +55,7 @@ export function useVideoProcessing(jobId: string | null) {
 				const deck = payload.result?.deck;
 				if (!deck) {
 					setStatus("failed");
-					setError("Deck não recebido no payload de conclusão.");
+					setError("Deck not received in completion payload.");
 					eventSource.close();
 					return;
 				}

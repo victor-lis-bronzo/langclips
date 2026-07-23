@@ -13,7 +13,6 @@ export default function ClipsGeneralInfo({ deckId }: ClipsGeneralInfoProps) {
 		queryFn: () => storageRepository.getDeck(deckId),
 	});
 
-
 	if (!deck || isLoading) {
 		return (
 			<div className="w-full flex items-center justify-between p-4 h-20 rounded-2xl transition-all duration-300 box-border shrink-0 bg-zinc-800/40 border-zinc-700 border-2 text-zinc-100 shadow-lg animate-pulse" />
@@ -28,22 +27,21 @@ export default function ClipsGeneralInfo({ deckId }: ClipsGeneralInfoProps) {
 	const seconds = String(roundedSeconds % 60).padStart(2, "0");
 
 	const durationText =
-		roundedSeconds < 60 ? `~${roundedSeconds} seg` : `~${minutes}m ${seconds}s`;
+		roundedSeconds < 60 ? `~${roundedSeconds} sec` : `~${minutes}m ${seconds}s`;
 
 	return (
 		<div className="w-full flex items-center justify-between p-4 h-20 rounded-2xl transition-all duration-300 box-border shrink-0 bg-zinc-800/40 border-zinc-700 border-2 text-zinc-100 shadow-lg">
 			<div className="flex flex-col">
 				<h3 className="font-inter text-emerald-400 text-xs uppercase">
-					Clipes Gerados
+					Generated Clips
 				</h3>
 				<h1 className="text-xl font-semibold">
-					{clipsCount}{" "}
-					{clipsCount === 1 ? "clip foi gerado" : "clips foram gerados"}
+					{clipsCount} {clipsCount === 1 ? "clip generated" : "clips generated"}
 				</h1>
 			</div>
 			<div className="flex flex-col ml-auto text-right">
 				<h3 className="font-inter text-emerald-400 text-xs uppercase">
-					Tempo Total
+					Total Time
 				</h3>
 				<h1 className="text-xl font-semibold">{durationText}</h1>
 			</div>

@@ -8,26 +8,26 @@ const clipRepository = new IndexedDbClipRepository();
 const exerciseRepository = new IndexedDbExerciseRepository();
 
 export function useCleanUpExistentData() {
-  const queryClient = useQueryClient();
+	const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async () => {
-      return await Promise.all([
-        deckRepository.cleanUp(),
-        clipRepository.cleanUp(),
-        exerciseRepository.cleanUp(),
-      ])
-        .then(() => {
-          queryClient.invalidateQueries({ queryKey: ["verify-deck-data"] });
-          queryClient.invalidateQueries({ queryKey: ["decks"] });
-          queryClient.invalidateQueries({ queryKey: ["clips"] });
-          queryClient.invalidateQueries({ queryKey: ["exercises"] });
-          return true;
-        })
-        .catch((error) => {
-          console.error(error);
-          return false;
-        });
-    },
-  });
+	return useMutation({
+		mutationFn: async () => {
+			return await Promise.all([
+				deckRepository.cleanUp(),
+				clipRepository.cleanUp(),
+				exerciseRepository.cleanUp(),
+			])
+				.then(() => {
+					queryClient.invalidateQueries({ queryKey: ["verify-deck-data"] });
+					queryClient.invalidateQueries({ queryKey: ["decks"] });
+					queryClient.invalidateQueries({ queryKey: ["clips"] });
+					queryClient.invalidateQueries({ queryKey: ["exercises"] });
+					return true;
+				})
+				.catch((error) => {
+					console.error(error);
+					return false;
+				});
+		},
+	});
 }

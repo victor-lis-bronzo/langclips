@@ -3,7 +3,9 @@ import type { IDBPDatabase } from "idb";
 
 export abstract class BaseIndexedDbRepository {
 	constructor(
-		protected readonly dbProvider: () => Promise<IDBPDatabase<LangClipsDB>> = getDatabase,
+		protected readonly dbProvider: () => Promise<
+			IDBPDatabase<LangClipsDB>
+		> = getDatabase,
 	) {}
 
 	protected getDb(): Promise<IDBPDatabase<LangClipsDB>> {

@@ -12,10 +12,10 @@ export function ProcessingSuccessCard({ result }: ProcessingSuccessCardProps) {
 		<div className="bg-zinc-900/60 border border-emerald-500/30 rounded-2xl p-4 h-20 flex items-center justify-between shadow-2xl backdrop-blur-md animate-fade-in box-border shrink-0">
 			<div className="flex flex-col">
 				<h4 className="text-emerald-400 font-bold text-sm tracking-wide">
-					Deck Pronto!
+					Deck Ready!
 				</h4>
 				<span className="inline-flex items-center text-[10px] font-semibold text-emerald-300/80 mt-0.5 font-mono">
-					{clipsCount} cortes gerados
+					{clipsCount} {clipsCount === 1 ? "clip generated" : "clips generated"}
 				</span>
 			</div>
 
@@ -23,7 +23,7 @@ export function ProcessingSuccessCard({ result }: ProcessingSuccessCardProps) {
 				to="/"
 				className="py-2 px-3 text-center font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-colors cursor-pointer"
 			>
-				Exercícios
+				Start Exercises
 			</Link>
 		</div>
 	);

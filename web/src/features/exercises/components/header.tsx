@@ -20,7 +20,8 @@ export default function ExercisesHeader({
 
 	const statuses: DotStatus[] =
 		deck?.clips.map((clip, index) => {
-			const clipExercises = exercises?.filter((e) => e.clipId === clip.id) ?? [];
+			const clipExercises =
+				exercises?.filter((e) => e.clipId === clip.id) ?? [];
 			const latestExercise = clipExercises.sort(
 				(a, b) => (b.doneAt || b.createdAt) - (a.doneAt || a.createdAt),
 			)[0];

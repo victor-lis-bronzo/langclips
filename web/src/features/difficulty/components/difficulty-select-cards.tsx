@@ -20,7 +20,7 @@ const cards: Record<
 	easy: {
 		title: "Easy",
 		description:
-			"Ideal para iniciantes. Foco em vocabulário básico e estruturas simples.",
+			"Ideal for beginners. Focus on basic vocabulary and simple structures.",
 		textColorClassName: "text-green-500",
 		className:
 			"border-green-500/20 hover:border-green-500/60 hover:shadow-green-500/10",
@@ -28,7 +28,7 @@ const cards: Record<
 	medium: {
 		title: "Medium",
 		description:
-			"Ideal para intermediários. Foco em vocabulário intermediário e estruturas médias.",
+			"Ideal for intermediate learners. Focus on intermediate vocabulary and structures.",
 		className:
 			"border-yellow-500/20 hover:border-yellow-500/60 hover:shadow-yellow-500/10",
 		textColorClassName: "text-yellow-500",
@@ -36,7 +36,7 @@ const cards: Record<
 	hard: {
 		title: "Hard",
 		description:
-			"Ideal para avançados. Foco em vocabulário avançado e estruturas complexas.",
+			"Ideal for advanced learners. Focus on advanced vocabulary and complex structures.",
 		className:
 			"border-red-500/20 hover:border-red-500/60 hover:shadow-red-500/10",
 		textColorClassName: "text-red-500",
@@ -83,11 +83,10 @@ export default function DifficultySelectCards({
 		});
 	}
 
-
 	return (
 		<main className="flex flex-col gap-2">
 			<h1 className="text-emerald-400 text-2xl font-semibold mt-4">
-				Selecione a Dificuldade
+				Select Difficulty
 			</h1>
 			<div className="flex flex-col gap-2">
 				{(Object.keys(cards) as DifficultyType[]).map((difficulty) => {
@@ -127,7 +126,7 @@ export default function DifficultySelectCards({
 				disabled={!selectedDifficulty}
 				onClick={handleConfirm}
 			>
-				Confirmar
+				Confirm
 			</button>
 		</main>
 	);

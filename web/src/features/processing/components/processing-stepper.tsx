@@ -10,14 +10,14 @@ interface ProcessingStepperProps {
 }
 
 const PROCESS_STEPS = [
-	{ id: "download", label: "Download do vídeo original" },
-	{ id: "audio-extraction", label: "Extração de áudio" },
-	{ id: "transcription", label: "Transcrição do áudio" },
-	{ id: "clip-generation", label: "Geração dos cortes (clips)" },
-	{ id: "clip-upload", label: "Upload dos cortes gerados" },
-	{ id: "deck-construction", label: "Construção do deck" },
-	{ id: "deck-upload", label: "Salvando deck finalizado" },
-	{ id: "local-save", label: "Salvando offline no dispositivo" },
+	{ id: "download", label: "Original video download" },
+	{ id: "audio-extraction", label: "Audio extraction" },
+	{ id: "transcription", label: "Audio transcription" },
+	{ id: "clip-generation", label: "Clip generation" },
+	{ id: "clip-upload", label: "Upload generated clips" },
+	{ id: "deck-construction", label: "Deck construction" },
+	{ id: "deck-upload", label: "Saving finalized deck" },
+	{ id: "local-save", label: "Saving offline on device" },
 ];
 
 export function ProcessingStepper({
@@ -67,7 +67,7 @@ export function ProcessingStepper({
 	return (
 		<div className="flex flex-col gap-3">
 			<h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider px-2">
-				Progresso das Etapas
+				Step Progress
 			</h3>
 
 			<div

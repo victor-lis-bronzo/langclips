@@ -15,8 +15,8 @@ export type DropFileProps = Omit<
 export const DropFileInput = React.forwardRef<HTMLInputElement, DropFileProps>(
 	(
 		{
-			title = "Preparado para começar?",
-			description = "Arraste um vídeo ou clique para enviar",
+			title = "Ready to start?",
+			description = "Drag a video here or click to upload",
 			icon = <Upload size={32} className="text-white" />,
 			containerClassName,
 			onChange,
@@ -69,7 +69,7 @@ export const DropFileInput = React.forwardRef<HTMLInputElement, DropFileProps>(
 
 		const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 			if (e.target.files && e.target.files.length > 0) {
-				setFileDescription(`Analisando: ${e.target.files[0].name}`);
+				setFileDescription(`Analyzing: ${e.target.files[0].name}`);
 			}
 			if (onChange) {
 				onChange(e);
