@@ -67,9 +67,10 @@ Em atualizações futures, planeja-se adicionar:
 
 ## 5. Requisitos Técnicos e Ferramentas Sugeridas (Para a versão Temporária)
 
-- **Frontend:** `React`, `Vue.js` ou `Tanstack Start`.
-- **Backend:** `Node.js` (`Express`) ou `Python` (`FastAPI`).
-- **Banco de Dados:** Nenhum necessário inicialmente (pode-se usar o estado do React no frontend para gerenciar a pontuação da sessão atual).
+- **Frontend:** `TanStack Start` + `TanStack Router` (React 19, Vite).
+- **Backend:** `NestJS` com adaptador `Fastify`.
+- **Fila de Processamento:** `BullMQ` com `Redis`.
+- **Banco de Dados / Armazenamento Local:** `IndexedDB` (via biblioteca `idb`) no navegador do cliente para mídias e pontuações locais. Na nuvem, o armazenamento temporário é feito via S3/storage volátil durante o processamento.
 - **Armazenamento de Vídeo:** Sistema de arquivos local do servidor (ex: pastas `/tmp`) ou bibliotecas que processem o arquivo diretamente em memória (ex: `multer` em `Node.js`), com scripts de limpeza automática (_cron jobs_) para arquivos órfãos.
 - **Processamento e IA:** `FFmpeg` (para cortar áudio/vídeo) e OpenAI `Whisper API`.
 

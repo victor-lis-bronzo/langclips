@@ -59,9 +59,9 @@ Visão final do usuário.
 
 Artefatos criados paralelamente ou logo antes de escrever o código.
 
-- [ ] **Especificação de API (OpenAPI/Swagger):** Documentar os endpoints do seu backend _(ex: POST /api/v1/process-video, detalhando o payload que recebe o FormData e a resposta JSON com os clipes)_.
-- [ ] **Decisões de Arquitetura (ADRs - Architecture Decision Records):** Documentos curtos justificando escolhas tecnológicas _(ex: "Por que escolhemos Node.js com Multer ao invés de Python para a Fase 1?")_.
-- [ ] **Modelo de Dados (Estado / LocalStorage):** Como não há banco na Fase 1, documentar o formato do JSON que o frontend vai guardar no estado global (Zustand/Context API) para manter a pontuação da sessão atual.
+- [x] **Especificação de API (OpenAPI/Swagger):** Documentar os endpoints do seu backend _(ex: POST /videos/process, detalhando o payload recebido e a resposta JSON com os clipes)_.
+- [x] **Decisões de Arquitetura (ADRs - Architecture Decision Records):** Documentos curtos justificando escolhas tecnológicas _(ex: "Por que escolhemos NestJS e TanStack Start para a Fase 1?")_.
+- [x] **Modelo de Dados (Estado / LocalStorage):** Documentar o formato do JSON/IndexedDB que o frontend guarda para manter a pontuação e os clipes locais.
 
 ---
 
