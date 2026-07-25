@@ -6,7 +6,6 @@ import {
   HttpCode,
   HttpStatus,
   Param,
-  BadRequestException,
   Sse,
   MessageEvent,
 } from '@nestjs/common';

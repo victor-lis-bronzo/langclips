@@ -3,7 +3,6 @@ import {
   S3Client,
   PutObjectCommand,
   ListObjectsV2Command,
-  ListObjectsV2CommandOutput,
   GetObjectCommand,
   DeleteObjectsCommand,
 } from '@aws-sdk/client-s3';
@@ -31,9 +30,7 @@ export class StorageService {
         ContinuationToken: continuationToken,
       });
 
-      const response = (await this.client.send(
-        command,
-      )) as ListObjectsV2CommandOutput;
+      const response = await this.client.send(command);
       if (response.Contents) {
         for (const object of response.Contents) {
           totalSize += object.Size || 0;

@@ -26,19 +26,19 @@ export class VideoEventsService implements OnModuleDestroy {
 
   getJobStream(jobId: string): Observable<MessageEvent> {
     return new Observable((subscriber) => {
-      this.videoQueue.getJob(jobId).then((job) => {
+      void this.videoQueue.getJob(jobId).then((job) => {
         if (!job) {
           subscriber.error(new BadRequestException('Job não encontrado.'));
           return;
         }
 
-        job.getState().then((state) => {
+        void job.getState().then((state) => {
           if (state === 'completed' || state === 'failed') {
             subscriber.next({
               data: {
                 status: state,
                 progress: 100,
-                result: job.returnvalue,
+                result: job.returnvalue as unknown,
                 error: job.failedReason,
               },
             });
@@ -57,13 +57,25 @@ export class VideoEventsService implements OnModuleDestroy {
         });
       });
 
-      const onProgress = ({ jobId: eventJobId, data }) => {
+      const onProgress = ({
+        jobId: eventJobId,
+        data,
+      }: {
+        jobId: string;
+        data: number | object;
+      }) => {
         if (eventJobId === jobId) {
           subscriber.next({ data: { status: 'processing', progress: data } });
         }
       };
 
-      const onCompleted = ({ jobId: eventJobId, returnvalue }) => {
+      const onCompleted = ({
+        jobId: eventJobId,
+        returnvalue,
+      }: {
+        jobId: string;
+        returnvalue: string;
+      }) => {
         if (eventJobId === jobId) {
           subscriber.next({
             data: { status: 'completed', result: returnvalue },
@@ -72,7 +84,13 @@ export class VideoEventsService implements OnModuleDestroy {
         }
       };
 
-      const onFailed = ({ jobId: eventJobId, failedReason }) => {
+      const onFailed = ({
+        jobId: eventJobId,
+        failedReason,
+      }: {
+        jobId: string;
+        failedReason: string;
+      }) => {
         if (eventJobId === jobId) {
           subscriber.next({ data: { status: 'failed', error: failedReason } });
           subscriber.complete();
