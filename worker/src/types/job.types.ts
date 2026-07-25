@@ -1,5 +1,5 @@
-import { Job } from "bullmq";
+import type { Job } from "bullmq";
 
 export type VideoProcessingJobType = Job<{
-  fileKey: string;
+	fileKey: string;
 }>;

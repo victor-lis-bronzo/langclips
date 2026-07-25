@@ -1,401 +1,401 @@
 import axios from "axios";
 import FormData from "form-data";
 import fs from "fs";
-import {
-  ITranscriptionService,
-  WhisperResponse,
-  WhisperSegment,
-  WhisperWord,
-} from "../interfaces/transcription.interface";
-import { TranscriptionSegment } from "../interfaces/deck-builder.interface";
-import {
-  IAudioChunkerService,
-  AudioChunk,
+import type {
+	AudioChunk,
+	IAudioChunkerService,
 } from "../interfaces/audio-chunker.interface";
+import type { TranscriptionSegment } from "../interfaces/deck-builder.interface";
+import type {
+	ITranscriptionService,
+	WhisperResponse,
+	WhisperSegment,
+	WhisperWord,
+} from "../interfaces/transcription.interface";
 
 export class WhisperTranscriptionService implements ITranscriptionService {
-  constructor(
-    private readonly GROQ_API_KEY: string,
-    private readonly audioChunker: IAudioChunkerService,
-    private readonly MIN_AVG_LOGPROB: number = -0.6,
-    private readonly MAX_NO_SPEECH_PROB: number = 0.4,
-    private readonly MIN_COMPRESSION_RATIO: number = 0.8,
-    private readonly MAX_COMPRESSION_RATIO: number = 2.4,
-  ) {}
+	constructor(
+		private readonly GROQ_API_KEY: string,
+		private readonly audioChunker: IAudioChunkerService,
+		private readonly MIN_AVG_LOGPROB: number = -0.6,
+		private readonly MAX_NO_SPEECH_PROB: number = 0.4,
+		private readonly MIN_COMPRESSION_RATIO: number = 0.8,
+		private readonly MAX_COMPRESSION_RATIO: number = 2.4,
+	) {}
 
-  async transcribe({
-    audioPath,
-  }: {
-    audioPath: string;
-  }): Promise<{ success: boolean; transcriptionData: TranscriptionSegment[] }> {
-    const stat = fs.statSync(audioPath);
-    const MAX_FILE_SIZE = 24 * 1024 * 1024; // 24MB limit
+	async transcribe({
+		audioPath,
+	}: {
+		audioPath: string;
+	}): Promise<{ success: boolean; transcriptionData: TranscriptionSegment[] }> {
+		const stat = fs.statSync(audioPath);
+		const MAX_FILE_SIZE = 24 * 1024 * 1024; // 24MB limit
 
-    let chunks: AudioChunk[] = [];
-    let isChunked = false;
+		let chunks: AudioChunk[] = [];
+		let isChunked = false;
 
-    if (stat.size > MAX_FILE_SIZE) {
-      console.log(
-        `[transcription.service.ts] Arquivo maior que 24MB. Realizando chunking via AudioChunkerService...`,
-      );
-      const result = await this.audioChunker.chunkAudio({
-        audioPath,
-        chunkDurationSeconds: 600, // 10 minutes
-      });
-      chunks = result.chunks;
-      isChunked = true;
-    } else {
-      chunks = [{ path: audioPath, startTimeOffset: 0 }];
-    }
+		if (stat.size > MAX_FILE_SIZE) {
+			console.log(
+				`[transcription.service.ts] Arquivo maior que 24MB. Realizando chunking via AudioChunkerService...`,
+			);
+			const result = await this.audioChunker.chunkAudio({
+				audioPath,
+				chunkDurationSeconds: 600, // 10 minutes
+			});
+			chunks = result.chunks;
+			isChunked = true;
+		} else {
+			chunks = [{ path: audioPath, startTimeOffset: 0 }];
+		}
 
-    try {
-      let allTranscriptionData: TranscriptionSegment[] = [];
+		try {
+			let allTranscriptionData: TranscriptionSegment[] = [];
 
-      for (let i = 0; i < chunks.length; i++) {
-        const chunk = chunks[i];
+			for (let i = 0; i < chunks.length; i++) {
+				const chunk = chunks[i];
 
-        if (isChunked) {
-          console.log(
-            `[transcription.service.ts] Transcrevendo chunk ${i + 1}/${chunks.length}...`,
-          );
-        }
+				if (isChunked) {
+					console.log(
+						`[transcription.service.ts] Transcrevendo chunk ${i + 1}/${chunks.length}...`,
+					);
+				}
 
-        const formData = new FormData();
-        formData.append("file", fs.createReadStream(chunk.path));
-        formData.append("model", "whisper-large-v3");
-        formData.append("response_format", "verbose_json");
-        formData.append("timestamp_granularities[]", "word");
-        formData.append("timestamp_granularities[]", "segment");
+				const formData = new FormData();
+				formData.append("file", fs.createReadStream(chunk.path));
+				formData.append("model", "whisper-large-v3");
+				formData.append("response_format", "verbose_json");
+				formData.append("timestamp_granularities[]", "word");
+				formData.append("timestamp_granularities[]", "segment");
 
-        const response = await axios.post<WhisperResponse>(
-          "https://api.groq.com/openai/v1/audio/transcriptions",
-          formData,
-          {
-            headers: {
-              ...formData.getHeaders(),
-              Authorization: `Bearer ${this.GROQ_API_KEY}`,
-            },
-            maxBodyLength: Infinity,
-            maxContentLength: Infinity,
-          },
-        );
+				const response = await axios.post<WhisperResponse>(
+					"https://api.groq.com/openai/v1/audio/transcriptions",
+					formData,
+					{
+						headers: {
+							...formData.getHeaders(),
+							Authorization: `Bearer ${this.GROQ_API_KEY}`,
+						},
+						maxBodyLength: Infinity,
+						maxContentLength: Infinity,
+					},
+				);
 
-        const data = response.data;
-        let transcriptionData: TranscriptionSegment[];
+				const data = response.data;
+				let transcriptionData: TranscriptionSegment[];
 
-        if (data.words && data.words.length > 0) {
-          console.log(
-            `[transcription.service.ts] Usando word-level timestamps (${data.words.length} palavras) para consolidação.`,
-          );
-          transcriptionData = this.buildSegmentsFromWords(data.words);
-        } else {
-          console.log(
-            `[transcription.service.ts] Fallback para segment-level timestamps.`,
-          );
-          const consolidatedSegments = this.consolidateSegments(data.segments);
-          const confidentSegments =
-            this.filterConfidentSegments(consolidatedSegments);
-          transcriptionData = this.mapToDeckSegments(confidentSegments);
-        }
+				if (data.words && data.words.length > 0) {
+					console.log(
+						`[transcription.service.ts] Usando word-level timestamps (${data.words.length} palavras) para consolidação.`,
+					);
+					transcriptionData = this.buildSegmentsFromWords(data.words);
+				} else {
+					console.log(
+						`[transcription.service.ts] Fallback para segment-level timestamps.`,
+					);
+					const consolidatedSegments = this.consolidateSegments(data.segments);
+					const confidentSegments =
+						this.filterConfidentSegments(consolidatedSegments);
+					transcriptionData = this.mapToDeckSegments(confidentSegments);
+				}
 
-        if (chunk.startTimeOffset > 0) {
-          transcriptionData = transcriptionData.map((seg) => ({
-            text: seg.text,
-            start: seg.start + chunk.startTimeOffset,
-            end: seg.end + chunk.startTimeOffset,
-          }));
-        }
+				if (chunk.startTimeOffset > 0) {
+					transcriptionData = transcriptionData.map((seg) => ({
+						text: seg.text,
+						start: seg.start + chunk.startTimeOffset,
+						end: seg.end + chunk.startTimeOffset,
+					}));
+				}
 
-        allTranscriptionData = allTranscriptionData.concat(transcriptionData);
+				allTranscriptionData = allTranscriptionData.concat(transcriptionData);
 
-        if (isChunked && fs.existsSync(chunk.path)) {
-          fs.unlinkSync(chunk.path);
-        }
-      }
+				if (isChunked && fs.existsSync(chunk.path)) {
+					fs.unlinkSync(chunk.path);
+				}
+			}
 
-      return {
-        success: true,
-        transcriptionData: allTranscriptionData,
-      };
-    } catch (error) {
-      console.error("[transcription.service.ts] Falha na transcrição:", error);
-      if (isChunked) {
-        chunks.forEach((chunk) => {
-          if (fs.existsSync(chunk.path)) fs.unlinkSync(chunk.path);
-        });
-      }
-      throw error;
-    }
-  }
+			return {
+				success: true,
+				transcriptionData: allTranscriptionData,
+			};
+		} catch (error) {
+			console.error("[transcription.service.ts] Falha na transcrição:", error);
+			if (isChunked) {
+				chunks.forEach((chunk) => {
+					if (fs.existsSync(chunk.path)) fs.unlinkSync(chunk.path);
+				});
+			}
+			throw error;
+		}
+	}
 
-  private filterConfidentSegments(
-    segments: WhisperSegment[],
-  ): WhisperSegment[] {
-    return segments.filter(
-      (seg) =>
-        seg.avg_logprob >= this.MIN_AVG_LOGPROB &&
-        seg.no_speech_prob <= this.MAX_NO_SPEECH_PROB &&
-        seg.compression_ratio >= this.MIN_COMPRESSION_RATIO &&
-        seg.compression_ratio <= this.MAX_COMPRESSION_RATIO,
-    );
-  }
+	private filterConfidentSegments(
+		segments: WhisperSegment[],
+	): WhisperSegment[] {
+		return segments.filter(
+			(seg) =>
+				seg.avg_logprob >= this.MIN_AVG_LOGPROB &&
+				seg.no_speech_prob <= this.MAX_NO_SPEECH_PROB &&
+				seg.compression_ratio >= this.MIN_COMPRESSION_RATIO &&
+				seg.compression_ratio <= this.MAX_COMPRESSION_RATIO,
+		);
+	}
 
-  private mapToDeckSegments(
-    segments: WhisperSegment[],
-  ): TranscriptionSegment[] {
-    return segments.map((seg) => ({
-      text: seg.text.trim(),
-      start: seg.start,
-      end: seg.end,
-    }));
-  }
+	private mapToDeckSegments(
+		segments: WhisperSegment[],
+	): TranscriptionSegment[] {
+		return segments.map((seg) => ({
+			text: seg.text.trim(),
+			start: seg.start,
+			end: seg.end,
+		}));
+	}
 
-  private isSentenceEnd(text: string): boolean {
-    const cleanText = text.trim().replace(/["'"']+$/, "");
-    return /[.!?]$/.test(cleanText);
-  }
+	private isSentenceEnd(text: string): boolean {
+		const cleanText = text.trim().replace(/["'"']+$/, "");
+		return /[.!?]$/.test(cleanText);
+	}
 
-  /**
-   * Tenta cortar o texto de um segmento no último ponto de pontuação finalizadora (.!?),
-   * ajustando proporcionalmente o timestamp `end` com base no índice do caractere no texto.
-   * Usamos interpolação de tempo porque o Groq não retorna `words` para whisper-large-v3.
-   */
-  private trimToLastPunctuation(segment: WhisperSegment): WhisperSegment {
-    if (this.isSentenceEnd(segment.text)) return segment;
+	/**
+	 * Tenta cortar o texto de um segmento no último ponto de pontuação finalizadora (.!?),
+	 * ajustando proporcionalmente o timestamp `end` com base no índice do caractere no texto.
+	 * Usamos interpolação de tempo porque o Groq não retorna `words` para whisper-large-v3.
+	 */
+	private trimToLastPunctuation(segment: WhisperSegment): WhisperSegment {
+		if (this.isSentenceEnd(segment.text)) return segment;
 
-    const text = segment.text.trim();
-    // Encontra o índice do último . ! ? no texto (ignorando aspas/símbolos após ele)
-    const match = text.match(/^(.*[.!?])[^.!?]*$/);
-    if (!match) return segment; // Nenhuma pontuação encontrada, retorna original
+		const text = segment.text.trim();
+		// Encontra o índice do último . ! ? no texto (ignorando aspas/símbolos após ele)
+		const match = text.match(/^(.*[.!?])[^.!?]*$/);
+		if (!match) return segment; // Nenhuma pontuação encontrada, retorna original
 
-    const trimmedText = match[1].trim();
-    // Interpolação linear: proporcional ao tamanho do texto que foi preservado
-    const ratio = trimmedText.length / text.length;
-    const duration = segment.end - segment.start;
-    const rawEnd = segment.start + duration * ratio;
-    
-    // Adiciona uma margem de segurança de 15% do tempo restante para garantir que a última palavra não seja cortada
-    const remainingDuration = segment.end - rawEnd;
-    const padding = remainingDuration * 0.15;
-    const newEnd = Math.min(rawEnd + padding, segment.end);
+		const trimmedText = match[1].trim();
+		// Interpolação linear: proporcional ao tamanho do texto que foi preservado
+		const ratio = trimmedText.length / text.length;
+		const duration = segment.end - segment.start;
+		const rawEnd = segment.start + duration * ratio;
 
-    return {
-      ...segment,
-      text: trimmedText,
-      end: parseFloat(newEnd.toFixed(3)),
-    };
-  }
+		// Adiciona uma margem de segurança de 15% do tempo restante para garantir que a última palavra não seja cortada
+		const remainingDuration = segment.end - rawEnd;
+		const padding = remainingDuration * 0.15;
+		const newEnd = Math.min(rawEnd + padding, segment.end);
 
-  private consolidateSegments(segments: WhisperSegment[]): WhisperSegment[] {
-    if (segments.length === 0) return [];
+		return {
+			...segment,
+			text: trimmedText,
+			end: parseFloat(newEnd.toFixed(3)),
+		};
+	}
 
-    const consolidated: WhisperSegment[] = [];
-    let currentGroup: WhisperSegment[] = [];
+	private consolidateSegments(segments: WhisperSegment[]): WhisperSegment[] {
+		if (segments.length === 0) return [];
 
-    const MAX_DURATION = 8; // 8 seconds
-    const MIN_DURATION = 3; // 3 seconds
-    const MAX_GAP = 1.0; // 1 seconds gap of silence
+		const consolidated: WhisperSegment[] = [];
+		let currentGroup: WhisperSegment[] = [];
 
-    for (const seg of segments) {
-      if (currentGroup.length > 0) {
-        const lastInGroup = currentGroup[currentGroup.length - 1];
-        const gap = seg.start - lastInGroup.end;
-        const groupStart = currentGroup[0].start;
-        const currentDuration = seg.end - groupStart;
+		const MAX_DURATION = 8; // 8 seconds
+		const MIN_DURATION = 3; // 3 seconds
+		const MAX_GAP = 1.0; // 1 seconds gap of silence
 
-        // Se houver um gap muito grande de silêncio, ou se adicionar este segmento estourar a duração máxima
-        if (gap > MAX_GAP || currentDuration > MAX_DURATION) {
-          // Aplica trim antes de empurrar, para garantir que não fechamos com frase incompleta
-          consolidated.push(
-            this.trimToLastPunctuation(this.mergeSegments(currentGroup)),
-          );
-          currentGroup = [seg];
-          continue;
-        }
-      }
+		for (const seg of segments) {
+			if (currentGroup.length > 0) {
+				const lastInGroup = currentGroup[currentGroup.length - 1];
+				const gap = seg.start - lastInGroup.end;
+				const groupStart = currentGroup[0].start;
+				const currentDuration = seg.end - groupStart;
 
-      currentGroup.push(seg);
+				// Se houver um gap muito grande de silêncio, ou se adicionar este segmento estourar a duração máxima
+				if (gap > MAX_GAP || currentDuration > MAX_DURATION) {
+					// Aplica trim antes de empurrar, para garantir que não fechamos com frase incompleta
+					consolidated.push(
+						this.trimToLastPunctuation(this.mergeSegments(currentGroup)),
+					);
+					currentGroup = [seg];
+					continue;
+				}
+			}
 
-      const groupStart = currentGroup[0].start;
-      const duration = seg.end - groupStart;
+			currentGroup.push(seg);
 
-      if (this.isSentenceEnd(seg.text) && duration >= MIN_DURATION) {
-        consolidated.push(this.mergeSegments(currentGroup));
-        currentGroup = [];
-      }
-    }
+			const groupStart = currentGroup[0].start;
+			const duration = seg.end - groupStart;
 
-    if (currentGroup.length > 0) {
-      const mergedResidual = this.trimToLastPunctuation(
-        this.mergeSegments(currentGroup),
-      );
-      const residualDuration = mergedResidual.end - mergedResidual.start;
-      const hasPunctuation = this.isSentenceEnd(mergedResidual.text);
+			if (this.isSentenceEnd(seg.text) && duration >= MIN_DURATION) {
+				consolidated.push(this.mergeSegments(currentGroup));
+				currentGroup = [];
+			}
+		}
 
-      if (residualDuration >= MIN_DURATION) {
-        consolidated.push(mergedResidual);
-      } else if (consolidated.length > 0) {
-        const lastConsolidated = consolidated[consolidated.length - 1];
-        const combinedDuration = mergedResidual.end - lastConsolidated.start;
-        const gap = mergedResidual.start - lastConsolidated.end;
-        const lastHasPunctuation = this.isSentenceEnd(lastConsolidated.text);
+		if (currentGroup.length > 0) {
+			const mergedResidual = this.trimToLastPunctuation(
+				this.mergeSegments(currentGroup),
+			);
+			const residualDuration = mergedResidual.end - mergedResidual.start;
+			const hasPunctuation = this.isSentenceEnd(mergedResidual.text);
 
-        // Só mescla se não sujar uma frase já bem terminada com fragmento sem pontuação
-        if (
-          combinedDuration <= MAX_DURATION &&
-          gap <= MAX_GAP &&
-          (!lastHasPunctuation || hasPunctuation)
-        ) {
-          consolidated.pop();
-          consolidated.push(
-            this.mergeSegments([lastConsolidated, mergedResidual]),
-          );
-        } else if (hasPunctuation) {
-          consolidated.push(mergedResidual);
-        }
-        // else: descarta fragmento solto sem pontuação
-      } else {
-        consolidated.push(mergedResidual);
-      }
-    }
+			if (residualDuration >= MIN_DURATION) {
+				consolidated.push(mergedResidual);
+			} else if (consolidated.length > 0) {
+				const lastConsolidated = consolidated[consolidated.length - 1];
+				const combinedDuration = mergedResidual.end - lastConsolidated.start;
+				const gap = mergedResidual.start - lastConsolidated.end;
+				const lastHasPunctuation = this.isSentenceEnd(lastConsolidated.text);
 
-    return consolidated;
-  }
+				// Só mescla se não sujar uma frase já bem terminada com fragmento sem pontuação
+				if (
+					combinedDuration <= MAX_DURATION &&
+					gap <= MAX_GAP &&
+					(!lastHasPunctuation || hasPunctuation)
+				) {
+					consolidated.pop();
+					consolidated.push(
+						this.mergeSegments([lastConsolidated, mergedResidual]),
+					);
+				} else if (hasPunctuation) {
+					consolidated.push(mergedResidual);
+				}
+				// else: descarta fragmento solto sem pontuação
+			} else {
+				consolidated.push(mergedResidual);
+			}
+		}
 
-  private mergeSegments(group: WhisperSegment[]): WhisperSegment {
-    if (group.length === 1) return group[0];
+		return consolidated;
+	}
 
-    const first = group[0];
-    const last = group[group.length - 1];
+	private mergeSegments(group: WhisperSegment[]): WhisperSegment {
+		if (group.length === 1) return group[0];
 
-    const mergedText = group
-      .map((s) => s.text.trim())
-      .filter(Boolean)
-      .join(" ");
+		const first = group[0];
+		const last = group[group.length - 1];
 
-    const mergedTokens = group.flatMap((s) => s.tokens || []);
-    const mergedWords = group.some((s) => s.words)
-      ? group.flatMap((s) => s.words || [])
-      : undefined;
+		const mergedText = group
+			.map((s) => s.text.trim())
+			.filter(Boolean)
+			.join(" ");
 
-    // Calcula médias ponderadas pela duração para os metadados de confiança
-    let totalDuration = 0;
-    let sumLogprob = 0;
-    let sumCompressionRatio = 0;
-    let sumNoSpeechProb = 0;
-    let sumTemp = 0;
+		const mergedTokens = group.flatMap((s) => s.tokens || []);
+		const mergedWords = group.some((s) => s.words)
+			? group.flatMap((s) => s.words || [])
+			: undefined;
 
-    for (const s of group) {
-      const d = Math.max(s.end - s.start, 0.001);
-      totalDuration += d;
-      sumLogprob += s.avg_logprob * d;
-      sumCompressionRatio += s.compression_ratio * d;
-      sumNoSpeechProb += s.no_speech_prob * d;
-      sumTemp += s.temperature * d;
-    }
+		// Calcula médias ponderadas pela duração para os metadados de confiança
+		let totalDuration = 0;
+		let sumLogprob = 0;
+		let sumCompressionRatio = 0;
+		let sumNoSpeechProb = 0;
+		let sumTemp = 0;
 
-    const avgLogprob = sumLogprob / totalDuration;
-    const compressionRatio = sumCompressionRatio / totalDuration;
-    const noSpeechProb = sumNoSpeechProb / totalDuration;
-    const temp = sumTemp / totalDuration;
+		for (const s of group) {
+			const d = Math.max(s.end - s.start, 0.001);
+			totalDuration += d;
+			sumLogprob += s.avg_logprob * d;
+			sumCompressionRatio += s.compression_ratio * d;
+			sumNoSpeechProb += s.no_speech_prob * d;
+			sumTemp += s.temperature * d;
+		}
 
-    return {
-      id: first.id,
-      seek: first.seek,
-      start: first.start,
-      end: last.end,
-      text: mergedText,
-      tokens: mergedTokens,
-      temperature: temp,
-      avg_logprob: avgLogprob,
-      compression_ratio: compressionRatio,
-      no_speech_prob: noSpeechProb,
-      words: mergedWords,
-    };
-  }
+		const avgLogprob = sumLogprob / totalDuration;
+		const compressionRatio = sumCompressionRatio / totalDuration;
+		const noSpeechProb = sumNoSpeechProb / totalDuration;
+		const temp = sumTemp / totalDuration;
 
-  private buildSegmentsFromWords(words: WhisperWord[]): TranscriptionSegment[] {
-    if (words.length === 0) return [];
+		return {
+			id: first.id,
+			seek: first.seek,
+			start: first.start,
+			end: last.end,
+			text: mergedText,
+			tokens: mergedTokens,
+			temperature: temp,
+			avg_logprob: avgLogprob,
+			compression_ratio: compressionRatio,
+			no_speech_prob: noSpeechProb,
+			words: mergedWords,
+		};
+	}
 
-    const segments: TranscriptionSegment[] = [];
-    let currentWords: WhisperWord[] = [];
+	private buildSegmentsFromWords(words: WhisperWord[]): TranscriptionSegment[] {
+		if (words.length === 0) return [];
 
-    const MIN_DURATION = 3.0;
-    const MAX_DURATION = 8.0;
-    const MAX_GAP = 1.0;
+		const segments: TranscriptionSegment[] = [];
+		let currentWords: WhisperWord[] = [];
 
-    for (let i = 0; i < words.length; i++) {
-      const wordObj = words[i];
+		const MIN_DURATION = 3.0;
+		const MAX_DURATION = 8.0;
+		const MAX_GAP = 1.0;
 
-      if (currentWords.length > 0) {
-        const lastWord = currentWords[currentWords.length - 1];
-        const gap = wordObj.start - lastWord.end;
-        const groupStart = currentWords[0].start;
-        const currentDuration = wordObj.end - groupStart;
+		for (let i = 0; i < words.length; i++) {
+			const wordObj = words[i];
 
-        // Se houver um gap muito grande de silêncio ou se a frase estourar a duração máxima
-        if (gap > MAX_GAP || currentDuration > MAX_DURATION) {
-          segments.push(this.createSegmentFromWords(currentWords));
-          currentWords = [wordObj];
-          continue;
-        }
-      }
+			if (currentWords.length > 0) {
+				const lastWord = currentWords[currentWords.length - 1];
+				const gap = wordObj.start - lastWord.end;
+				const groupStart = currentWords[0].start;
+				const currentDuration = wordObj.end - groupStart;
 
-      currentWords.push(wordObj);
+				// Se houver um gap muito grande de silêncio ou se a frase estourar a duração máxima
+				if (gap > MAX_GAP || currentDuration > MAX_DURATION) {
+					segments.push(this.createSegmentFromWords(currentWords));
+					currentWords = [wordObj];
+					continue;
+				}
+			}
 
-      const groupStart = currentWords[0].start;
-      const duration = wordObj.end - groupStart;
+			currentWords.push(wordObj);
 
-      // Se for fim de frase (pontuação) e atingiu a duração mínima, fecha o segmento
-      if (this.isSentenceEnd(wordObj.word) && duration >= MIN_DURATION) {
-        segments.push(this.createSegmentFromWords(currentWords));
-        currentWords = [];
-      }
-    }
+			const groupStart = currentWords[0].start;
+			const duration = wordObj.end - groupStart;
 
-    // Processa resíduo se sobrar
-    if (currentWords.length > 0) {
-      const residualSeg = this.createSegmentFromWords(currentWords);
-      const residualDuration = residualSeg.end - residualSeg.start;
-      const hasPunctuation = this.isSentenceEnd(
-        currentWords[currentWords.length - 1].word,
-      );
+			// Se for fim de frase (pontuação) e atingiu a duração mínima, fecha o segmento
+			if (this.isSentenceEnd(wordObj.word) && duration >= MIN_DURATION) {
+				segments.push(this.createSegmentFromWords(currentWords));
+				currentWords = [];
+			}
+		}
 
-      if (residualDuration >= MIN_DURATION) {
-        segments.push(residualSeg);
-      } else if (segments.length > 0) {
-        const lastSeg = segments[segments.length - 1];
-        const combinedDuration = residualSeg.end - lastSeg.start;
-        const lastWords = lastSeg.text.split(" ");
-        const gap = residualSeg.start - lastSeg.end;
-        const lastHasPunctuation = this.isSentenceEnd(
-          lastWords[lastWords.length - 1],
-        );
+		// Processa resíduo se sobrar
+		if (currentWords.length > 0) {
+			const residualSeg = this.createSegmentFromWords(currentWords);
+			const residualDuration = residualSeg.end - residualSeg.start;
+			const hasPunctuation = this.isSentenceEnd(
+				currentWords[currentWords.length - 1].word,
+			);
 
-        // Mescla se não estourar MAX_DURATION e gap <= MAX_GAP
-        if (combinedDuration <= MAX_DURATION && gap <= MAX_GAP) {
-          segments[segments.length - 1] = {
-            text: `${lastSeg.text} ${residualSeg.text}`,
-            start: lastSeg.start,
-            end: residualSeg.end,
-          };
-        } else if (hasPunctuation || residualDuration >= 1.5) {
-          segments.push(residualSeg);
-        }
-      } else {
-        segments.push(residualSeg);
-      }
-    }
+			if (residualDuration >= MIN_DURATION) {
+				segments.push(residualSeg);
+			} else if (segments.length > 0) {
+				const lastSeg = segments[segments.length - 1];
+				const combinedDuration = residualSeg.end - lastSeg.start;
+				const lastWords = lastSeg.text.split(" ");
+				const gap = residualSeg.start - lastSeg.end;
+				const lastHasPunctuation = this.isSentenceEnd(
+					lastWords[lastWords.length - 1],
+				);
 
-    return segments;
-  }
+				// Mescla se não estourar MAX_DURATION e gap <= MAX_GAP
+				if (combinedDuration <= MAX_DURATION && gap <= MAX_GAP) {
+					segments[segments.length - 1] = {
+						text: `${lastSeg.text} ${residualSeg.text}`,
+						start: lastSeg.start,
+						end: residualSeg.end,
+					};
+				} else if (hasPunctuation || residualDuration >= 1.5) {
+					segments.push(residualSeg);
+				}
+			} else {
+				segments.push(residualSeg);
+			}
+		}
 
-  private createSegmentFromWords(words: WhisperWord[]): TranscriptionSegment {
-    const text = words.map((w) => w.word.trim()).join(" ");
-    return {
-      text,
-      start: parseFloat(words[0].start.toFixed(3)),
-      end: parseFloat(words[words.length - 1].end.toFixed(3)),
-    };
-  }
+		return segments;
+	}
+
+	private createSegmentFromWords(words: WhisperWord[]): TranscriptionSegment {
+		const text = words.map((w) => w.word.trim()).join(" ");
+		return {
+			text,
+			start: parseFloat(words[0].start.toFixed(3)),
+			end: parseFloat(words[words.length - 1].end.toFixed(3)),
+		};
+	}
 }
