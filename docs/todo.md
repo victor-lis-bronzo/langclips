@@ -69,5 +69,5 @@ Artefatos criados paralelamente ou logo antes de escrever o código.
 
 Garantindo que a plataforma funciona conforme documentado.
 
-- [ ] **Plano de Testes:** Definir quais fluxos terão testes automatizados _(ex: Testar se a função de verificar resposta do ditado lida bem com pontuação e letras maiúsculas/minúsculas)_.
+- [x] **Plano de Testes:** Definir quais fluxos terão testes automatizados _(ex: Testar se a função de verificar resposta do ditado lida bem com pontuação e letras maiúsculas/minúsculas)_.
 - [ ] **README.md do Repositório:** O documento principal do seu GitHub. Deve conter: O que é o projeto, Stack utilizada, Como rodar localmente, e Como contribuir.
