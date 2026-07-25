@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
     "dev": "tsx watch src/index.ts",
     "build": "tsup src/*.ts --format cjs --dts --clean",
     "start": "node dist/index.js"
@@ -27,9 +27,11 @@
     "@types/fluent-ffmpeg": "^2.1.28",
     "@types/node": "^26.1.1",
     "@types/uuid": "^11.0.0",
+    "@vitest/coverage-v8": "^4.1.10",
     "bullmq": "^5.80.1",
     "tsup": "^8.5.1",
     "tsx": "^4.23.0",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vitest": "^4.1.10"
   }
 }
