@@ -1,7 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import type { Deck } from "../types/deck.types";
 import { ProcessingStepCard } from "./processing-step-card";
-import { ProcessingSuccessCard } from "./processing-success-card";
 
 interface ProcessingStepperProps {
 	currentStep: string | null;

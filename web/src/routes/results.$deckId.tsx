@@ -1,7 +1,7 @@
 import PrecisionCircle from "#/features/results/components/precision-circle";
 import PerformanceSummary from "#/features/results/components/performance-summary";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowDownLeft, CornerDownLeft } from "lucide-react";
+import { CornerDownLeft } from "lucide-react";
 
 export const Route = createFileRoute("/results/$deckId")({
 	component: ResultsRoute,
