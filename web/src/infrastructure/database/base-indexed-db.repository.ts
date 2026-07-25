@@ -1,5 +1,5 @@
-import { getDatabase, type LangClipsDB } from "./indexed-db.provider";
 import type { IDBPDatabase } from "idb";
+import { getDatabase, type LangClipsDB } from "./indexed-db.provider";
 
 export abstract class BaseIndexedDbRepository {
 	constructor(

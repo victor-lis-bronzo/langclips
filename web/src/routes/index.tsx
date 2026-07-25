@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Film, Github, Linkedin, Sparkles } from "lucide-react";
 import { Container } from "#/components/container";
-import { DropFileForm } from "#/features/home/components/upload-file-form";
 import { AlertExistentDeckDialog } from "#/features/home/components/alert-existent-deck-dialog";
+import { DropFileForm } from "#/features/home/components/upload-file-form";
 
 export const Route = createFileRoute("/")({
 	component: HomeScreen,

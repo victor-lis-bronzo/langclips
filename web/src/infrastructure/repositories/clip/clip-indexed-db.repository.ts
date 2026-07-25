@@ -1,8 +1,8 @@
 import { BaseIndexedDbRepository } from "#/infrastructure/database/base-indexed-db.repository";
 import type { ClipMetadata } from "#/infrastructure/database/indexed-db.types";
 import type {
-	IClipStorageRepository,
 	ClipPositionDetails,
+	IClipStorageRepository,
 } from "./clip.repository.interface";
 
 export class IndexedDbClipRepository

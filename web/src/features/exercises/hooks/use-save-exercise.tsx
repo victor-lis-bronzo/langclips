@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { IndexedDbExerciseRepository } from "#/infrastructure/repositories/exercise/exercise-indexed-db.repository";
 import type { Exercise } from "#/infrastructure/database/indexed-db.types";
+import { IndexedDbExerciseRepository } from "#/infrastructure/repositories/exercise/exercise-indexed-db.repository";
 
 const exerciseIndexDbRepository = new IndexedDbExerciseRepository();
 

@@ -1,6 +1,6 @@
-import { cn } from "#/lib/utils";
+import { useEffect, useMemo, useState } from "react";
 import { splitIntoWords } from "#/lib/string-utils";
-import { useEffect, useState, useMemo } from "react";
+import { cn } from "#/lib/utils";
 
 type AnswerEasyProps = {
 	transcription: string;

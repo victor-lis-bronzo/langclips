@@ -6,9 +6,9 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { Toaster } from "#/components/ui/sonner";
 import indexCss from "#/styles/index.css?url";
 import { TanStackQueryDevtools } from "../integrations/tanstack-query/devtools";
-import { Toaster } from "#/components/ui/sonner";
 
 interface MyRouterContext {
 	queryClient: QueryClient;
@@ -40,7 +40,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
-		<html lang="pt-br">
+		<html lang="pt-BR">
 			<head>
 				<HeadContent />
 			</head>

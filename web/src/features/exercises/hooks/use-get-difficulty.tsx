@@ -1,11 +1,9 @@
-import { LocalStorageRepository } from "#/infrastructure/repositories/preferences/preferences-local-storage.repository";
 import { useQuery } from "@tanstack/react-query";
-
-type UseGetDifficultyProps = {};
+import { LocalStorageRepository } from "#/infrastructure/repositories/preferences/preferences-local-storage.repository";
 
 const preferencesRepository = new LocalStorageRepository();
 
-export default function useGetDifficulty({}: UseGetDifficultyProps = {}) {
+export default function useGetDifficulty() {
 	return useQuery<"easy" | "medium" | "hard" | undefined>({
 		queryKey: ["difficulty"],
 		queryFn: () => preferencesRepository.getDifficulty(),

@@ -1,4 +1,6 @@
-import { type ReactNode } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import type { ReactNode } from "react";
+import { toast } from "sonner";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -9,10 +11,8 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "#/components/ui/alert-dialog";
-import { useVerifyExistentDecks } from "../hooks/use-verify-decks";
 import { useCleanUpExistentData } from "../hooks/use-cleanup-existent-data";
-import { toast } from "sonner";
-import { useNavigate } from "@tanstack/react-router";
+import { useVerifyExistentDecks } from "../hooks/use-verify-decks";
 
 type AlertExistentDeckDialogProps = {
 	title?: string;

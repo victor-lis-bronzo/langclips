@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { IndexedDbStorageRepository } from "#/infrastructure/repositories/deck/deck-indexed-db.repository";
 import { IndexedDbClipRepository } from "#/infrastructure/repositories/clip/clip-indexed-db.repository";
+import { IndexedDbStorageRepository } from "#/infrastructure/repositories/deck/deck-indexed-db.repository";
 import { DeckDownloadService } from "../services/deck-download.service";
 import type { Clip, Deck } from "../types/deck.types";
 import { useAcknowledgeDownload } from "./use-acknowledge-download";

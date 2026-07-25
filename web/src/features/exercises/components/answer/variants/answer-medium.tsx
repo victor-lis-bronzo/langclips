@@ -1,6 +1,6 @@
-import { cn } from "#/lib/utils";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { splitIntoWords } from "#/lib/string-utils";
-import { useEffect, useState, useMemo, useRef } from "react";
+import { cn } from "#/lib/utils";
 
 type AnswerMediumProps = {
 	transcription: string;

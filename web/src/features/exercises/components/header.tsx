@@ -1,6 +1,6 @@
-import useGetDeckById from "../hooks/use-get-deck-by-id";
-import { ProgressDots, type DotStatus } from "./progress-dots";
 import { useGetDeckExercises } from "#/features/results/hooks/use-get-deck-exercises";
+import useGetDeckById from "../hooks/use-get-deck-by-id";
+import { type DotStatus, ProgressDots } from "./progress-dots";
 
 interface ExercisesHeaderProps {
 	deckId: string;

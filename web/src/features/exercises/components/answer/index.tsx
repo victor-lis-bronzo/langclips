@@ -1,17 +1,17 @@
+import { useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import type { DifficultyType } from "#/infrastructure/repositories/preferences/preferences.repository.interface";
 import { cn } from "#/lib/utils";
-import { useState } from "react";
 import useGetClip from "../../hooks/use-get-clip";
-import useSaveExercise from "../../hooks/use-save-exercise";
 import useGetClipNext from "../../hooks/use-get-next-clip";
-import { useNavigate } from "@tanstack/react-router";
+import useSaveExercise from "../../hooks/use-save-exercise";
 import { evaluateAttempt } from "./functions/handle-attempt";
 import { handleNextExercise as navigateToNext } from "./functions/handle-next-exercise";
 import type { WordResult } from "./types/word-result";
 
 import AnswerEasy from "./variants/answer-easy";
-import AnswerMedium from "./variants/answer-medium";
 import AnswerHard from "./variants/answer-hard";
+import AnswerMedium from "./variants/answer-medium";
 
 type AnswerBoxProps = {
 	variant: DifficultyType;

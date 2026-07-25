@@ -116,6 +116,7 @@ export default function DifficultySelectCards({
 				})}
 			</div>
 			<button
+				type="button"
 				className={cn(
 					"ml-auto rounded-2xl transition-all duration-300 box-border border-2 text-zinc-100 shadow-lg cursor-pointer mt-4 py-2 px-12 text-lg font-bold",
 					!selectedDifficulty ? "opacity-50 cursor-not-allowed" : "",

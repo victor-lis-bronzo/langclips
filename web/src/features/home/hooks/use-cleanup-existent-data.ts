@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { IndexedDbClipRepository } from "#/infrastructure/repositories/clip/clip-indexed-db.repository";
-import { IndexedDbExerciseRepository } from "#/infrastructure/repositories/exercise/exercise-indexed-db.repository";
 import { IndexedDbStorageRepository } from "#/infrastructure/repositories/deck/deck-indexed-db.repository";
+import { IndexedDbExerciseRepository } from "#/infrastructure/repositories/exercise/exercise-indexed-db.repository";
 
 const deckRepository = new IndexedDbStorageRepository();
 const clipRepository = new IndexedDbClipRepository();
