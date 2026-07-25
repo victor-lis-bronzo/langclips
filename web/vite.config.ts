@@ -4,6 +4,7 @@ import { devtools } from "@tanstack/devtools-vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+import { configDefaults } from "vitest/config";
 
 const config = defineConfig({
 	resolve: { tsconfigPaths: true },
@@ -14,6 +15,10 @@ const config = defineConfig({
 		tanstackStart(),
 		viteReact(),
 	].filter(Boolean),
+	test: {
+		exclude: [...configDefaults.exclude, "tests/e2e/**"],
+	},
 });
 
 export default config;
+
