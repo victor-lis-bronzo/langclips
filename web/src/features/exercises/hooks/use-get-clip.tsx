@@ -12,6 +12,6 @@ export default function useGetClip({ deckId, clipId }: UseGetClipProps) {
 	return useQuery({
 		queryKey: ["clip", deckId, clipId],
 		queryFn: () => clipIndexDbRepository.getClipById(deckId, clipId),
-		enabled: !!deckId && !!clipId,
+		enabled: !!deckId && !!clipId && typeof window !== "undefined",
 	});
 }

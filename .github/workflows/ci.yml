@@ -7,8 +7,8 @@ on:
     branches: [main, master]
 
 jobs:
-  ci:
-    name: CI (${{ matrix.project }})
+  unitary:
+    name: Unitary Tests (${{ matrix.project }})
     runs-on: ubuntu-latest
 
     strategy:

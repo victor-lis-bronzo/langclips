@@ -14,100 +14,28 @@ export class IndexedDbClipRepository
 		await db.put("clips", clip);
 	}
 
-	async getClipPosition(
-		sourceFileKey: string,
-	): Promise<ClipPositionDetails | null> {
-		const db = await this.getDb();
-		const tx = db.transaction("clips", "readonly");
-
-		const store = tx.store;
-
-		let cursor = await store.openCursor();
-		const clips: ClipMetadata[] = [];
-
-		while (cursor) {
-			clips.push(cursor.value);
-			cursor = await cursor.continue();
-		}
-
-		await tx.done;
-
-		const currentClipIndex = clips.findIndex(
-			(clip) => clip.sourceFileKey === sourceFileKey,
-		);
-
-		return {
-			position: currentClipIndex + 1,
-			total: clips.length,
-		};
-	}
-
-	async getClip(sourceFileKey: string) {
-		const db = await this.getDb();
-		const clip = await db.get("clips", sourceFileKey);
-		const position = await this.getClipPosition(sourceFileKey);
-
-		if (!clip || !position) return null;
-
-		return {
-			...clip,
-			...position,
-		};
-	}
-
-	async getNextClip(sourceFileKey: string) {
-		const db = await this.getDb();
-		const tx = db.transaction("clips", "readonly");
-
-		const store = tx.store;
-
-		let cursor = await store.openCursor();
-		const clips: ClipMetadata[] = [];
-
-		while (cursor) {
-			clips.push(cursor.value);
-			cursor = await cursor.continue();
-		}
-
-		await tx.done;
-
-		const currentClipIndex = clips.findIndex(
-			(clip) => clip.sourceFileKey === sourceFileKey,
-		);
-
-		const clip = clips[currentClipIndex + 1];
-		if (!clip) return null;
-		const position = await this.getClipPosition(clip.sourceFileKey);
-
-		if (!position) return null;
-
-		return {
-			...clip,
-			...position,
-		};
-	}
-
-	async getClipBlob(sourceFileKey: string): Promise<Blob | null> {
-		const clip = await this.getClip(sourceFileKey);
-		return clip ? clip.blob : null;
-	}
-
 	async getClipById(deckId: string, clipId: string) {
 		const db = await this.getDb();
 		const deck = await db.get("decks", deckId);
 		if (!deck) return null;
-		const clipInfo = deck.clips.find((c) => c.id === clipId);
-		if (!clipInfo) return null;
-		return this.getClip(clipInfo.sourceFileKey);
+
+		const clipInfoIndex = deck.clips.findIndex((c) => c.id === clipId);
+		if (clipInfoIndex === -1) return null;
+
+		const clip = await db.get("clips", clipId);
+		if (!clip) return null;
+
+		return {
+			...clip,
+			position: clipInfoIndex + 1,
+			total: deck.clips.length,
+		};
 	}
 
 	async getClipBlobById(deckId: string, clipId: string): Promise<Blob | null> {
 		const db = await this.getDb();
-		const deck = await db.get("decks", deckId);
-		if (!deck) return null;
-		const clipInfo = deck.clips.find((c) => c.id === clipId);
-		if (!clipInfo) return null;
-		return this.getClipBlob(clipInfo.sourceFileKey);
+		const clip = await db.get("clips", clipId);
+		return clip ? clip.blob : null;
 	}
 
 	async getNextClipById(

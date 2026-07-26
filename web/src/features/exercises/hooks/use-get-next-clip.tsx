@@ -15,6 +15,6 @@ export default function useGetClipNext({
 	return useQuery({
 		queryKey: ["next-clip", deckId, clipId],
 		queryFn: () => clipIndexDbRepository.getNextClipById(deckId, clipId),
-		enabled: !!clipId && !!deckId,
+		enabled: !!clipId && !!deckId && typeof window !== "undefined",
 	});
 }

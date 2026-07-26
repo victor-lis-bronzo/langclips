@@ -7,14 +7,6 @@ export type ClipPositionDetails = {
 
 export interface IClipStorageRepository {
 	saveClip(clip: ClipMetadata): Promise<void>;
-	getClipPosition(sourceFileKey: string): Promise<ClipPositionDetails | null>;
-	getClip(
-		sourceFileKey: string,
-	): Promise<(ClipMetadata & ClipPositionDetails) | null>;
-	getNextClip(
-		sourceFileKey: string,
-	): Promise<(ClipMetadata & ClipPositionDetails) | null>;
-	getClipBlob(sourceFileKey: string): Promise<Blob | null>;
 	getClipById(
 		deckId: string,
 		clipId: string,
