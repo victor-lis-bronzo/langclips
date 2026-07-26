@@ -61,7 +61,7 @@ jobs:
 
   e2e:
     name: E2E Tests (${{ matrix.project }})
-    needs: ci
+    needs: unitary
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
