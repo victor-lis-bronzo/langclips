@@ -14,7 +14,7 @@ export default function useGetClipBlob({
 }: UseGetClipBlobProps) {
 	return useQuery({
 		queryKey: ["clip-blob", deckId, clipId],
-		queryFn: () => clipIndexDbRepository.getClipBlobById(deckId, clipId),
+		queryFn: () => clipIndexDbRepository.getClipBlobById(clipId),
 		enabled: !!deckId && !!clipId && typeof window !== "undefined",
 	});
 }

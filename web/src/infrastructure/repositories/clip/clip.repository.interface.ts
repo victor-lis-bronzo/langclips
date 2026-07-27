@@ -11,7 +11,7 @@ export interface IClipStorageRepository {
 		deckId: string,
 		clipId: string,
 	): Promise<(ClipMetadata & ClipPositionDetails) | null>;
-	getClipBlobById(deckId: string, clipId: string): Promise<Blob | null>;
+	getClipBlobById(clipId: string): Promise<Blob | null>;
 	getNextClipById(
 		deckId: string,
 		clipId: string,
