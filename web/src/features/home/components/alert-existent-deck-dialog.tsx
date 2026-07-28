@@ -12,7 +12,7 @@ import {
 	AlertDialogTitle,
 } from "#/components/ui/alert-dialog";
 import { useCleanUpExistentData } from "../hooks/use-cleanup-existent-data";
-import { useVerifyExistentDecks } from "../hooks/use-verify-decks";
+import { useHasExistentDecks } from "../hooks/use-has-existent-decks";
 
 type AlertExistentDeckDialogProps = {
 	title?: string;
@@ -21,14 +21,14 @@ type AlertExistentDeckDialogProps = {
 };
 
 export function AlertExistentDeckDialog({
-	title = "You already have a saved deck!",
-	description = "By continuing, you will go to the existing deck, or you can choose to delete the existing deck by clicking cancel!",
+	title = "You already have saved decks!",
+	description = "By continuing, you will view all your saved decks, or you can choose to clear all saved decks by clicking drop!",
 }: AlertExistentDeckDialogProps) {
-	const { data: existentDeck } = useVerifyExistentDecks();
+	const { data: hasDecks } = useHasExistentDecks();
 	const navigate = useNavigate();
 	const { mutateAsync: cleanupExistentData } = useCleanUpExistentData();
 
-	if (!existentDeck) return null;
+	if (!hasDecks) return null;
 
 	async function handleCancel() {
 		const success = await cleanupExistentData();
@@ -43,10 +43,7 @@ export function AlertExistentDeckDialog({
 
 	async function handleConfirm() {
 		navigate({
-			to: "/difficulty/$deckId",
-			params: {
-				deckId: existentDeck!.id,
-			},
+			to: "/decks",
 		});
 	}
 

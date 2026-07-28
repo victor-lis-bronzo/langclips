@@ -3,15 +3,10 @@ import { IndexedDbStorageRepository } from "#/infrastructure/repositories/deck/d
 
 const storageRepository = new IndexedDbStorageRepository();
 
-export function useVerifyExistentDecks() {
+export function useHasExistentDecks() {
 	return useQuery({
-		queryKey: ["verify-deck-data"],
+		queryKey: ["has-existent-deck"],
 		queryFn: () =>
-			storageRepository.getAllDecks().then((decks) => {
-				if (decks.length === 0) {
-					return null;
-				}
-				return decks[0];
-			}),
+			storageRepository.getAllDecks().then((decks) => decks.length > 0),
 	});
 }
