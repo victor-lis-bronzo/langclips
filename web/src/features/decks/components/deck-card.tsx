@@ -14,6 +14,7 @@ import {
 } from "#/components/ui/alert-dialog";
 import type { DeckRecord } from "#/infrastructure/database/indexed-db.types";
 import { IndexedDbClipRepository } from "#/infrastructure/repositories/clip/clip-indexed-db.repository";
+import { IndexedDbStorageRepository } from "#/infrastructure/repositories/deck/deck-indexed-db.repository";
 import { useDeleteDeck } from "../hooks/use-delete-deck";
 import { captureThumbnailFromBlob } from "#/features/processing/utils/capture-thumbnail";
 
@@ -22,6 +23,7 @@ interface DeckCardProps {
 }
 
 const clipRepository = new IndexedDbClipRepository();
+const deckRepository = new IndexedDbStorageRepository();
 
 export function DeckCard({ deck }: DeckCardProps) {
 	const navigate = useNavigate();
@@ -43,6 +45,10 @@ export function DeckCard({ deck }: DeckCardProps) {
 				const thumb = await captureThumbnailFromBlob(blob);
 				if (thumb && isMounted) {
 					setAutoThumbnailBlob(thumb);
+					await deckRepository.saveDeck({
+						...deck,
+						thumbnailBlob: thumb,
+					});
 				}
 			});
 

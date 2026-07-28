@@ -19,7 +19,24 @@ export class IndexedDbClipRepository
 		const clipInfoIndex = deck.clips.findIndex((c) => c.id === clipId);
 		if (clipInfoIndex === -1) return null;
 
-		const clip = await db.get("clips", clipId);
+		let clip = await db.get("clips", clipId);
+		if (!clip) {
+			const legacyClip = (deck.clips as any)[clipInfoIndex];
+			if (legacyClip && legacyClip.blob) {
+				clip = {
+					id: legacyClip.id,
+					deckId: deck.id,
+					transcription: legacyClip.transcription,
+					sourceFileKey: legacyClip.sourceFileKey,
+					blob: legacyClip.blob,
+					mimeType: legacyClip.mimeType || "video/mp4",
+					startTime: legacyClip.startTime ?? 0,
+					endTime: legacyClip.endTime ?? 0,
+				};
+				await db.put("clips", clip);
+			}
+		}
+
 		if (!clip) return null;
 
 		return {
@@ -32,7 +49,28 @@ export class IndexedDbClipRepository
 	async getClipBlobById(clipId: string): Promise<Blob | null> {
 		const db = await this.getDb();
 		const clip = await db.get("clips", clipId);
-		return clip ? clip.blob : null;
+		if (clip?.blob) return clip.blob;
+
+		const decks = await db.getAll("decks");
+		for (const deck of decks) {
+			const legacyClip = deck.clips?.find((c: any) => c.id === clipId) as any;
+			if (legacyClip && legacyClip.blob) {
+				const migratedClip: ClipMetadata = {
+					id: legacyClip.id,
+					deckId: deck.id,
+					transcription: legacyClip.transcription,
+					sourceFileKey: legacyClip.sourceFileKey,
+					blob: legacyClip.blob,
+					mimeType: legacyClip.mimeType || "video/mp4",
+					startTime: legacyClip.startTime ?? 0,
+					endTime: legacyClip.endTime ?? 0,
+				};
+				await db.put("clips", migratedClip);
+				return legacyClip.blob;
+			}
+		}
+
+		return null;
 	}
 
 	async getNextClipById(
