@@ -3,18 +3,20 @@ import ClipsGeneralInfo from "#/features/difficulty/components/clips-general-inf
 import DifficultySelectCards from "#/features/difficulty/components/difficulty-select-cards";
 
 export const Route = createFileRoute("/difficulty/$deckId")({
-	component: RouteComponent,
+  component: RouteComponent,
 });
 
 function RouteComponent() {
-	const { deckId } = Route.useParams();
+  const { deckId } = Route.useParams();
 
-	return (
-		<div className="flex min-h-screen items-center justify-center bg-background text-foreground p-4 md:p-8">
-			<div className="flex flex-col w-full md:max-w-1/2 lg:max-w-1/3 gap-2">
-				<ClipsGeneralInfo deckId={deckId} />
-				<DifficultySelectCards deckId={deckId} />
-			</div>
-		</div>
-	);
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background text-foreground p-4 md:p-8">
+      <div className="absolute top-[0%] left-[0%] w-[25%] h-[25%] rounded-full bg-primary/10 blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-[0%] right-[0%] w-[25%] h-[25%] rounded-full bg-emerald-500/10 blur-[100px] pointer-events-none" />
+      <div className="flex flex-col w-full md:max-w-1/2 lg:max-w-1/3 gap-2">
+        <ClipsGeneralInfo deckId={deckId} />
+        <DifficultySelectCards deckId={deckId} />
+      </div>
+    </div>
+  );
 }

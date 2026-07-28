@@ -1,15 +1,9 @@
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { Container } from "#/components/container";
 
 export function Navbar() {
-  const location = useLocation();
-
-  if (location.pathname === "/") {
-    return null;
-  }
-
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 py-4 pointer-events-none">
+    <header className="fixed top-0 left-0 right-0 z-50 py-0.5 pointer-events-none">
       <Container className="flex items-center justify-between w-full max-w-6xl mx-auto pointer-events-auto">
         <Link
           to="/"
