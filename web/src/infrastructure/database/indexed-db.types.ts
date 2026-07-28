@@ -18,6 +18,7 @@ export interface DeckRecord {
 	createdAt: number;
 	downloadedAt: number;
 	totalSeconds: number;
+	thumbnailBlob?: Blob;
 }
 
 export interface Exercise {

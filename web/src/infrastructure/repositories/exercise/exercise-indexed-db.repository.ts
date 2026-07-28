@@ -34,6 +34,20 @@ export class IndexedDbExerciseRepository
 		return db.getAll("exercises");
 	}
 
+	async deleteExercisesByDeckId(deckId: string): Promise<void> {
+		const db = await this.getDb();
+		const tx = db.transaction("exercises", "readwrite");
+		const index = tx.store.index("deckId");
+		let cursor = await index.openCursor(deckId);
+
+		while (cursor) {
+			await cursor.delete();
+			cursor = await cursor.continue();
+		}
+
+		await tx.done;
+	}
+
 	async cleanUp(): Promise<void> {
 		const db = await this.getDb();
 		await db.clear("exercises");

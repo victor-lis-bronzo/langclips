@@ -21,7 +21,7 @@ export interface LangClipsDB extends DBSchema {
 }
 
 const DB_NAME = "langclips-local";
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 let dbPromise: Promise<IDBPDatabase<LangClipsDB>> | null = null;
 

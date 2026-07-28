@@ -6,5 +6,6 @@ export interface IExerciseStorageRepository {
 	getExercisesByClipId(clipId: string): Promise<Exercise[]>;
 	getExercisesByDeckId(deckId: string): Promise<Exercise[]>;
 	getAllExercises(): Promise<Exercise[]>;
+	deleteExercisesByDeckId(deckId: string): Promise<void>;
 	cleanUp(): Promise<void>;
 }
