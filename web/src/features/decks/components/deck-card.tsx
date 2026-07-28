@@ -13,21 +13,57 @@ import {
 	AlertDialogTrigger,
 } from "#/components/ui/alert-dialog";
 import type { DeckRecord } from "#/infrastructure/database/indexed-db.types";
+import { IndexedDbClipRepository } from "#/infrastructure/repositories/clip/clip-indexed-db.repository";
+import { IndexedDbStorageRepository } from "#/infrastructure/repositories/deck/deck-indexed-db.repository";
 import { useDeleteDeck } from "../hooks/use-delete-deck";
+import { captureThumbnailFromBlob } from "#/features/processing/utils/capture-thumbnail";
 
 interface DeckCardProps {
 	deck: DeckRecord;
 }
 
+const clipRepository = new IndexedDbClipRepository();
+const deckRepository = new IndexedDbStorageRepository();
+
 export function DeckCard({ deck }: DeckCardProps) {
 	const navigate = useNavigate();
 	const { mutate: deleteDeck, isPending: isDeleting } = useDeleteDeck();
 	const [confirmOpen, setConfirmOpen] = useState(false);
+	const [autoThumbnailBlob, setAutoThumbnailBlob] = useState<Blob | undefined>(
+		deck.thumbnailBlob,
+	);
+
+	useEffect(() => {
+		setAutoThumbnailBlob(deck.thumbnailBlob);
+
+		if (!deck.thumbnailBlob && deck.clips && deck.clips.length > 0) {
+			const firstClipId = deck.clips[0].id;
+			let isMounted = true;
+
+			clipRepository.getClipBlobById(firstClipId).then(async (blob) => {
+				if (!blob || !isMounted) return;
+				const thumb = await captureThumbnailFromBlob(blob);
+				if (thumb && isMounted) {
+					setAutoThumbnailBlob(thumb);
+					await deckRepository.saveDeck({
+						...deck,
+						thumbnailBlob: thumb,
+					});
+				}
+			});
+
+			return () => {
+				isMounted = false;
+			};
+		}
+	}, [deck]);
+
+	const currentThumbnailBlob = deck.thumbnailBlob || autoThumbnailBlob;
 
 	const thumbnailUrl = useMemo(() => {
-		if (!deck.thumbnailBlob) return null;
-		return URL.createObjectURL(deck.thumbnailBlob);
-	}, [deck.thumbnailBlob]);
+		if (!currentThumbnailBlob) return null;
+		return URL.createObjectURL(currentThumbnailBlob);
+	}, [currentThumbnailBlob]);
 
 	useEffect(() => {
 		return () => {

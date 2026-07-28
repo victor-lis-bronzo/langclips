@@ -15,6 +15,26 @@ vi.mock("../hooks/use-delete-deck", () => ({
 	}),
 }));
 
+vi.mock(
+	"#/infrastructure/repositories/clip/clip-indexed-db.repository",
+	() => ({
+		IndexedDbClipRepository: vi.fn().mockImplementation(function (this: any) {
+			this.getClipBlobById = vi.fn().mockResolvedValue(null);
+		}),
+	}),
+);
+
+vi.mock(
+	"#/infrastructure/repositories/deck/deck-indexed-db.repository",
+	() => ({
+		IndexedDbStorageRepository: vi.fn().mockImplementation(function (
+			this: any,
+		) {
+			this.saveDeck = vi.fn().mockResolvedValue(undefined);
+		}),
+	}),
+);
+
 describe("DeckCard", () => {
 	afterEach(() => {
 		cleanup();
