@@ -33,6 +33,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         rel: "icon",
         type: "image/svg+xml",
         href: "/icon.svg",
+        sizes: "24x24",
       },
       {
         rel: "stylesheet",
