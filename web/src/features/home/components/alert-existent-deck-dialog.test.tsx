@@ -36,7 +36,7 @@ describe("AlertExistentDeckDialog", () => {
 
 		render(<AlertExistentDeckDialog />);
 		expect(screen.getByText("You already have saved decks!")).toBeTruthy();
-		expect(screen.getByText("Continue")).toBeTruthy();
-		expect(screen.getByText("Drop")).toBeTruthy();
+		expect(screen.getByText("Go to decks")).toBeTruthy();
+		expect(screen.getByText("Continue Here")).toBeTruthy();
 	});
 });

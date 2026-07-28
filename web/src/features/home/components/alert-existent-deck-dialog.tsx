@@ -60,10 +60,10 @@ export function AlertExistentDeckDialog({
 						variant={"destructive"}
 						className="cursor-pointer hover:bg-red-400/80"
 					>
-						Drop
+						Continue Here
 					</AlertDialogCancel>
 					<AlertDialogAction onClick={handleConfirm} className="cursor-pointer">
-						Continue
+						Go to decks
 					</AlertDialogAction>
 				</AlertDialogFooter>
 			</AlertDialogContent>
