@@ -29,7 +29,7 @@ export function ProcessingStepper({
 	const isNavigating = status === "saved" && result;
 
 	if (isNavigating) {
-		navigate({ to: "/difficulty/$deckId", params: { deckId: result.id } });
+		navigate({ to: "/decks" });
 		return null;
 	}
 

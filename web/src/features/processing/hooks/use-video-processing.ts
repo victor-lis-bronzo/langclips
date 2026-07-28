@@ -3,6 +3,7 @@ import { IndexedDbClipRepository } from "#/infrastructure/repositories/clip/clip
 import { IndexedDbStorageRepository } from "#/infrastructure/repositories/deck/deck-indexed-db.repository";
 import { DeckDownloadService } from "../services/deck-download.service";
 import type { Clip, Deck } from "../types/deck.types";
+import { captureThumbnailFromBlob } from "../utils/capture-thumbnail";
 import { useAcknowledgeDownload } from "./use-acknowledge-download";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3333";
@@ -73,9 +74,21 @@ export function useVideoProcessing(jobId: string | null) {
 						const { deckRecord, clipRecords } =
 							await downloadService.downloadDeckAssets(deck);
 
-						// 2. Salvar no IndexedDB
-						await storageRepository.cleanUp();
-						await storageRepository.saveDeck(deckRecord);
+						// 2. Capturar thumbnail do primeiro clip
+						const firstClip = clipRecords[0];
+						let thumbnailBlob: Blob | undefined;
+						if (firstClip?.blob) {
+							thumbnailBlob = await captureThumbnailFromBlob(
+								firstClip.blob,
+								firstClip.mimeType,
+							);
+						}
+
+						// 3. Salvar no IndexedDB (sem deletar os outros decks)
+						await storageRepository.saveDeck({
+							...deckRecord,
+							thumbnailBlob,
+						});
 						for (const clipRecord of clipRecords) {
 							await clipRepository.saveClip(clipRecord);
 						}
