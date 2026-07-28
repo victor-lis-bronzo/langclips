@@ -22,9 +22,12 @@ export async function captureThumbnailFromBlob(
 		const cleanup = () => {
 			if (isCleanedUp) return;
 			isCleanedUp = true;
+			video.onloadedmetadata = null;
+			video.onseeked = null;
+			video.onerror = null;
 			URL.revokeObjectURL(url);
-			video.removeAttribute("src");
-			video.load();
+			video.pause();
+			video.src = "";
 		};
 
 		const timeoutId = setTimeout(() => {

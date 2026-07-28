@@ -24,16 +24,6 @@ vi.mock(
 	}),
 );
 
-vi.mock(
-	"#/infrastructure/repositories/deck/deck-indexed-db.repository",
-	() => ({
-		IndexedDbStorageRepository: vi.fn().mockImplementation(function (
-			this: any,
-		) {
-			this.saveDeck = vi.fn().mockResolvedValue(undefined);
-		}),
-	}),
-);
 
 describe("DeckCard", () => {
 	afterEach(() => {
