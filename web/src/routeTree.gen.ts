@@ -9,12 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as DecksRouteImport } from './routes/decks'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ResultsDeckIdRouteImport } from './routes/results.$deckId'
 import { Route as ProcessingJobIdRouteImport } from './routes/processing.$jobId'
 import { Route as DifficultyDeckIdRouteImport } from './routes/difficulty.$deckId'
 import { Route as ExercisesDeckIdClipIdRouteImport } from './routes/exercises.$deckId.$clipId'
 
+const DecksRoute = DecksRouteImport.update({
+  id: '/decks',
+  path: '/decks',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -43,6 +49,7 @@ const ExercisesDeckIdClipIdRoute = ExercisesDeckIdClipIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/decks': typeof DecksRoute
   '/difficulty/$deckId': typeof DifficultyDeckIdRoute
   '/processing/$jobId': typeof ProcessingJobIdRoute
   '/results/$deckId': typeof ResultsDeckIdRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/decks': typeof DecksRoute
   '/difficulty/$deckId': typeof DifficultyDeckIdRoute
   '/processing/$jobId': typeof ProcessingJobIdRoute
   '/results/$deckId': typeof ResultsDeckIdRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/decks': typeof DecksRoute
   '/difficulty/$deckId': typeof DifficultyDeckIdRoute
   '/processing/$jobId': typeof ProcessingJobIdRoute
   '/results/$deckId': typeof ResultsDeckIdRoute
@@ -67,6 +76,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/decks'
     | '/difficulty/$deckId'
     | '/processing/$jobId'
     | '/results/$deckId'
@@ -74,6 +84,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/decks'
     | '/difficulty/$deckId'
     | '/processing/$jobId'
     | '/results/$deckId'
@@ -81,6 +92,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/decks'
     | '/difficulty/$deckId'
     | '/processing/$jobId'
     | '/results/$deckId'
@@ -89,6 +101,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DecksRoute: typeof DecksRoute
   DifficultyDeckIdRoute: typeof DifficultyDeckIdRoute
   ProcessingJobIdRoute: typeof ProcessingJobIdRoute
   ResultsDeckIdRoute: typeof ResultsDeckIdRoute
@@ -97,6 +110,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/decks': {
+      id: '/decks'
+      path: '/decks'
+      fullPath: '/decks'
+      preLoaderRoute: typeof DecksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -137,6 +157,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DecksRoute: DecksRoute,
   DifficultyDeckIdRoute: DifficultyDeckIdRoute,
   ProcessingJobIdRoute: ProcessingJobIdRoute,
   ResultsDeckIdRoute: ResultsDeckIdRoute,
