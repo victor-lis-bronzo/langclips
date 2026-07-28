@@ -4,11 +4,13 @@ import {
 	createRootRouteWithContext,
 	HeadContent,
 	Scripts,
+	useLocation,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { Toaster } from "#/components/ui/sonner";
 import indexCss from "#/styles/index.css?url";
 import { TanStackQueryDevtools } from "../integrations/tanstack-query/devtools";
+import { Navbar } from "#/components/navbar";
 
 interface MyRouterContext {
 	queryClient: QueryClient;
@@ -51,7 +53,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<HeadContent />
 			</head>
 			<body className="font-caveat antialiased">
-				{children}
+				<LayoutWrapper>{children}</LayoutWrapper>
 				<Toaster />
 				<TanStackDevtools
 					config={{
@@ -68,5 +70,17 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<Scripts />
 			</body>
 		</html>
+	);
+}
+
+function LayoutWrapper({ children }: { children: React.ReactNode }) {
+	const location = useLocation();
+	const isHome = location.pathname === "/";
+
+	return (
+		<>
+			<Navbar />
+			<div className="flex-1 w-full flex flex-col">{children}</div>
+		</>
 	);
 }
