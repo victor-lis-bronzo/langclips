@@ -7,5 +7,6 @@ export function useGetAllDecks() {
 	return useQuery({
 		queryKey: ["decks"],
 		queryFn: () => deckRepository.getAllDecks(),
+		staleTime: 30_000,
 	});
 }
