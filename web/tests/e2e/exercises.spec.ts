@@ -5,7 +5,7 @@ async function seedDeckAndClip(
 	deckData: any,
 	hasClip: boolean = false,
 ) {
-	await page.goto("/");
+	await page.goto("/", { waitUntil: "domcontentloaded" });
 
 	await page.evaluate(
 		async ({ deck, createClip }: { deck: any; createClip: boolean }) => {
@@ -92,7 +92,9 @@ test.describe("Exercises Screen E2E", () => {
 
 		await seedDeckAndClip(page, deck, true);
 
-		await page.goto("/exercises/deck-e2e-exercises/clip-e2e-1");
+		await page.goto("/exercises/deck-e2e-exercises/clip-e2e-1", {
+			waitUntil: "domcontentloaded",
+		});
 
 		// The video element should be present and visible
 		await expect(page.locator("video")).toBeVisible();
@@ -105,7 +107,9 @@ test.describe("Exercises Screen E2E", () => {
 	}) => {
 		await seedDeckAndClip(page, null, false);
 
-		await page.goto("/exercises/invalid-deck/invalid-clip");
+		await page.goto("/exercises/invalid-deck/invalid-clip", {
+			waitUntil: "domcontentloaded",
+		});
 
 		await expect(page.getByText("Could not load video")).toBeVisible();
 	});

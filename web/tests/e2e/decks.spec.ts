@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 async function clearAndSeedDeck(page: any, deckData?: any) {
 	// Navigate to home first to set same-origin context for IndexedDB
-	await page.goto("/");
+	await page.goto("/", { waitUntil: "domcontentloaded" });
 
 	await page.evaluate(async (data: any) => {
 		return new Promise<void>((resolve, reject) => {
@@ -46,9 +46,11 @@ async function clearAndSeedDeck(page: any, deckData?: any) {
 test.describe("Decks Screen E2E", () => {
 	test("should display empty state when no decks are saved", async ({ page }) => {
 		await clearAndSeedDeck(page, null);
-		await page.goto("/decks");
+		await page.goto("/decks", { waitUntil: "domcontentloaded" });
 
-		await expect(page.getByText("My Decks")).toBeVisible();
+		await expect(
+			page.getByRole("heading", { name: "My Decks" }),
+		).toBeVisible();
 		await expect(page.getByText("No Decks Found")).toBeVisible();
 		await expect(page.getByText("Create First Deck")).toBeVisible();
 	});
@@ -63,7 +65,7 @@ test.describe("Decks Screen E2E", () => {
 			totalSeconds: 125,
 		});
 
-		await page.goto("/decks");
+		await page.goto("/decks", { waitUntil: "domcontentloaded" });
 
 		await expect(page.getByText("1 clip")).toBeVisible();
 		await expect(page.getByText("~02m 05s")).toBeVisible();
@@ -79,7 +81,7 @@ test.describe("Decks Screen E2E", () => {
 			totalSeconds: 45,
 		});
 
-		await page.goto("/decks");
+		await page.goto("/decks", { waitUntil: "domcontentloaded" });
 
 		await page.getByText("1 clip").click();
 		await expect(page).toHaveURL(/\/difficulty\/deck-nav-test/);
