@@ -6,39 +6,50 @@ async function clearAndSeedDeck(page: any, deckData?: any) {
 
 	await page.evaluate(async (data: any) => {
 		return new Promise<void>((resolve, reject) => {
-			const req = indexedDB.open("langclips-local", 3);
-			req.onupgradeneeded = (e: any) => {
-				const db = e.target.result;
-				if (!db.objectStoreNames.contains("decks")) {
-					db.createObjectStore("decks", { keyPath: "id" });
-				}
-				if (!db.objectStoreNames.contains("clips")) {
-					db.createObjectStore("clips", { keyPath: "id" });
-				}
-				if (!db.objectStoreNames.contains("exercises")) {
-					const store = db.createObjectStore("exercises", { keyPath: "id" });
-					store.createIndex("deckId", "deckId");
-					store.createIndex("clipId", "clipId");
-				}
-			};
-			req.onsuccess = (e: any) => {
-				const db = e.target.result;
-				const tx = db.transaction("decks", "readwrite");
-				const store = tx.objectStore("decks");
-				store.clear();
-				if (data) {
-					store.put(data);
-				}
-				tx.oncomplete = () => {
-					db.close();
-					resolve();
+			try {
+				const req = indexedDB.open("langclips-local", 3);
+				req.onupgradeneeded = (e: any) => {
+					const db = e.target.result;
+					if (!db.objectStoreNames.contains("decks")) {
+						db.createObjectStore("decks", { keyPath: "id" });
+					}
+					if (!db.objectStoreNames.contains("clips")) {
+						db.createObjectStore("clips", { keyPath: "id" });
+					}
+					if (!db.objectStoreNames.contains("exercises")) {
+						const store = db.createObjectStore("exercises", { keyPath: "id" });
+						store.createIndex("deckId", "deckId");
+						store.createIndex("clipId", "clipId");
+					}
 				};
-				tx.onerror = () => {
-					db.close();
-					reject(tx.error);
+				req.onsuccess = (e: any) => {
+					const db = e.target.result;
+					db.onversionchange = () => db.close();
+
+					const tx = db.transaction("decks", "readwrite");
+					const store = tx.objectStore("decks");
+					store.clear();
+					if (data) {
+						store.put(data);
+					}
+					tx.oncomplete = () => {
+						db.close();
+						resolve();
+					};
+					tx.onerror = (err: any) => {
+						db.close();
+						reject(String(err?.target?.error?.message || "Transaction error"));
+					};
 				};
-			};
-			req.onerror = () => reject(req.error);
+				req.onerror = (err: any) => {
+					reject(String(err?.target?.error?.message || "Open DB error"));
+				};
+				req.onblocked = () => {
+					reject("Open DB blocked");
+				};
+			} catch (err: any) {
+				reject(String(err?.message || err));
+			}
 		});
 	}, deckData);
 }

@@ -10,58 +10,69 @@ async function seedDeckAndClip(
 	await page.evaluate(
 		async ({ deck, createClip }: { deck: any; createClip: boolean }) => {
 			return new Promise<void>((resolve, reject) => {
-				const req = indexedDB.open("langclips-local", 3);
-				req.onupgradeneeded = (e: any) => {
-					const db = e.target.result;
-					if (!db.objectStoreNames.contains("decks")) {
-						db.createObjectStore("decks", { keyPath: "id" });
-					}
-					if (!db.objectStoreNames.contains("clips")) {
-						db.createObjectStore("clips", { keyPath: "id" });
-					}
-					if (!db.objectStoreNames.contains("exercises")) {
-						const store = db.createObjectStore("exercises", { keyPath: "id" });
-						store.createIndex("deckId", "deckId");
-						store.createIndex("clipId", "clipId");
-					}
-				};
-				req.onsuccess = (e: any) => {
-					const db = e.target.result;
-					const tx = db.transaction(["decks", "clips"], "readwrite");
-					const deckStore = tx.objectStore("decks");
-					const clipStore = tx.objectStore("clips");
-					deckStore.clear();
-					clipStore.clear();
-
-					if (deck) {
-						deckStore.put(deck);
-					}
-					if (createClip && deck && deck.clips && deck.clips[0]) {
-						const sampleBlob = new Blob(["fake-mp4-video-content"], {
-							type: "video/mp4",
-						});
-						clipStore.put({
-							id: deck.clips[0].id,
-							deckId: deck.id,
-							transcription: deck.clips[0].transcription,
-							sourceFileKey: deck.clips[0].sourceFileKey,
-							blob: sampleBlob,
-							mimeType: "video/mp4",
-							startTime: 0,
-							endTime: 5,
-						});
-					}
-
-					tx.oncomplete = () => {
-						db.close();
-						resolve();
+				try {
+					const req = indexedDB.open("langclips-local", 3);
+					req.onupgradeneeded = (e: any) => {
+						const db = e.target.result;
+						if (!db.objectStoreNames.contains("decks")) {
+							db.createObjectStore("decks", { keyPath: "id" });
+						}
+						if (!db.objectStoreNames.contains("clips")) {
+							db.createObjectStore("clips", { keyPath: "id" });
+						}
+						if (!db.objectStoreNames.contains("exercises")) {
+							const store = db.createObjectStore("exercises", { keyPath: "id" });
+							store.createIndex("deckId", "deckId");
+							store.createIndex("clipId", "clipId");
+						}
 					};
-					tx.onerror = () => {
-						db.close();
-						reject(tx.error);
+					req.onsuccess = (e: any) => {
+						const db = e.target.result;
+						db.onversionchange = () => db.close();
+
+						const tx = db.transaction(["decks", "clips"], "readwrite");
+						const deckStore = tx.objectStore("decks");
+						const clipStore = tx.objectStore("clips");
+						deckStore.clear();
+						clipStore.clear();
+
+						if (deck) {
+							deckStore.put(deck);
+						}
+						if (createClip && deck && deck.clips && deck.clips[0]) {
+							const sampleBlob = new Blob(["fake-mp4-video-content"], {
+								type: "video/mp4",
+							});
+							clipStore.put({
+								id: deck.clips[0].id,
+								deckId: deck.id,
+								transcription: deck.clips[0].transcription,
+								sourceFileKey: deck.clips[0].sourceFileKey,
+								blob: sampleBlob,
+								mimeType: "video/mp4",
+								startTime: 0,
+								endTime: 5,
+							});
+						}
+
+						tx.oncomplete = () => {
+							db.close();
+							resolve();
+						};
+						tx.onerror = (err: any) => {
+							db.close();
+							reject(String(err?.target?.error?.message || "Transaction error"));
+						};
 					};
-				};
-				req.onerror = () => reject(req.error);
+					req.onerror = (err: any) => {
+						reject(String(err?.target?.error?.message || "Open DB error"));
+					};
+					req.onblocked = () => {
+						reject("Open DB blocked");
+					};
+				} catch (err: any) {
+					reject(String(err?.message || err));
+				}
 			});
 		},
 		{ deck: deckData, createClip: hasClip },
