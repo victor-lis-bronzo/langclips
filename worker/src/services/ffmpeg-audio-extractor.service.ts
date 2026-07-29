@@ -1,7 +1,7 @@
-import { exec } from "child_process";
+import { exec } from "node:child_process";
 import ffmpegPath from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
-import { promisify } from "util";
+import { promisify } from "node:util";
 import type { IAudioExtractorService } from "../interfaces/audio-extractor.interface";
 
 const execPromise = promisify(exec);
@@ -18,9 +18,10 @@ export class FFmpegAudioExtractorService implements IAudioExtractorService {
 			const ffmpegBin = ffmpegPath || "ffmpeg";
 			const { stderr } = await execPromise(`"${ffmpegBin}" -i "${videoPath}"`);
 			return this.parseDuration(stderr);
-		} catch (error: any) {
-			if (error.stderr) {
-				return this.parseDuration(error.stderr);
+		} catch (error: unknown) {
+			const err = error as { stderr?: string };
+			if (err.stderr) {
+				return this.parseDuration(err.stderr);
 			}
 			console.error("[AUDIO-EXTRACTOR] Erro ao obter duração do vídeo:", error);
 			return 0;

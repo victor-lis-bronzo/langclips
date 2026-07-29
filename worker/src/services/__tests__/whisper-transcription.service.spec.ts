@@ -1,6 +1,6 @@
 import axios from "axios";
-import fs from "fs";
-import { Readable } from "stream";
+import fs from "node:fs";
+import { Readable } from "node:stream";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { IAudioChunkerService } from "../../interfaces/audio-chunker.interface";
 import { WhisperTranscriptionService } from "../whisper-transcription.service";

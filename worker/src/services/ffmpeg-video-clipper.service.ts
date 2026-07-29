@@ -1,15 +1,15 @@
-import * as crypto from "crypto";
+import * as crypto from "node:crypto";
 import ffmpegPath from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
-import * as os from "os";
-import * as path from "path";
+import * as os from "node:os";
+import * as path from "node:path";
 import type {
 	ClipCreationRequest,
-	IVideoClipperService,
+	IFmpegVideoClipperService,
 	LocalGeneratedClip,
 } from "../interfaces/video-clipper.interface";
 
-export class FFmpegVideoClipperService implements IVideoClipperService {
+export class FFmpegVideoClipperService implements IFmpegVideoClipperService {
 	constructor() {
 		if (ffmpegPath) {
 			ffmpeg.setFfmpegPath(ffmpegPath);
@@ -22,11 +22,11 @@ export class FFmpegVideoClipperService implements IVideoClipperService {
 	}: {
 		sourceFilePath: string;
 		requests: ClipCreationRequest[];
-	}) {
+	}): Promise<{ success: boolean; clips: LocalGeneratedClip[] }> {
 		const tmpDir = os.tmpdir();
 		const clips: LocalGeneratedClip[] = [];
 
-		for (const [index, request] of requests.entries()) {
+		for (const [_index, request] of requests.entries()) {
 			const clipId = crypto.randomUUID();
 			const tempFilePath = path.join(tmpDir, `${clipId}.mp4`);
 

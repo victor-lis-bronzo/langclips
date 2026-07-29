@@ -1,6 +1,6 @@
 import axios from "axios";
 import FormData from "form-data";
-import fs from "fs";
+import fs from "node:fs";
 import type {
 	AudioChunk,
 	IAudioChunkerService,
@@ -368,7 +368,7 @@ export class WhisperTranscriptionService implements ITranscriptionService {
 				const combinedDuration = residualSeg.end - lastSeg.start;
 				const lastWords = lastSeg.text.split(" ");
 				const gap = residualSeg.start - lastSeg.end;
-				const lastHasPunctuation = this.isSentenceEnd(
+				const _lastHasPunctuation = this.isSentenceEnd(
 					lastWords[lastWords.length - 1],
 				);
 

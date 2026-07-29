@@ -1,5 +1,5 @@
-import crypto from "crypto";
-import fs from "fs/promises";
+import crypto from "node:crypto";
+import fs from "node:fs/promises";
 import type { IClipUploaderService } from "../interfaces/clip-uploader.interface";
 import type { IStorageService } from "../interfaces/storage.interface";
 import type { LocalGeneratedClip } from "../interfaces/video-clipper.interface";

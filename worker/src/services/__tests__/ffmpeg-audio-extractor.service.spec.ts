@@ -35,7 +35,11 @@ describe("FFmpegAudioExtractorService", () => {
 			audioCodec: vi.fn().mockReturnThis(),
 			audioQuality: vi.fn().mockReturnThis(),
 			output: vi.fn().mockReturnThis(),
-			on: vi.fn().mockImplementation(function (this: any, event, callback) {
+			on: vi.fn().mockImplementation(function (
+				this: Record<string, unknown>,
+				event: string,
+				callback: (err?: Error) => void,
+			) {
 				if (event === "end") {
 					setTimeout(() => callback(), 10);
 				}
@@ -69,7 +73,11 @@ describe("FFmpegAudioExtractorService", () => {
 			audioCodec: vi.fn().mockReturnThis(),
 			audioQuality: vi.fn().mockReturnThis(),
 			output: vi.fn().mockReturnThis(),
-			on: vi.fn().mockImplementation(function (this: any, event, callback) {
+			on: vi.fn().mockImplementation(function (
+				this: Record<string, unknown>,
+				event: string,
+				callback: (err?: Error) => void,
+			) {
 				if (event === "error") {
 					setTimeout(
 						() => callback(new Error("FFmpeg error: corrupt input")),

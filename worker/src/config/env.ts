@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import path from "path";
+import path from "node:path";
 import { z } from "zod";
 
 // Carrega o arquivo .env resolvendo o caminho relativo ao diretório atual do processo

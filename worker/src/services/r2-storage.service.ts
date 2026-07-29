@@ -4,9 +4,9 @@ import {
 	PutObjectCommand,
 	type S3Client,
 } from "@aws-sdk/client-s3";
-import { createWriteStream } from "fs";
-import type { Readable } from "stream";
-import { pipeline } from "stream/promises";
+import { createWriteStream } from "node:fs";
+import type { Readable } from "node:stream";
+import { pipeline } from "node:stream/promises";
 import type { IStorageService } from "../interfaces/storage.interface";
 
 export class R2StorageService implements IStorageService {

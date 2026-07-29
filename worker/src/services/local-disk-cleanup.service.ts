@@ -1,4 +1,4 @@
-import { unlink } from "fs/promises";
+import { unlink } from "node:fs/promises";
 import type { IDiskCleanupService } from "../interfaces/disk-cleanup.interface";
 
 export class LocalDiskCleanupService implements IDiskCleanupService {

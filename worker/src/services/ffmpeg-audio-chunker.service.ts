@@ -1,9 +1,9 @@
-import * as crypto from "crypto";
+import * as crypto from "node:crypto";
 import ffmpegPath from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
-import * as fs from "fs";
-import * as os from "os";
-import * as path from "path";
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
 import type {
 	AudioChunk,
 	IAudioChunkerService,
@@ -41,7 +41,7 @@ export class FFmpegAudioChunkerService implements IAudioChunkerService {
 					])
 					.output(pattern)
 					.on("end", () => resolve())
-					.on("error", (err: any) => reject(err))
+					.on("error", (err: unknown) => reject(err))
 					.run();
 			});
 

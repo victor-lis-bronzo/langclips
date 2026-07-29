@@ -1,6 +1,6 @@
 import type { Job } from "bullmq";
-import os from "os";
-import path from "path";
+import os from "node:os";
+import path from "node:path";
 import type { IAudioExtractorService } from "../interfaces/audio-extractor.interface";
 import type { IClipUploaderService } from "../interfaces/clip-uploader.interface";
 import type { IDeckBuilderService } from "../interfaces/deck-builder.interface";
@@ -52,7 +52,6 @@ export class VideoProcessingJob {
 			console.log(`[FFMPEG] Extraindo áudio...`);
 			await job.updateProgress({ step: "audio-extraction", percentage: 20 });
 			const {
-				outputPath,
 				success: extractionSuccess,
 				startOffset,
 			} = await this.audioExtractor.extract({
@@ -104,7 +103,7 @@ export class VideoProcessingJob {
 			console.log(`[DECK] Construindo deck...`);
 			await job.updateProgress({ step: "deck-construction", percentage: 85 });
 			const deck = this.deckBuilder.build({
-				jobId: job.id!,
+				jobId: job.id ?? "unknown-job",
 				sourceFileKey: fileKey,
 				uploadedClips,
 			});
