@@ -18,7 +18,7 @@ vi.mock("../hooks/use-delete-deck", () => ({
 vi.mock(
 	"#/infrastructure/repositories/clip/clip-indexed-db.repository",
 	() => ({
-		IndexedDbClipRepository: vi.fn().mockImplementation(function (this: any) {
+		IndexedDbClipRepository: vi.fn().mockImplementation(function (this: Record<string, unknown>) {
 			this.getClipBlobById = vi.fn().mockResolvedValue(null);
 		}),
 	}),

@@ -25,14 +25,18 @@ describe("AlertExistentDeckDialog", () => {
 	});
 
 	it("does not render when hasDecks is false", () => {
-		vi.mocked(useHasExistentDecks).mockReturnValue({ data: false } as any);
+		vi.mocked(useHasExistentDecks).mockReturnValue({
+			data: false,
+		} as unknown as ReturnType<typeof useHasExistentDecks>);
 
 		const { container } = render(<AlertExistentDeckDialog />);
 		expect(container.firstChild).toBeNull();
 	});
 
 	it("renders dialog when hasDecks is true", () => {
-		vi.mocked(useHasExistentDecks).mockReturnValue({ data: true } as any);
+		vi.mocked(useHasExistentDecks).mockReturnValue({
+			data: true,
+		} as unknown as ReturnType<typeof useHasExistentDecks>);
 
 		render(<AlertExistentDeckDialog />);
 		expect(screen.getByText("You already have saved decks!")).toBeTruthy();

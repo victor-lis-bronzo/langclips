@@ -24,7 +24,11 @@ describe("useGetAllDecks", () => {
 		vi.spyOn(
 			IndexedDbStorageRepository.prototype,
 			"getAllDecks",
-		).mockResolvedValue(mockDecks as any);
+		).mockResolvedValue(
+			mockDecks as unknown as Awaited<
+				ReturnType<typeof IndexedDbStorageRepository.prototype.getAllDecks>
+			>,
+		);
 
 		const queryClient = new QueryClient({
 			defaultOptions: { queries: { retry: false } },

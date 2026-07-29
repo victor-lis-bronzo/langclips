@@ -33,7 +33,11 @@ describe("useHasExistentDecks", () => {
 		vi.spyOn(
 			IndexedDbStorageRepository.prototype,
 			"getAllDecks",
-		).mockResolvedValue([{ id: "deck-1" } as any]);
+		).mockResolvedValue([
+			{ id: "deck-1" } as unknown as Awaited<
+				ReturnType<typeof IndexedDbStorageRepository.prototype.getAllDecks>
+			>[number],
+		]);
 
 		const queryClient = new QueryClient({
 			defaultOptions: { queries: { retry: false } },

@@ -4,7 +4,7 @@ import { IndexedDbExerciseRepository } from "./exercise-indexed-db.repository";
 
 describe("IndexedDbExerciseRepository", () => {
 	let repository: IndexedDbExerciseRepository;
-	let mockDb: any;
+	let mockDb: Record<string, unknown>;
 
 	const mockExercises: Exercise[] = [
 		{

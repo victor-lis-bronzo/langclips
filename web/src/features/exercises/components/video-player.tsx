@@ -130,15 +130,12 @@ export default function VideoPlayer({ deckId, clipId }: VideoPlayerProps) {
 
 	return (
 		<div className="flex flex-col gap-4 w-full">
-			{/* biome-ignore lint/a11y/useKeyWithClickEvents: hover interaction only toggles overlay visibility */}
-			{/* biome-ignore lint/a11y/noStaticElementInteractions: hover interaction only toggles overlay visibility */}
 			<div
 				className="group w-full aspect-video rounded-2xl bg-black border border-white/10 relative overflow-hidden shadow-2xl transition-all duration-300 hover:shadow-primary/5 hover:border-white/15"
 				onMouseEnter={() => setShowControlsOverlay(true)}
 				onMouseLeave={() => isPlaying && setShowControlsOverlay(false)}
 			>
 				{/* biome-ignore lint/a11y/useMediaCaption: video clip training does not require secondary tracks */}
-				{/* biome-ignore lint/a11y/useKeyWithClickEvents: clicking video is standard play/pause shortcut */}
 				<video
 					ref={videoRef}
 					src={videoUrl}

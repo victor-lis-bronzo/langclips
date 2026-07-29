@@ -17,7 +17,7 @@ describe("handleDbUpgrade", () => {
 			}),
 		};
 
-		handleDbUpgrade(mockDb as any, 0, 3);
+		handleDbUpgrade(mockDb as unknown as Parameters<typeof handleDbUpgrade>[0], 0, 3);
 
 		expect(createdStores).toContain("decks");
 		expect(createdStores).toContain("clips");
@@ -40,7 +40,7 @@ describe("handleDbUpgrade", () => {
 			}),
 		};
 
-		handleDbUpgrade(mockDb as any, 2, 3);
+		handleDbUpgrade(mockDb as unknown as Parameters<typeof handleDbUpgrade>[0], 2, 3);
 
 		expect(createdStores).toContain("clips");
 		expect(mockDb.createObjectStore).toHaveBeenCalledWith("clips", {

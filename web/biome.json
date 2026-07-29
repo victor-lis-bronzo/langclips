@@ -10,10 +10,16 @@
 		"includes": [
 			"**/src/**/*",
 			"**/.vscode/**/*",
-			"**/index.html",
-			"**/vite.config.ts",
+			"index.html",
+			"vite.config.ts",
 			"!**/src/styles/*",
-			"!**/src/routeTree.gen.ts"
+			"!**/src/routeTree.gen.ts",
+			"!**/dist",
+			"!**/playwright-report",
+			"!**/test-results",
+			"!**/.wrangler",
+			"!**/.tanstack",
+			"!**/.content-collections"
 		]
 	},
 	"formatter": {

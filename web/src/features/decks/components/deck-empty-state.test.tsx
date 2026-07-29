@@ -4,7 +4,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { DeckEmptyState } from "./deck-empty-state";
 
 vi.mock("@tanstack/react-router", () => ({
-	Link: ({ children, to }: any) => <a href={to}>{children}</a>,
+	Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
+		<a href={to}>{children}</a>
+	),
 }));
 
 describe("DeckEmptyState", () => {

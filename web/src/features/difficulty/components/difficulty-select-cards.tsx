@@ -57,7 +57,8 @@ export default function DifficultySelectCards({
 	const navigate = useNavigate();
 
 	async function handleConfirm() {
-		await localStorageRepository.setDifficulty(selectedDifficulty!);
+		if (!selectedDifficulty) return;
+		await localStorageRepository.setDifficulty(selectedDifficulty);
 
 		const deck = await deckRepository.getDeck(deckId);
 		if (!deck) {

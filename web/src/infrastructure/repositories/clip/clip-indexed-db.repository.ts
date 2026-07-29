@@ -2,7 +2,18 @@ import { BaseIndexedDbRepository } from "#/infrastructure/database/base-indexed-
 import type { ClipMetadata, StoredClipRecord } from "#/infrastructure/database/indexed-db.types";
 import type { IClipStorageRepository } from "./clip.repository.interface";
 
-function extractBlob(record: StoredClipRecord | any): Blob {
+interface LegacyClipRecord {
+	id: string;
+	transcription: string;
+	sourceFileKey: string;
+	blob?: Blob;
+	blobBuffer?: ArrayBuffer;
+	mimeType?: string;
+	startTime?: number;
+	endTime?: number;
+}
+
+function extractBlob(record: StoredClipRecord | LegacyClipRecord): Blob {
 	if (record.blobBuffer) {
 		return new Blob([record.blobBuffer], { type: record.mimeType || "video/mp4" });
 	}
@@ -42,7 +53,7 @@ export class IndexedDbClipRepository
 
 		let clipRecord = await db.get("clips", clipId);
 		if (!clipRecord) {
-			const legacyClip = (deck.clips as any)[clipInfoIndex];
+			const legacyClip = (deck.clips as unknown as LegacyClipRecord[])[clipInfoIndex];
 			if (legacyClip && (legacyClip.blob || legacyClip.blobBuffer)) {
 				const blob = extractBlob(legacyClip);
 				const blobBuffer = await blob.arrayBuffer();
@@ -90,7 +101,7 @@ export class IndexedDbClipRepository
 
 		const decks = await db.getAll("decks");
 		for (const deck of decks) {
-			const legacyClip = deck.clips?.find((c: any) => c.id === clipId) as any;
+			const legacyClip = (deck.clips as unknown as LegacyClipRecord[])?.find((c) => c.id === clipId);
 			if (legacyClip && (legacyClip.blob || legacyClip.blobBuffer)) {
 				const blob = extractBlob(legacyClip);
 				const blobBuffer = await blob.arrayBuffer();

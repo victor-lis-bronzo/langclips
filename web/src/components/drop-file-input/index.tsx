@@ -28,7 +28,7 @@ export const DropFileInput = React.forwardRef<HTMLInputElement, DropFileProps>(
 		const [isDragging, setIsDragging] = useState(false);
 		const [fileDescription, setFileDescription] = useState(description);
 
-		useImperativeHandle(ref, () => inputRef.current!);
+		useImperativeHandle(ref, () => inputRef.current as HTMLInputElement);
 
 		const handleClick = () => {
 			inputRef.current?.click();

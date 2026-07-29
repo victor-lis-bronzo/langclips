@@ -4,7 +4,7 @@ import { IndexedDbClipRepository } from "./clip-indexed-db.repository";
 
 describe("IndexedDbClipRepository", () => {
 	let repository: IndexedDbClipRepository;
-	let mockDb: any;
+	let mockDb: Record<string, unknown>;
 
 	const mockBlob = new Blob(["test-video"], { type: "video/mp4" });
 	const mockClip: ClipMetadata = {
