@@ -40,9 +40,14 @@ async function seedDeckAndClip(
 							deckStore.put(deck);
 						}
 						if (createClip && deck && deck.clips && deck.clips[0]) {
-							const sampleBlob = new Blob(["fake-mp4-video-content"], {
-								type: "video/mp4",
-							});
+							const sampleBlob = new Blob(
+								[
+									new Uint8Array([
+										0, 0, 0, 20, 102, 116, 121, 112, 105, 115, 111, 109,
+									]),
+								],
+								{ type: "video/mp4" },
+							);
 							clipStore.put({
 								id: deck.clips[0].id,
 								deckId: deck.id,

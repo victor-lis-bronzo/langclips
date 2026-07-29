@@ -1,8 +1,8 @@
 import { expect, test } from "@playwright/test";
 
 async function clearAndSeedDeck(page: any, deckData?: any) {
-	// Navigate to home first to set same-origin context for IndexedDB
-	await page.goto("/", { waitUntil: "domcontentloaded" });
+	// Establish same-origin context first
+	await page.goto("/decks", { waitUntil: "domcontentloaded" });
 
 	await page.evaluate(async (data: any) => {
 		return new Promise<void>((resolve, reject) => {
@@ -52,12 +52,13 @@ async function clearAndSeedDeck(page: any, deckData?: any) {
 			}
 		});
 	}, deckData);
+
+	await page.reload({ waitUntil: "domcontentloaded" });
 }
 
 test.describe("Decks Screen E2E", () => {
 	test("should display empty state when no decks are saved", async ({ page }) => {
 		await clearAndSeedDeck(page, null);
-		await page.goto("/decks", { waitUntil: "domcontentloaded" });
 
 		await expect(
 			page.getByRole("heading", { name: "My Decks" }),
@@ -76,8 +77,6 @@ test.describe("Decks Screen E2E", () => {
 			totalSeconds: 125,
 		});
 
-		await page.goto("/decks", { waitUntil: "domcontentloaded" });
-
 		await expect(page.getByText("1 clip")).toBeVisible();
 		await expect(page.getByText("~02m 05s")).toBeVisible();
 	});
@@ -91,8 +90,6 @@ test.describe("Decks Screen E2E", () => {
 			downloadedAt: Date.now(),
 			totalSeconds: 45,
 		});
-
-		await page.goto("/decks", { waitUntil: "domcontentloaded" });
 
 		await page.getByText("1 clip").click();
 		await expect(page).toHaveURL(/\/difficulty\/deck-nav-test/);
