@@ -4,7 +4,6 @@ import {
   createRootRouteWithContext,
   HeadContent,
   Scripts,
-  useLocation,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { Toaster } from "#/components/ui/sonner";

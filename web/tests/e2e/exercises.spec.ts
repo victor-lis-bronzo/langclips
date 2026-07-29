@@ -8,7 +8,7 @@ async function seedDeckAndClip(
 	await page.goto("/");
 
 	await page.evaluate(
-		async ({ deck, createClip }) => {
+		async ({ deck, createClip }: { deck: any; createClip: boolean }) => {
 			return new Promise<void>((resolve, reject) => {
 				const req = indexedDB.open("langclips-local", 3);
 				req.onupgradeneeded = (e: any) => {

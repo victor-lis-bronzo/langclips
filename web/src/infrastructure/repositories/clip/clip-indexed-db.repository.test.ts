@@ -88,7 +88,7 @@ describe("IndexedDbClipRepository", () => {
 			id: "deck-1",
 			clips: [{ id: "clip-1" }, { id: "clip-2" }],
 		};
-		mockDb.get.mockImplementation((store: string, id: string) => {
+		mockDb.get.mockImplementation((store: string) => {
 			if (store === "decks") return Promise.resolve(deck);
 			if (store === "clips") return Promise.resolve(mockClip);
 			return Promise.resolve(undefined);
