@@ -1,6 +1,16 @@
 import { BaseIndexedDbRepository } from "#/infrastructure/database/base-indexed-db.repository";
-import type { ClipMetadata } from "#/infrastructure/database/indexed-db.types";
+import type { ClipMetadata, StoredClipRecord } from "#/infrastructure/database/indexed-db.types";
 import type { IClipStorageRepository } from "./clip.repository.interface";
+
+function extractBlob(record: StoredClipRecord | any): Blob {
+	if (record.blobBuffer) {
+		return new Blob([record.blobBuffer], { type: record.mimeType || "video/mp4" });
+	}
+	if (record.blob && typeof record.blob === "object") {
+		return record.blob;
+	}
+	return new Blob([], { type: record.mimeType || "video/mp4" });
+}
 
 export class IndexedDbClipRepository
 	extends BaseIndexedDbRepository
@@ -8,7 +18,18 @@ export class IndexedDbClipRepository
 {
 	async saveClip(clip: ClipMetadata): Promise<void> {
 		const db = await this.getDb();
-		await db.put("clips", clip);
+		const blobBuffer = clip.blob ? await clip.blob.arrayBuffer() : new ArrayBuffer(0);
+		const storedClip: StoredClipRecord = {
+			id: clip.id,
+			deckId: clip.deckId,
+			transcription: clip.transcription,
+			sourceFileKey: clip.sourceFileKey,
+			blobBuffer,
+			mimeType: clip.mimeType || "video/mp4",
+			startTime: clip.startTime,
+			endTime: clip.endTime,
+		};
+		await db.put("clips", storedClip);
 	}
 
 	async getClipById(deckId: string, clipId: string) {
@@ -19,25 +40,39 @@ export class IndexedDbClipRepository
 		const clipInfoIndex = deck.clips.findIndex((c) => c.id === clipId);
 		if (clipInfoIndex === -1) return null;
 
-		let clip = await db.get("clips", clipId);
-		if (!clip) {
+		let clipRecord = await db.get("clips", clipId);
+		if (!clipRecord) {
 			const legacyClip = (deck.clips as any)[clipInfoIndex];
-			if (legacyClip && legacyClip.blob) {
-				clip = {
+			if (legacyClip && (legacyClip.blob || legacyClip.blobBuffer)) {
+				const blob = extractBlob(legacyClip);
+				const blobBuffer = await blob.arrayBuffer();
+				clipRecord = {
 					id: legacyClip.id,
 					deckId: deck.id,
 					transcription: legacyClip.transcription,
 					sourceFileKey: legacyClip.sourceFileKey,
-					blob: legacyClip.blob,
+					blobBuffer,
 					mimeType: legacyClip.mimeType || "video/mp4",
 					startTime: legacyClip.startTime ?? 0,
 					endTime: legacyClip.endTime ?? 0,
 				};
-				await db.put("clips", clip);
+				await db.put("clips", clipRecord);
 			}
 		}
 
-		if (!clip) return null;
+		if (!clipRecord) return null;
+
+		const blob = extractBlob(clipRecord);
+		const clip: ClipMetadata = {
+			id: clipRecord.id,
+			deckId: clipRecord.deckId,
+			transcription: clipRecord.transcription,
+			sourceFileKey: clipRecord.sourceFileKey,
+			blob,
+			mimeType: clipRecord.mimeType || "video/mp4",
+			startTime: clipRecord.startTime ?? 0,
+			endTime: clipRecord.endTime ?? 0,
+		};
 
 		return {
 			...clip,
@@ -48,25 +83,29 @@ export class IndexedDbClipRepository
 
 	async getClipBlobById(clipId: string): Promise<Blob | null> {
 		const db = await this.getDb();
-		const clip = await db.get("clips", clipId);
-		if (clip?.blob) return clip.blob;
+		const clipRecord = await db.get("clips", clipId);
+		if (clipRecord) {
+			return extractBlob(clipRecord);
+		}
 
 		const decks = await db.getAll("decks");
 		for (const deck of decks) {
 			const legacyClip = deck.clips?.find((c: any) => c.id === clipId) as any;
-			if (legacyClip && legacyClip.blob) {
-				const migratedClip: ClipMetadata = {
+			if (legacyClip && (legacyClip.blob || legacyClip.blobBuffer)) {
+				const blob = extractBlob(legacyClip);
+				const blobBuffer = await blob.arrayBuffer();
+				const migratedClip: StoredClipRecord = {
 					id: legacyClip.id,
 					deckId: deck.id,
 					transcription: legacyClip.transcription,
 					sourceFileKey: legacyClip.sourceFileKey,
-					blob: legacyClip.blob,
+					blobBuffer,
 					mimeType: legacyClip.mimeType || "video/mp4",
 					startTime: legacyClip.startTime ?? 0,
 					endTime: legacyClip.endTime ?? 0,
 				};
 				await db.put("clips", migratedClip);
-				return legacyClip.blob;
+				return blob;
 			}
 		}
 

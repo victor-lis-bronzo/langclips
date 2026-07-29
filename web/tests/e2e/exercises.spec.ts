@@ -40,20 +40,15 @@ async function seedDeckAndClip(
 							deckStore.put(deck);
 						}
 						if (createClip && deck && deck.clips && deck.clips[0]) {
-							const sampleBlob = new Blob(
-								[
-									new Uint8Array([
-										0, 0, 0, 20, 102, 116, 121, 112, 105, 115, 111, 109,
-									]),
-								],
-								{ type: "video/mp4" },
-							);
+							const sampleBuffer = new Uint8Array([
+								0, 0, 0, 20, 102, 116, 121, 112, 105, 115, 111, 109,
+							]).buffer;
 							clipStore.put({
 								id: deck.clips[0].id,
 								deckId: deck.id,
 								transcription: deck.clips[0].transcription,
 								sourceFileKey: deck.clips[0].sourceFileKey,
-								blob: sampleBlob,
+								blobBuffer: sampleBuffer,
 								mimeType: "video/mp4",
 								startTime: 0,
 								endTime: 5,

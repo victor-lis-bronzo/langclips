@@ -11,6 +11,18 @@ export interface ClipMetadata {
 	endTime: number;
 }
 
+export interface StoredClipRecord {
+	id: string;
+	deckId: string;
+	transcription: string;
+	sourceFileKey: string;
+	blobBuffer?: ArrayBuffer;
+	blob?: Blob;
+	mimeType: string;
+	startTime: number;
+	endTime: number;
+}
+
 export interface DeckRecord {
 	id: string;
 	sourceFileKey: string;

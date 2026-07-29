@@ -1,5 +1,5 @@
 import { type DBSchema, type IDBPDatabase, openDB } from "idb";
-import type { ClipMetadata, DeckRecord, Exercise } from "./indexed-db.types";
+import type { ClipMetadata, DeckRecord, Exercise, StoredClipRecord } from "./indexed-db.types";
 
 export interface LangClipsDB extends DBSchema {
 	decks: {
@@ -8,7 +8,7 @@ export interface LangClipsDB extends DBSchema {
 	};
 	clips: {
 		key: string;
-		value: ClipMetadata;
+		value: StoredClipRecord;
 	};
 	exercises: {
 		key: string;
