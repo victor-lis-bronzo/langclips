@@ -10,7 +10,12 @@ interface VideoPlayerProps {
 const PLAYBACK_SPEEDS = [0.5, 0.75, 1.0, 1.25, 1.5];
 
 export default function VideoPlayer({ deckId, clipId }: VideoPlayerProps) {
-	const { data: blob, isLoading, isError } = useGetClipBlob({ deckId, clipId });
+	const {
+		data: blob,
+		isLoading,
+		isFetching,
+		isError,
+	} = useGetClipBlob({ deckId, clipId });
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [speed, setSpeed] = useState(1.0);
@@ -83,7 +88,7 @@ export default function VideoPlayer({ deckId, clipId }: VideoPlayerProps) {
 		}
 	};
 
-	if (isLoading) {
+	if (isLoading || (isFetching && !videoUrl)) {
 		return (
 			<div className="flex flex-col gap-4 w-full">
 				<div className="w-full aspect-video rounded-2xl bg-zinc-900 border border-white/5 relative overflow-hidden shadow-2xl">

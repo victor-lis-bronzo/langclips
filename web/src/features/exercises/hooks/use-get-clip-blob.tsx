@@ -4,6 +4,8 @@ import { IndexedDbClipRepository } from "#/infrastructure/repositories/clip/clip
 type UseGetClipBlobProps = {
 	deckId: string;
 	clipId: string;
+	retry?: number | boolean;
+	retryDelay?: number | ((failureCount: number, error: Error) => number);
 };
 
 const clipIndexDbRepository = new IndexedDbClipRepository();
@@ -11,11 +13,21 @@ const clipIndexDbRepository = new IndexedDbClipRepository();
 export default function useGetClipBlob({
 	deckId,
 	clipId,
+	retry = 5,
+	retryDelay = (attempt) => Math.min(1000 * 2 ** attempt, 10_000),
 }: UseGetClipBlobProps) {
 	return useQuery({
 		queryKey: ["clip-blob", deckId, clipId],
-		queryFn: () => clipIndexDbRepository.getClipBlobById(clipId),
+		queryFn: async () => {
+			const blob = await clipIndexDbRepository.getClipBlobById(clipId);
+			if (!blob) {
+				throw new Error(`Clip blob not found for clipId: ${clipId}`);
+			}
+			return blob;
+		},
 		enabled: !!deckId && !!clipId && typeof window !== "undefined",
-		staleTime: Number.POSITIVE_INFINITY,
+		staleTime: 5_000,
+		retry,
+		retryDelay,
 	});
 }
