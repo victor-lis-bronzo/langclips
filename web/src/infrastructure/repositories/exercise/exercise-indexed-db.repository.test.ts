@@ -2,9 +2,20 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Exercise } from "#/infrastructure/database/indexed-db.types";
 import { IndexedDbExerciseRepository } from "./exercise-indexed-db.repository";
 
+import type { IDBPDatabase } from "idb";
+import type { LangClipsDB } from "#/infrastructure/database/indexed-db.provider";
+
+type MockDb = {
+	put: ReturnType<typeof vi.fn>;
+	get: ReturnType<typeof vi.fn>;
+	getAll: ReturnType<typeof vi.fn>;
+	clear: ReturnType<typeof vi.fn>;
+	transaction: ReturnType<typeof vi.fn>;
+};
+
 describe("IndexedDbExerciseRepository", () => {
 	let repository: IndexedDbExerciseRepository;
-	let mockDb: Record<string, unknown>;
+	let mockDb: MockDb;
 
 	const mockExercises: Exercise[] = [
 		{
@@ -48,7 +59,9 @@ describe("IndexedDbExerciseRepository", () => {
 			transaction: vi.fn(),
 		};
 
-		repository = new IndexedDbExerciseRepository(async () => mockDb);
+		repository = new IndexedDbExerciseRepository(
+			async () => mockDb as unknown as IDBPDatabase<LangClipsDB>,
+		);
 	});
 
 	it("should save an exercise", async () => {
