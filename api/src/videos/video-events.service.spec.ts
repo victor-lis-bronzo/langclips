@@ -3,14 +3,25 @@ import { VideoEventsService } from './video-events.service';
 import { getQueueToken } from '@nestjs/bullmq';
 import { EventEmitter } from 'events';
 
+const mockQueueEventsInstance = Object.assign(new EventEmitter(), {
+  close: jest.fn().mockResolvedValue(undefined),
+});
+
+jest.mock('bullmq', () => {
+  const actual = jest.requireActual('bullmq');
+  return {
+    ...actual,
+    QueueEvents: jest.fn().mockImplementation(() => mockQueueEventsInstance),
+  };
+});
+
 describe('VideoEventsService', () => {
   let service: VideoEventsService;
   let mockQueue: any;
-  let mockQueueEventsInstance: EventEmitter;
 
   beforeEach(async () => {
-    mockQueueEventsInstance = new EventEmitter();
-    (mockQueueEventsInstance as any).close = jest.fn();
+    mockQueueEventsInstance.removeAllListeners();
+    mockQueueEventsInstance.close.mockClear();
 
     mockQueue = {
       opts: { connection: {} },
@@ -28,9 +39,6 @@ describe('VideoEventsService', () => {
     }).compile();
 
     service = module.get<VideoEventsService>(VideoEventsService);
-
-    // Override private queueEvents with our mock EventEmitter instance for assertions
-    (service as any).queueEvents = mockQueueEventsInstance;
   });
 
   it('should be defined', () => {
