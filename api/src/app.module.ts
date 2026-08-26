@@ -7,10 +7,11 @@ import { UploadsModule } from './uploads/uploads.module';
 import { VideosModule } from './videos/videos.module';
 import { HealthModule } from './health/health.module';
 import { FastifyAdapter } from '@bull-board/fastify';
+import { validate } from './config/env.validation';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, validate }),
     BullModule.forRoot({
       connection: {
         host: process.env.REDIS_HOST,
