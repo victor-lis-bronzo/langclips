@@ -19,10 +19,14 @@ import { validate } from './config/env.validation';
         password: process.env.REDIS_PASSWORD || undefined,
       },
     }),
-    BullBoardModule.forRoot({
-      route: '/admin/queues',
-      adapter: FastifyAdapter,
-    }),
+    ...(process.env.ENABLE_BULL_BOARD === 'true'
+      ? [
+          BullBoardModule.forRoot({
+            route: '/admin/queues',
+            adapter: FastifyAdapter,
+          }),
+        ]
+      : []),
     StorageModule,
     UploadsModule,
     VideosModule,
