@@ -1,0 +1,274 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*.[0-9]*.[0-9]*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag a deployar/rollback (ex.: v0.1.0)'
+        required: true
+      skip_verify:
+        description: 'Pular verify (uso: rollback de emergência)'
+        type: boolean
+        default: false
+      confirm:
+        description: 'Digite "yes" para confirmar'
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-release
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.confirm == 'yes' }}
+    outputs:
+      tag: ${{ steps.resolve.outputs.tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Restaurar objetos de tag anotada
+        run: git fetch --force --tags origin
+
+      - name: Resolver e validar a tag
+        id: resolve
+        run: |
+          TAG="${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}"
+
+          if ! echo "$TAG" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "Tag '$TAG' não segue o padrão SemVer vX.Y.Z"
+            exit 1
+          fi
+
+          if ! git rev-parse -q --verify "refs/tags/$TAG" > /dev/null; then
+            echo "Tag '$TAG' não existe no repositório"
+            exit 1
+          fi
+
+          tag_type="$(git cat-file -t "refs/tags/$TAG")"
+          if [ "$tag_type" != "tag" ]; then
+            echo "Tag '$TAG' é leve (tipo '$tag_type'); só tags anotadas são aceitas"
+            exit 1
+          fi
+
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+  verify:
+    needs: resolve
+    if: ${{ !inputs.skip_verify }}
+    uses: ./.github/workflows/verify.yml
+    with:
+      ref: ${{ needs.resolve.outputs.tag }}
+    secrets: inherit
+
+  images:
+    needs: [resolve, verify]
+    if: ${{ !cancelled() && needs.resolve.result == 'success' && needs.verify.result != 'failure' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [api, worker]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.resolve.outputs.tag }}
+
+      - name: Login no GHCR
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
+
+      - name: Build e push
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        with:
+          context: ./${{ matrix.project }}
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/langclips-${{ matrix.project }}:${{ needs.resolve.outputs.tag }}
+            ghcr.io/${{ github.repository_owner }}/langclips-${{ matrix.project }}:latest
+          cache-from: type=gha,scope=${{ matrix.project }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.project }}
+
+  deploy-vps:
+    needs: [resolve, verify, images]
+    if: ${{ !cancelled() && needs.resolve.result == 'success' && needs.verify.result != 'failure' && needs.images.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    env:
+      TAG: ${{ needs.resolve.outputs.tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.resolve.outputs.tag }}
+
+      - name: Configurar SSH
+        uses: ./.github/actions/setup-ssh
+        with:
+          private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+
+      - name: Enviar compose de produção
+        env:
+          SSH_TARGET: ${{ vars.SSH_TARGET }}
+          VPS_APP_DIR: ${{ vars.VPS_APP_DIR }}
+        run: scp infra/compose.prod.yml "$SSH_TARGET:$VPS_APP_DIR/compose.prod.yml"
+
+      - name: Login no GHCR (VPS)
+        env:
+          SSH_TARGET: ${{ vars.SSH_TARGET }}
+          GHCR_ACTOR: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+        run: |
+          printf '%s' "$GHCR_TOKEN" | ssh "$SSH_TARGET" "docker login ghcr.io -u '$GHCR_ACTOR' --password-stdin"
+
+      - name: Deploy via docker compose
+        env:
+          SSH_TARGET: ${{ vars.SSH_TARGET }}
+          VPS_APP_DIR: ${{ vars.VPS_APP_DIR }}
+        run: |
+          # shellcheck disable=SC2029
+          ssh "$SSH_TARGET" 'bash -euo pipefail -s' "$VPS_APP_DIR" "$TAG" << 'EOF'
+            app_dir="$1"
+            tag="$2"
+            cd "$app_dir"
+
+            [ -f .current-release ] && cp .current-release .last-release
+
+            IMAGE_TAG="$tag" docker compose -f compose.prod.yml pull
+            IMAGE_TAG="$tag" docker compose -f compose.prod.yml up -d --remove-orphans
+
+            echo "$tag" > .current-release
+            docker image prune -f
+          EOF
+
+  deploy-web:
+    needs: [resolve, verify]
+    if: ${{ !cancelled() && needs.resolve.result == 'success' && needs.verify.result != 'failure' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.resolve.outputs.tag }}
+
+      - name: Setup Node and pnpm
+        uses: ./.github/actions/setup-node-pnpm
+        with:
+          project: web
+
+      - name: Build
+        working-directory: web
+        env:
+          VITE_API_URL: ${{ vars.WEB_VITE_API_URL }}
+        run: pnpm run build
+
+      - name: Deploy no Cloudflare Workers
+        working-directory: web
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: pnpm exec wrangler deploy
+
+  smoke:
+    needs: [deploy-vps, deploy-web]
+    if: ${{ !cancelled() && needs.deploy-vps.result == 'success' && needs.deploy-web.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checar API
+        env:
+          API_PUBLIC_URL: ${{ vars.API_PUBLIC_URL }}
+        run: |
+          for i in $(seq 1 10); do
+            if curl -fsS -o /dev/null "$API_PUBLIC_URL/health"; then
+              echo "API ok"
+              exit 0
+            fi
+            echo "Tentativa $i falhou, aguardando..."
+            sleep $((i * 3))
+          done
+          echo "API não respondeu em /health após 10 tentativas"
+          exit 1
+
+      - name: Checar Web
+        env:
+          WEB_PUBLIC_URL: ${{ vars.WEB_PUBLIC_URL }}
+        run: |
+          for i in $(seq 1 10); do
+            if curl -fsS -o /dev/null "$WEB_PUBLIC_URL"; then
+              echo "Web ok"
+              exit 0
+            fi
+            echo "Tentativa $i falhou, aguardando..."
+            sleep $((i * 3))
+          done
+          echo "Web não respondeu após 10 tentativas"
+          exit 1
+
+      - name: Configurar SSH
+        uses: ./.github/actions/setup-ssh
+        with:
+          private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+
+      - name: Checar worker via docker
+        env:
+          SSH_TARGET: ${{ vars.SSH_TARGET }}
+        run: |
+          # shellcheck disable=SC2029
+          ssh "$SSH_TARGET" 'bash -euo pipefail -s' << 'EOF'
+            status="$(docker inspect -f '{{.State.Status}}' langclips-worker)"
+            restarts="$(docker inspect -f '{{.RestartCount}}' langclips-worker)"
+            echo "status=$status restarts=$restarts"
+            if [ "$status" != "running" ]; then
+              echo "Worker não está running"
+              exit 1
+            fi
+          EOF
+
+  github-release:
+    needs: [resolve, smoke]
+    if: ${{ !cancelled() && needs.smoke.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.resolve.outputs.tag }}
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Criar GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.resolve.outputs.tag }}
+        run: gh release create "$TAG" --generate-notes --verify-tag
