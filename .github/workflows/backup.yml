@@ -1,0 +1,65 @@
+name: Backup
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Configurar SSH
+        uses: ./.github/actions/setup-ssh
+        with:
+          private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+
+      - name: Enviar passphrase temporária
+        env:
+          SSH_TARGET: ${{ vars.SSH_TARGET }}
+          VPS_BACKUP_DIR: ${{ vars.VPS_BACKUP_DIR }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          printf '%s' "$BACKUP_PASSPHRASE" > "$RUNNER_TEMP/backup.pass"
+          ssh "$SSH_TARGET" "mkdir -p '$VPS_BACKUP_DIR'"
+          scp "$RUNNER_TEMP/backup.pass" "$SSH_TARGET:$VPS_BACKUP_DIR/.backup.pass"
+          ssh "$SSH_TARGET" "chmod 600 '$VPS_BACKUP_DIR/.backup.pass'"
+          shred -u "$RUNNER_TEMP/backup.pass" 2>/dev/null || rm -f "$RUNNER_TEMP/backup.pass"
+
+      - name: Backup, cifragem e rotação
+        env:
+          SSH_TARGET: ${{ vars.SSH_TARGET }}
+          VPS_APP_DIR: ${{ vars.VPS_APP_DIR }}
+          VPS_BACKUP_DIR: ${{ vars.VPS_BACKUP_DIR }}
+          BACKUP_RETENTION_DAYS: ${{ vars.BACKUP_RETENTION_DAYS }}
+        run: |
+          # shellcheck disable=SC2029
+          ssh "$SSH_TARGET" 'bash -euo pipefail -s' \
+            "$VPS_APP_DIR" "$VPS_BACKUP_DIR" "$BACKUP_RETENTION_DAYS" << 'EOF'
+            app_dir="$1"
+            backup_dir="$2"
+            retention_days="$3"
+            stamp="$(date +%Y%m%d-%H%M%S)"
+            pass_file="$backup_dir/.backup.pass"
+
+            docker exec langclips-redis redis-cli BGSAVE
+            sleep 3
+            docker cp langclips-redis:/data/dump.rdb "$backup_dir/redis-$stamp.rdb"
+            tar -czf "$backup_dir/envs-$stamp.tar.gz" -C "$app_dir" api.env worker.env
+
+            for f in "$backup_dir/redis-$stamp.rdb" "$backup_dir/envs-$stamp.tar.gz"; do
+              gpg --batch --yes --passphrase-file "$pass_file" -c "$f"
+              rm -f "$f"
+            done
+            rm -f "$pass_file"
+
+            find "$backup_dir" -type f -name '*.gpg' -mtime "+$retention_days" -delete
+          EOF
