@@ -5,6 +5,7 @@ import { BullBoardModule } from '@bull-board/nestjs';
 import { StorageModule } from './storage/storage.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { VideosModule } from './videos/videos.module';
+import { HealthModule } from './health/health.module';
 import { FastifyAdapter } from '@bull-board/fastify';
 
 @Module({
@@ -24,6 +25,7 @@ import { FastifyAdapter } from '@bull-board/fastify';
     StorageModule,
     UploadsModule,
     VideosModule,
+    HealthModule,
   ],
 })
 export class AppModule {}
