@@ -1,3 +1,4 @@
+name: "lang-clips-infra"
 services:
   redis:
     image: redis:8.8.0-alpine
