@@ -1,5 +1,7 @@
 <div align="center">
 
+**English** | [Português](README.pt-BR.md)
+
 # LangClips
 
 **Turn any short video into English listening exercises, with AI-powered transcription, automatic clipping and offline-first practice.**
