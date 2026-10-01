@@ -1,6 +1,10 @@
 import type { Job } from "bullmq";
 import os from "node:os";
 import path from "node:path";
+import {
+	MAX_CLIP_DURATION_SECONDS,
+	MIN_CLIP_DURATION_SECONDS,
+} from "../config/clip-duration";
 import type { IAudioExtractorService } from "../interfaces/audio-extractor.interface";
 import type { IClipUploaderService } from "../interfaces/clip-uploader.interface";
 import type { IDeckBuilderService } from "../interfaces/deck-builder.interface";
@@ -72,7 +76,10 @@ export class VideoProcessingJob {
 
 			const validRequests = transcriptionData.filter((data) => {
 				const duration = data.end - data.start;
-				return duration >= 2 && duration <= 20;
+				return (
+					duration >= MIN_CLIP_DURATION_SECONDS &&
+					duration <= MAX_CLIP_DURATION_SECONDS
+				);
 			});
 
 			// Passo 4: Gera os cortes solicitados
