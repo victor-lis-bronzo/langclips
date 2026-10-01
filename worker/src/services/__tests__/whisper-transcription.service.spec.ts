@@ -118,4 +118,41 @@ describe("WhisperTranscriptionService", () => {
 		expect(fs.unlinkSync).toHaveBeenCalledWith("/tmp/chunk1.mp3");
 		expect(fs.unlinkSync).toHaveBeenCalledWith("/tmp/chunk2.mp3");
 	});
+
+	describe("short sentence splitting", () => {
+		const phrases = [
+			"Good morning, my name is Anna.",
+			"I like to drink coffee every day.",
+			"The weather is very nice today.",
+			"Let's go to the park together.",
+		];
+
+		function wordsFor(pauseSeconds: number) {
+			let t = 0.3;
+			return phrases.flatMap((phrase) => {
+				const words = phrase.split(" ").map((word) => {
+					const start = t;
+					t += 0.3;
+					return { word, start, end: t };
+				});
+				t += pauseSeconds;
+				return words;
+			});
+		}
+
+		it.each([0.5, 0.8, 1.5])(
+			"should generate one segment per phrase when the pause is %s s",
+			async (pause) => {
+				vi.mocked(axios.post).mockResolvedValue({
+					data: { text: "", words: wordsFor(pause), segments: [] },
+				});
+
+				const result = await service.transcribe({
+					audioPath: "/tmp/audio.mp3",
+				});
+
+				expect(result.transcriptionData.map((s) => s.text)).toEqual(phrases);
+			},
+		);
+	});
 });

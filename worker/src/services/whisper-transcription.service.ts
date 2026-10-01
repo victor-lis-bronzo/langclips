@@ -5,6 +5,7 @@ import type {
 	AudioChunk,
 	IAudioChunkerService,
 } from "../interfaces/audio-chunker.interface";
+import { MIN_CLIP_DURATION_SECONDS } from "../config/clip-duration";
 import type { TranscriptionSegment } from "../interfaces/deck-builder.interface";
 import type {
 	ITranscriptionService,
@@ -193,7 +194,7 @@ export class WhisperTranscriptionService implements ITranscriptionService {
 		let currentGroup: WhisperSegment[] = [];
 
 		const MAX_DURATION = 8; // 8 seconds
-		const MIN_DURATION = 3; // 3 seconds
+		const MIN_DURATION = MIN_CLIP_DURATION_SECONDS;
 		const MAX_GAP = 1.0; // 1 seconds gap of silence
 
 		for (const seg of segments) {
@@ -320,7 +321,7 @@ export class WhisperTranscriptionService implements ITranscriptionService {
 		const segments: TranscriptionSegment[] = [];
 		let currentWords: WhisperWord[] = [];
 
-		const MIN_DURATION = 3.0;
+		const MIN_DURATION = MIN_CLIP_DURATION_SECONDS;
 		const MAX_DURATION = 8.0;
 		const MAX_GAP = 1.0;
 
