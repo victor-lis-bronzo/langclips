@@ -1,9 +1,11 @@
+import type { DifficultyType } from "#/infrastructure/repositories/preferences/preferences.repository.interface";
 import { normalizeWord, splitIntoWords } from "#/lib/string-utils";
 import type { WordResult } from "../types/word-result";
 
 export function evaluateAttempt(
 	userValue: string,
 	transcription: string,
+	difficulty?: DifficultyType,
 ): { results: WordResult[]; isHit: boolean } {
 	const originalTokens = splitIntoWords(transcription);
 	const userTokens = splitIntoWords(userValue);
@@ -98,7 +100,10 @@ export function evaluateAttempt(
 	}
 
 	const results = reversedResults.reverse();
-	const isHit = greens + yellows > reds;
+	// Hard é ditado: a frase inteira precisa estar certa. Nos demais níveis
+	// vale a maioria, tolerando erros pequenos.
+	const isHit =
+		difficulty === "hard" ? reds === 0 : greens + yellows > reds;
 
 	return { results, isHit };
 }
