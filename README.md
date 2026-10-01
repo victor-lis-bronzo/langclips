@@ -15,7 +15,8 @@
 ![FFmpeg](https://img.shields.io/badge/FFmpeg-007808?logo=ffmpeg&logoColor=white)
 ![Cloudflare R2](https://img.shields.io/badge/Cloudflare_R2-F38020?logo=cloudflare&logoColor=white)
 
-[![LangClips demo](docs/media/brag.jpg)](docs/media/brag.mp4)
+
+https://github.com/user-attachments/assets/439e5b0a-e2dc-4036-a52d-02988145b98f
 
 <sub>Watch the 30s demo</sub>
 
