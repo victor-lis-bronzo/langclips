@@ -22,7 +22,7 @@ export default function useCleanUpOldGuesses({
 			const clipPosition = deck?.clips.findIndex((clip) => clip.id === clipId);
 
 			// apaga apenas se for o primeiro exercicio de um nova tentativa
-			if (clipPosition === undefined || clipPosition === -1 || clipPosition > 1)
+			if (clipPosition === undefined || clipPosition === -1 || clipPosition > 0)
 				return false;
 
 			return await exerciseRepository.cleanUp();
