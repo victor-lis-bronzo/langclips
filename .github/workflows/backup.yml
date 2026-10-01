@@ -28,6 +28,7 @@ jobs:
           VPS_BACKUP_DIR: ${{ vars.VPS_BACKUP_DIR }}
           BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
         run: |
+          # shellcheck disable=SC2029
           printf '%s' "$BACKUP_PASSPHRASE" > "$RUNNER_TEMP/backup.pass"
           ssh "$SSH_TARGET" "mkdir -p '$VPS_BACKUP_DIR'"
           scp "$RUNNER_TEMP/backup.pass" "$SSH_TARGET:$VPS_BACKUP_DIR/.backup.pass"

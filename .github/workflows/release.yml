@@ -143,6 +143,7 @@ jobs:
           GHCR_ACTOR: ${{ github.actor }}
           GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
         run: |
+          # shellcheck disable=SC2029
           printf '%s' "$GHCR_TOKEN" | ssh "$SSH_TARGET" "docker login ghcr.io -u '$GHCR_ACTOR' --password-stdin"
 
       - name: Deploy via docker compose
