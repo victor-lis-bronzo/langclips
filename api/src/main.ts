@@ -13,7 +13,10 @@ async function bootstrap() {
     new FastifyAdapter(),
   );
 
-  app.enableCors();
+  const corsOrigins = process.env.CORS_ORIGINS?.split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+  app.enableCors(corsOrigins?.length ? { origin: corsOrigins } : undefined);
 
   const config = new DocumentBuilder()
     .setTitle('Lang Clips API')

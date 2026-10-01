@@ -1,7 +1,11 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "tanstack-start-app",
+  "name": "langclips-web",
   "compatibility_date": "2025-09-02",
   "compatibility_flags": ["nodejs_compat"],
-  "main": "@tanstack/react-start/server-entry"
+  "main": "@tanstack/react-start/server-entry",
+  "vars": {
+    // TODO: substituir pela URL pública real da api antes do primeiro deploy (ver docs/deploy.md)
+    "API_URL": "https://api.langclips.example.com"
+  }
 }

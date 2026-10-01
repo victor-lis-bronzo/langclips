@@ -8,9 +8,15 @@ importers:
 
   .:
     dependencies:
+      '@aws-sdk/client-s3':
+        specifier: ^3.1085.0
+        version: 3.1085.0
       axios:
         specifier: ^1.18.1
         version: 1.18.1
+      bullmq:
+        specifier: ^5.80.1
+        version: 5.80.1
       dotenv:
         specifier: ^16.4.5
         version: 16.6.1
@@ -30,9 +36,6 @@ importers:
         specifier: ^4.4.3
         version: 4.4.3
     devDependencies:
-      '@aws-sdk/client-s3':
-        specifier: ^3.1085.0
-        version: 3.1085.0
       '@biomejs/biome':
         specifier: 2.4.5
         version: 2.4.5
@@ -48,9 +51,6 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
-      bullmq:
-        specifier: ^5.80.1
-        version: 5.80.1
       tsup:
         specifier: ^8.5.1
         version: 8.5.1(postcss@8.5.23)(tsx@4.23.0)(typescript@5.9.3)

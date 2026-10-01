@@ -54,3 +54,16 @@ videoWorker.on("completed", (job) => {
 videoWorker.on("failed", (job, err) => {
 	console.error(`❌ Job ${job?.id} falhou:`, err.message);
 });
+
+let isShuttingDown = false;
+
+async function shutdown(signal: string) {
+	if (isShuttingDown) return;
+	isShuttingDown = true;
+	console.log(`🛑 Recebido ${signal}, encerrando worker...`);
+	await videoWorker.close();
+	process.exit(0);
+}
+
+process.on("SIGTERM", () => void shutdown("SIGTERM"));
+process.on("SIGINT", () => void shutdown("SIGINT"));
