@@ -1,0 +1,8 @@
+LINKEDIN
+Construí o LangClips: você solta um vídeo curto e ele vira exercícios de listening em 3 níveis — Easy (montar a frase com palavras embaralhadas), Medium (completar lacunas) e Hard (ditado). Por baixo: upload direto ao Cloudflare R2 via presigned URL, fila BullMQ + Redis com FFmpeg e Whisper no worker, API NestJS, front TanStack Start e consumo offline-first com IndexedDB.
+Código: github.com/victor-lis-bronzo/langclips
+#buildinpublic #typescript #nestjs #bullmq #ffmpeg #whisper #offlinefirst #english
+
+README / GITHUB (curta)
+LangClips transforma vídeos curtos em exercícios de listening em 3 níveis (montar a frase, lacunas e ditado) — pipeline BullMQ + FFmpeg + Whisper e prática offline-first com IndexedDB.
+#typescript #nestjs #offlinefirst
