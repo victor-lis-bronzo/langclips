@@ -91,7 +91,7 @@ A classificação de cada palavra da Transcription ao comparar com a Answer: exa
 _Avoid_: diff, erro, correção
 
 **Hit**:
-Resultado de um Exercise considerado correto na comparação palavra a palavra; o oposto é Mistake.
+Resultado de um Exercise considerado correto na comparação palavra a palavra; o oposto é Mistake. No **Hard** (ditado) exige a frase inteira certa (sem palavras erradas, faltando ou extras; maiúsculas e pontuação são ignoradas). No **Easy** e no **Medium** vale a maioria: palavras exatas ou só de caixa diferente superam as erradas, faltando e extras.
 _Avoid_: acerto, correct, success
 
 **Mistake**:

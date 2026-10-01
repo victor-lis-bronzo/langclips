@@ -39,6 +39,7 @@ export default function AnswerBox({ variant, deckId, clipId }: AnswerBoxProps) {
 		const { results, isHit } = evaluateAttempt(
 			currentAnswer,
 			clip?.transcription || "",
+			variant,
 		);
 		setResultWords(results);
 
