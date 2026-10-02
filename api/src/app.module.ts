@@ -18,6 +18,15 @@ import { validate } from './config/env.validation';
         port: Number(process.env.REDIS_PORT),
         password: process.env.REDIS_PASSWORD || undefined,
       },
+      defaultJobOptions: {
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 2000,
+        },
+        removeOnComplete: 50,
+        removeOnFail: 50,
+      },
     }),
     ...(process.env.ENABLE_BULL_BOARD === 'true'
       ? [
