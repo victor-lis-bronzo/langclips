@@ -6,6 +6,7 @@ import {
   IsString,
   validateSync,
 } from 'class-validator';
+import { MIN_SESSION_SECRET_LENGTH } from '../auth/session.service';
 
 class EnvironmentVariables {
   @IsString()
@@ -66,6 +67,10 @@ class EnvironmentVariables {
 
   @IsOptional()
   @IsString()
+  SESSION_SECRET?: string;
+
+  @IsOptional()
+  @IsString()
   CORS_ORIGINS?: string;
 }
 
@@ -91,6 +96,12 @@ export function validate(config: Record<string, unknown>) {
   }
 
   if (validated.NODE_ENV === 'production') {
+    const sessionSecret = validated.SESSION_SECRET?.trim();
+    if (!sessionSecret || sessionSecret.length < MIN_SESSION_SECRET_LENGTH) {
+      throw new Error(
+        `SESSION_SECRET must be set to at least ${MIN_SESSION_SECRET_LENGTH} characters in production.`,
+      );
+    }
     const origins = validated.CORS_ORIGINS?.split(',')
       .map((o) => o.trim())
       .filter(Boolean);

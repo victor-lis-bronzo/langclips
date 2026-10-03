@@ -11,6 +11,8 @@ describe('env.validation', () => {
     REDIS_PORT: '6379',
   };
 
+  const validSecret = 'a'.repeat(32);
+
   it('should pass validation with valid minimum config', () => {
     expect(() => validate(baseValidConfig)).not.toThrow();
   });
@@ -62,6 +64,7 @@ describe('env.validation', () => {
         validate({
           ...baseValidConfig,
           NODE_ENV: 'production',
+          SESSION_SECRET: validSecret,
         }),
       ).toThrow(/CORS_ORIGINS must be configured in production/);
     });
@@ -71,6 +74,7 @@ describe('env.validation', () => {
         validate({
           ...baseValidConfig,
           NODE_ENV: 'production',
+          SESSION_SECRET: validSecret,
           CORS_ORIGINS: 'https://app.example.com, *',
         }),
       ).toThrow(/Wildcard "\*" origin is not permitted in CORS_ORIGINS/);
@@ -81,9 +85,49 @@ describe('env.validation', () => {
         validate({
           ...baseValidConfig,
           NODE_ENV: 'production',
+          SESSION_SECRET: validSecret,
           CORS_ORIGINS: 'https://langclips.com, https://admin.langclips.com',
         }),
       ).not.toThrow();
     });
+  });
+
+  describe('SESSION_SECRET validation', () => {
+    const prod = {
+      ...baseValidConfig,
+      NODE_ENV: 'production',
+      CORS_ORIGINS: 'https://langclips.com',
+    };
+
+    it('should fail in production when SESSION_SECRET is missing', () => {
+      expect(() => validate(prod)).toThrow(/SESSION_SECRET must be set/);
+    });
+
+    it('should fail in production when SESSION_SECRET is blank', () => {
+      expect(() => validate({ ...prod, SESSION_SECRET: '   ' })).toThrow(
+        /SESSION_SECRET must be set/,
+      );
+    });
+
+    it('should fail in production when SESSION_SECRET is too short', () => {
+      expect(() => validate({ ...prod, SESSION_SECRET: 'short' })).toThrow(
+        /at least 32 characters/,
+      );
+    });
+
+    it('should pass in production with a valid SESSION_SECRET', () => {
+      expect(() =>
+        validate({ ...prod, SESSION_SECRET: validSecret }),
+      ).not.toThrow();
+    });
+
+    it.each(['development', 'test'])(
+      'should not require SESSION_SECRET in %s',
+      (env) => {
+        expect(() =>
+          validate({ ...baseValidConfig, NODE_ENV: env }),
+        ).not.toThrow();
+      },
+    );
   });
 });

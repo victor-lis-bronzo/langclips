@@ -1,14 +1,34 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID, createHmac, timingSafeEqual } from 'crypto';
 
+export const MIN_SESSION_SECRET_LENGTH = 32;
+
+// Explicit, public value used ONLY when NODE_ENV is not "production" and
+// SESSION_SECRET is unset. Never valid in production.
+export const INSECURE_DEV_SESSION_SECRET =
+  'insecure-dev-only-session-secret-do-not-use-in-production';
+
+export function resolveSessionSecret(
+  env: Record<string, string | undefined>,
+): string {
+  const secret = env.SESSION_SECRET?.trim();
+  if (env.NODE_ENV === 'production') {
+    if (!secret || secret.length < MIN_SESSION_SECRET_LENGTH) {
+      throw new Error(
+        `SESSION_SECRET must be set to at least ${MIN_SESSION_SECRET_LENGTH} characters in production.`,
+      );
+    }
+    return secret;
+  }
+  return secret || INSECURE_DEV_SESSION_SECRET;
+}
+
 @Injectable()
 export class SessionService {
   private readonly secret: string;
 
   constructor() {
-    this.secret =
-      process.env.SESSION_SECRET ||
-      'lang-clips-anonymous-session-secret-default-key-change-in-prod';
+    this.secret = resolveSessionSecret(process.env);
   }
 
   createSession(): { sessionId: string; token: string } {
