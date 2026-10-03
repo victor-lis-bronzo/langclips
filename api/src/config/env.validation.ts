@@ -7,6 +7,7 @@ import {
   validateSync,
 } from 'class-validator';
 import { MIN_SESSION_SECRET_LENGTH } from '../auth/session.service';
+import { parseTrustProxy } from './trust-proxy';
 
 class EnvironmentVariables {
   @IsString()
@@ -72,6 +73,10 @@ class EnvironmentVariables {
   @IsOptional()
   @IsString()
   CORS_ORIGINS?: string;
+
+  @IsOptional()
+  @IsString()
+  TRUST_PROXY?: string;
 }
 
 export function validate(config: Record<string, unknown>) {
@@ -114,6 +119,9 @@ export function validate(config: Record<string, unknown>) {
       );
     }
   }
+
+  // Throws on unsupported values (e.g. "true"); see ./trust-proxy.ts.
+  parseTrustProxy(validated.TRUST_PROXY);
 
   return validated;
 }
