@@ -1,7 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ForbiddenException } from '@nestjs/common';
 import { VideosController } from './videos.controller';
 import { VideoEventsService } from './video-events.service';
 import { StorageService } from '../storage/storage.service';
+import { OwnershipService } from '../ownership/ownership.service';
+import { SessionGuard } from '../auth/session.guard';
+import { SessionService } from '../auth/session.service';
 import { getQueueToken } from '@nestjs/bullmq';
 
 describe('VideosController', () => {
@@ -9,10 +13,17 @@ describe('VideosController', () => {
   let moduleRef: TestingModule;
   let mockQueue: any;
   let mockStorageService: any;
+  let mockOwnershipService: any;
 
   beforeEach(async () => {
     mockQueue = { add: jest.fn() };
     mockStorageService = { deleteMany: jest.fn() };
+    mockOwnershipService = {
+      isOwner: jest.fn().mockResolvedValue(true),
+      areAllOwners: jest.fn().mockResolvedValue(true),
+      setJobOwner: jest.fn().mockResolvedValue(undefined),
+      deleteOwnershipMany: jest.fn().mockResolvedValue(undefined),
+    };
 
     moduleRef = await Test.createTestingModule({
       controllers: [VideosController],
@@ -31,6 +42,21 @@ describe('VideosController', () => {
           provide: StorageService,
           useValue: mockStorageService,
         },
+        {
+          provide: OwnershipService,
+          useValue: mockOwnershipService,
+        },
+        {
+          provide: SessionService,
+          useValue: {
+            verifyToken: jest.fn(),
+            createSession: jest.fn().mockReturnValue({
+              sessionId: 'session-123',
+              token: 'test.token',
+            }),
+          },
+        },
+        SessionGuard,
       ],
     }).compile();
 
@@ -41,36 +67,80 @@ describe('VideosController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should process video request and queue job', async () => {
+  it('should process video request, register job ownership and queue job', async () => {
     mockQueue.add.mockResolvedValue({ id: 'job-123' });
 
-    const result = await controller.process({ fileKey: 'uploads/test.mp4' });
+    const session = { id: 'session-123' };
+    const result = await controller.process(
+      { fileKey: 'uploads/test.mp4' },
+      session,
+    );
 
     expect(result).toEqual({
       message: 'Upload acknowledged and job queued.',
       jobId: 'job-123',
     });
+    expect(mockOwnershipService.isOwner).toHaveBeenCalledWith(
+      'uploads/test.mp4',
+      'session-123',
+    );
+    expect(mockOwnershipService.setJobOwner).toHaveBeenCalled();
     expect(mockQueue.add).toHaveBeenCalledWith(
       'extract-audio-and-transcribe',
-      { fileKey: 'uploads/test.mp4' },
+      { fileKey: 'uploads/test.mp4', sessionId: 'session-123' },
       expect.objectContaining({ jobId: expect.any(String) }),
     );
   });
 
-  it('should acknowledge download and delete files from storage', async () => {
+  it('should reject process if fileKey does not belong to session', async () => {
+    mockOwnershipService.isOwner.mockResolvedValueOnce(false);
+
+    const session = { id: 'attacker-session' };
+    await expect(
+      controller.process({ fileKey: 'uploads/victim.mp4' }, session),
+    ).rejects.toThrow(ForbiddenException);
+
+    expect(mockQueue.add).not.toHaveBeenCalled();
+  });
+
+  it('should acknowledge download and delete files when caller is owner of all keys', async () => {
     mockStorageService.deleteMany.mockResolvedValue(undefined);
 
-    const result = await controller.acknowledgeDownload({
-      fileKeys: ['key1.mp4', 'key2.mp3'],
-    });
+    const session = { id: 'session-123' };
+    const result = await controller.acknowledgeDownload(
+      { fileKeys: ['key1.mp4', 'key2.mp3'] },
+      session,
+    );
 
     expect(result).toEqual({
       acknowledged: true,
       deletedCount: 2,
     });
+    expect(mockOwnershipService.areAllOwners).toHaveBeenCalledWith(
+      ['key1.mp4', 'key2.mp3'],
+      'session-123',
+    );
     expect(mockStorageService.deleteMany).toHaveBeenCalledWith([
       'key1.mp4',
       'key2.mp3',
     ]);
+    expect(mockOwnershipService.deleteOwnershipMany).toHaveBeenCalledWith([
+      'key1.mp4',
+      'key2.mp3',
+    ]);
+  });
+
+  it('should throw ForbiddenException in acknowledgeDownload if any key belongs to another session', async () => {
+    mockOwnershipService.areAllOwners.mockResolvedValueOnce(false);
+
+    const session = { id: 'attacker-session' };
+    await expect(
+      controller.acknowledgeDownload(
+        { fileKeys: ['my-key.mp4', 'victim-key.mp4'] },
+        session,
+      ),
+    ).rejects.toThrow(ForbiddenException);
+
+    expect(mockStorageService.deleteMany).not.toHaveBeenCalled();
   });
 });

@@ -26,6 +26,15 @@ export class OwnershipService {
     );
   }
 
+  async setJobOwner(
+    jobId: string,
+    sessionId: string,
+    ttlSeconds: number = this.defaultTtlSeconds,
+  ): Promise<void> {
+    await this.redis.set(`owner:job:${jobId}`, sessionId, 'EX', ttlSeconds);
+    await this.setOwner(`decks/${jobId}.json`, sessionId, ttlSeconds);
+  }
+
   async setOwnerMany(
     fileKeys: string[],
     sessionId: string,
@@ -45,20 +54,36 @@ export class OwnershipService {
 
   async isOwner(fileKey: string, sessionId: string): Promise<boolean> {
     const owner = await this.getOwner(fileKey);
-    return owner === sessionId;
+    if (owner === sessionId) {
+      return true;
+    }
+
+    const clipsMatch = fileKey.match(/^clips\/([a-zA-Z0-9-]+)\//);
+    if (clipsMatch) {
+      const jobId = clipsMatch[1];
+      const jobOwner = await this.redis.get(`owner:job:${jobId}`);
+      if (jobOwner === sessionId) {
+        return true;
+      }
+    }
+
+    const decksMatch = fileKey.match(/^decks\/([a-zA-Z0-9-]+)\.json$/);
+    if (decksMatch) {
+      const jobId = decksMatch[1];
+      const jobOwner = await this.redis.get(`owner:job:${jobId}`);
+      if (jobOwner === sessionId) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   async areAllOwners(fileKeys: string[], sessionId: string): Promise<boolean> {
     if (!fileKeys.length) return true;
-    const pipeline = this.redis.pipeline();
     for (const fileKey of fileKeys) {
-      pipeline.get(this.getRedisKey(fileKey));
-    }
-    const results = await pipeline.exec();
-    if (!results) return false;
-
-    for (const [err, owner] of results) {
-      if (err || owner !== sessionId) {
+      const owns = await this.isOwner(fileKey, sessionId);
+      if (!owns) {
         return false;
       }
     }

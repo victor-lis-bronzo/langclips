@@ -57,27 +57,45 @@ describe('OwnershipService', () => {
     expect(isNonExistent).toBe(false);
   });
 
+  it('should verify ownership for clips via job prefix', async () => {
+    // Direct key not found, but job owner matches
+    redisMock.get
+      .mockResolvedValueOnce(null) // owner:clips/job-abc/clip-1.mp4
+      .mockResolvedValueOnce('session-123'); // owner:job:job-abc
+
+    const isOwner = await service.isOwner(
+      'clips/job-abc/clip-1.mp4',
+      'session-123',
+    );
+    expect(isOwner).toBe(true);
+    expect(redisMock.get).toHaveBeenCalledWith('owner:job:job-abc');
+  });
+
+  it('should verify ownership for decks via job prefix', async () => {
+    redisMock.get
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce('session-123');
+
+    const isOwner = await service.isOwner('decks/job-xyz.json', 'session-123');
+    expect(isOwner).toBe(true);
+    expect(redisMock.get).toHaveBeenCalledWith('owner:job:job-xyz');
+  });
+
   it('should verify ownership for multiple files', async () => {
-    const pipelineMock = {
-      get: jest.fn().mockReturnThis(),
-      exec: jest.fn().mockResolvedValue([
-        [null, 'session-123'],
-        [null, 'session-123'],
-      ]),
-    };
-    redisMock.pipeline.mockReturnValue(pipelineMock);
+    redisMock.get
+      .mockResolvedValueOnce('session-123')
+      .mockResolvedValueOnce('session-123');
 
     const allOwned = await service.areAllOwners(
       ['file1.mp4', 'file2.mp4'],
       'session-123',
     );
     expect(allOwned).toBe(true);
-    expect(pipelineMock.get).toHaveBeenCalledTimes(2);
 
-    pipelineMock.exec.mockResolvedValueOnce([
-      [null, 'session-123'],
-      [null, 'session-other'],
-    ]);
+    redisMock.get
+      .mockResolvedValueOnce('session-123')
+      .mockResolvedValueOnce('session-other');
+
     const notAllOwned = await service.areAllOwners(
       ['file1.mp4', 'file2.mp4'],
       'session-123',
