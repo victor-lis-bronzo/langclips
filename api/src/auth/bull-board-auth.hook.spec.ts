@@ -47,12 +47,7 @@ describe('bull-board-auth.hook', () => {
         headers: {},
       };
 
-      const result = handleBullBoardAuth(
-        req,
-        mockReply,
-        validUser,
-        validPass,
-      );
+      const result = handleBullBoardAuth(req, mockReply, validUser, validPass);
       expect(result).toBe(true);
       expect(statusMock).not.toHaveBeenCalled();
     });
@@ -74,12 +69,7 @@ describe('bull-board-auth.hook', () => {
         headers: {},
       };
 
-      const result = handleBullBoardAuth(
-        req,
-        mockReply,
-        validUser,
-        validPass,
-      );
+      const result = handleBullBoardAuth(req, mockReply, validUser, validPass);
       expect(result).toBe(false);
       expect(statusMock).toHaveBeenCalledWith(401);
       expect(headerMock).toHaveBeenCalledWith(
@@ -96,12 +86,7 @@ describe('bull-board-auth.hook', () => {
         },
       };
 
-      const result = handleBullBoardAuth(
-        req,
-        mockReply,
-        validUser,
-        validPass,
-      );
+      const result = handleBullBoardAuth(req, mockReply, validUser, validPass);
       expect(result).toBe(false);
       expect(statusMock).toHaveBeenCalledWith(401);
     });
@@ -115,12 +100,7 @@ describe('bull-board-auth.hook', () => {
         },
       };
 
-      const result = handleBullBoardAuth(
-        req,
-        mockReply,
-        validUser,
-        validPass,
-      );
+      const result = handleBullBoardAuth(req, mockReply, validUser, validPass);
       expect(result).toBe(false);
       expect(statusMock).toHaveBeenCalledWith(401);
     });
@@ -133,12 +113,7 @@ describe('bull-board-auth.hook', () => {
         },
       };
 
-      const result = handleBullBoardAuth(
-        req,
-        mockReply,
-        validUser,
-        validPass,
-      );
+      const result = handleBullBoardAuth(req, mockReply, validUser, validPass);
       expect(result).toBe(true);
       expect(statusMock).not.toHaveBeenCalled();
       expect(sendMock).not.toHaveBeenCalled();
