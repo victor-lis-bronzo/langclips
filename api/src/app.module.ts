@@ -8,6 +8,8 @@ import { VideosModule } from './videos/videos.module';
 import { HealthModule } from './health/health.module';
 import { FastifyAdapter } from '@bull-board/fastify';
 import { validate } from './config/env.validation';
+import { AuthModule } from './auth/auth.module';
+import { OwnershipModule } from './ownership/ownership.module';
 
 @Module({
   imports: [
@@ -40,6 +42,8 @@ import { validate } from './config/env.validation';
     UploadsModule,
     VideosModule,
     HealthModule,
+    AuthModule,
+    OwnershipModule,
   ],
 })
 export class AppModule {}
