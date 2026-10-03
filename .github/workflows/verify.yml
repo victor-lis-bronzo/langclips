@@ -22,6 +22,16 @@ jobs:
     name: Quality (${{ matrix.project }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    services:
+      redis:
+        image: redis:8.8.0-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     strategy:
       fail-fast: false
       matrix:
@@ -47,6 +57,16 @@ jobs:
 
       - name: Test
         working-directory: ${{ matrix.project }}
+        env:
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          STORAGE_ENDPOINT: https://dummy.r2.cloudflarestorage.com
+          STORAGE_REGION: auto
+          STORAGE_ACCESS_KEY_ID: dummy
+          STORAGE_SECRET_ACCESS_KEY: dummy
+          STORAGE_BUCKET_NAME: dummy
+          PORT: 3333
+          NODE_ENV: test
         run: pnpm run test
 
       - name: Build
@@ -55,12 +75,20 @@ jobs:
           VITE_API_URL: https://dummy.invalid
         run: pnpm run build
 
-      # `api`'s test:e2e is intentionally not run here yet: it hangs today because
-      # test/app.e2e-spec.ts boots the full AppModule (real BullMQ connection) without
-      # a Redis service container and without closing that connection in teardown, so
-      # app.close() never resolves. Needs a Redis service + BullMQ teardown fix first
-      # (see docs/deploy.md, "O que foi deliberadamente deixado de fora") — enabling
-      # it as-is would hang this job until its timeout instead of failing fast.
+      - name: E2E Test (api)
+        if: matrix.project == 'api'
+        working-directory: api
+        env:
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          STORAGE_ENDPOINT: https://dummy.r2.cloudflarestorage.com
+          STORAGE_REGION: auto
+          STORAGE_ACCESS_KEY_ID: dummy
+          STORAGE_SECRET_ACCESS_KEY: dummy
+          STORAGE_BUCKET_NAME: dummy
+          PORT: 3333
+          NODE_ENV: test
+        run: pnpm run test:e2e
 
   e2e:
     name: E2E (web)

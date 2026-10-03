@@ -58,6 +58,14 @@ class EnvironmentVariables {
 
   @IsOptional()
   @IsString()
+  BULL_BOARD_USER?: string;
+
+  @IsOptional()
+  @IsString()
+  BULL_BOARD_PASSWORD?: string;
+
+  @IsOptional()
+  @IsString()
   CORS_ORIGINS?: string;
 }
 
@@ -69,6 +77,31 @@ export function validate(config: Record<string, unknown>) {
 
   if (errors.length > 0) {
     throw new Error(errors.toString());
+  }
+
+  if (validated.ENABLE_BULL_BOARD === 'true') {
+    if (
+      !validated.BULL_BOARD_USER?.trim() ||
+      !validated.BULL_BOARD_PASSWORD?.trim()
+    ) {
+      throw new Error(
+        'BULL_BOARD_USER and BULL_BOARD_PASSWORD must be configured when ENABLE_BULL_BOARD is enabled.',
+      );
+    }
+  }
+
+  if (validated.NODE_ENV === 'production') {
+    const origins = validated.CORS_ORIGINS?.split(',')
+      .map((o) => o.trim())
+      .filter(Boolean);
+    if (!origins || origins.length === 0) {
+      throw new Error('CORS_ORIGINS must be configured in production.');
+    }
+    if (origins.includes('*')) {
+      throw new Error(
+        'Wildcard "*" origin is not permitted in CORS_ORIGINS in production.',
+      );
+    }
   }
 
   return validated;

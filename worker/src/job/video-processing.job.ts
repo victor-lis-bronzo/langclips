@@ -6,10 +6,7 @@ import type { IClipUploaderService } from "../interfaces/clip-uploader.interface
 import type { IDeckBuilderService } from "../interfaces/deck-builder.interface";
 import type { IStorageService } from "../interfaces/storage.interface";
 import type { ITranscriptionService } from "../interfaces/transcription.interface";
-import type {
-  IVideoClipperService,
-  LocalGeneratedClip,
-} from "../interfaces/video-clipper.interface";
+import type { IVideoClipperService } from "../interfaces/video-clipper.interface";
 import type { Deck } from "../types/deck.types";
 
 export class VideoProcessingJob {
@@ -32,7 +29,6 @@ export class VideoProcessingJob {
 
     const videoPath = path.join(tmpDir, `${job.id}-video`);
     const audioPath = path.join(tmpDir, `${job.id}-audio.mp3`);
-    let clips: LocalGeneratedClip[] = [];
 
     try {
       // Passo 1: Download do vídeo bruto do R2
@@ -83,7 +79,6 @@ export class VideoProcessingJob {
             transcription: data.text,
           })),
         });
-      clips = localClips;
 
       if (!clipsSuccess) {
         throw new Error(`Falha ao gerar cortes para o arquivo ${fileKey}`);

@@ -8,6 +8,9 @@ import { VideosModule } from './videos/videos.module';
 import { HealthModule } from './health/health.module';
 import { FastifyAdapter } from '@bull-board/fastify';
 import { validate } from './config/env.validation';
+import { AuthModule } from './auth/auth.module';
+import { OwnershipModule } from './ownership/ownership.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -40,6 +43,14 @@ import { validate } from './config/env.validation';
     UploadsModule,
     VideosModule,
     HealthModule,
+    AuthModule,
+    OwnershipModule,
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 20,
+      },
+    ]),
   ],
 })
 export class AppModule {}

@@ -6,6 +6,7 @@ import {
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { handleBullBoardAuth } from './auth/bull-board-auth.hook';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -13,10 +14,47 @@ async function bootstrap() {
     new FastifyAdapter(),
   );
 
+  const fastify = app.getHttpAdapter().getInstance();
+
+  if (process.env.ENABLE_BULL_BOARD === 'true') {
+    fastify.addHook(
+      'onRequest',
+      (request: unknown, reply: unknown, done: () => void) => {
+        const allowed = handleBullBoardAuth(
+          request as Parameters<typeof handleBullBoardAuth>[0],
+          reply as Parameters<typeof handleBullBoardAuth>[1],
+          process.env.BULL_BOARD_USER,
+          process.env.BULL_BOARD_PASSWORD,
+        );
+        if (allowed) {
+          done();
+        }
+      },
+    );
+  }
+
   const corsOrigins = process.env.CORS_ORIGINS?.split(',')
     .map((origin) => origin.trim())
     .filter(Boolean);
-  app.enableCors(corsOrigins?.length ? { origin: corsOrigins } : undefined);
+
+  const isProduction = process.env.NODE_ENV === 'production';
+  if (isProduction) {
+    if (!corsOrigins || corsOrigins.length === 0) {
+      throw new Error('CORS_ORIGINS must be configured in production.');
+    }
+    if (corsOrigins.includes('*')) {
+      throw new Error(
+        'Wildcard "*" origin is not permitted in CORS_ORIGINS in production.',
+      );
+    }
+    app.enableCors({ origin: corsOrigins, credentials: true });
+  } else {
+    app.enableCors(
+      corsOrigins?.length
+        ? { origin: corsOrigins, credentials: true }
+        : { origin: true, credentials: true },
+    );
+  }
 
   const config = new DocumentBuilder()
     .setTitle('Lang Clips API')

@@ -10,10 +10,14 @@ import { VideoEventsService } from './video-events.service';
     BullModule.registerQueueAsync({
       name: 'video-processing',
     }),
-    BullBoardModule.forFeature({
-      name: 'video-processing',
-      adapter: BullMQAdapter,
-    }),
+    ...(process.env.ENABLE_BULL_BOARD === 'true'
+      ? [
+          BullBoardModule.forFeature({
+            name: 'video-processing',
+            adapter: BullMQAdapter,
+          }),
+        ]
+      : []),
   ],
   controllers: [VideosController],
   providers: [VideoEventsService],
