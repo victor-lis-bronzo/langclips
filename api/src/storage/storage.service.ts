@@ -2,6 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import {
   S3Client,
   PutObjectCommand,
+  HeadObjectCommand,
   ListObjectsV2Command,
   ListObjectsV2CommandOutput,
   GetObjectCommand,
@@ -98,5 +99,31 @@ export class StorageService {
     });
 
     await this.client.send(command);
+  }
+
+  async getObjectMetadata(
+    fileKey: string,
+  ): Promise<{ size: number; contentType?: string } | null> {
+    try {
+      const command = new HeadObjectCommand({
+        Bucket: process.env.STORAGE_BUCKET_NAME,
+        Key: fileKey,
+      });
+
+      const response = await this.client.send(command);
+      return {
+        size: response.ContentLength ?? 0,
+        contentType: response.ContentType,
+      };
+    } catch (err: any) {
+      if (
+        err?.name === 'NotFound' ||
+        err?.$metadata?.httpStatusCode === 404 ||
+        err?.name === 'NoSuchKey'
+      ) {
+        return null;
+      }
+      throw err;
+    }
   }
 }

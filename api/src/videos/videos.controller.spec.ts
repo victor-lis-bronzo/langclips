@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { VideosController } from './videos.controller';
 import { VideoEventsService } from './video-events.service';
 import { StorageService } from '../storage/storage.service';
@@ -7,6 +7,8 @@ import { OwnershipService } from '../ownership/ownership.service';
 import { SessionGuard } from '../auth/session.guard';
 import { SessionService } from '../auth/session.service';
 import { getQueueToken } from '@nestjs/bullmq';
+
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 describe('VideosController', () => {
   let controller: VideosController;
@@ -17,7 +19,13 @@ describe('VideosController', () => {
 
   beforeEach(async () => {
     mockQueue = { add: jest.fn() };
-    mockStorageService = { deleteMany: jest.fn() };
+    mockStorageService = {
+      deleteMany: jest.fn(),
+      getObjectMetadata: jest.fn().mockResolvedValue({
+        size: 5000000,
+        contentType: 'video/mp4',
+      }),
+    };
     mockOwnershipService = {
       isOwner: jest.fn().mockResolvedValue(true),
       areAllOwners: jest.fn().mockResolvedValue(true),
@@ -58,7 +66,12 @@ describe('VideosController', () => {
         },
         SessionGuard,
       ],
-    }).compile();
+    })
+      .overrideGuard(ThrottlerGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(SessionGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = moduleRef.get<VideosController>(VideosController);
   });
@@ -99,6 +112,17 @@ describe('VideosController', () => {
     await expect(
       controller.process({ fileKey: 'uploads/victim.mp4' }, session),
     ).rejects.toThrow(ForbiddenException);
+
+    expect(mockQueue.add).not.toHaveBeenCalled();
+  });
+
+  it('should reject process if fileKey does not exist in storage', async () => {
+    mockStorageService.getObjectMetadata.mockResolvedValueOnce(null);
+
+    const session = { id: 'session-123' };
+    await expect(
+      controller.process({ fileKey: 'uploads/deleted.mp4' }, session),
+    ).rejects.toThrow(NotFoundException);
 
     expect(mockQueue.add).not.toHaveBeenCalled();
   });

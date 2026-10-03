@@ -73,4 +73,29 @@ describe('StorageService', () => {
       service.generatePresignedUrl('video.mp4', 'video/mp4'),
     ).rejects.toThrow(BadRequestException);
   });
+
+  it('should return metadata when object exists in storage', async () => {
+    process.env.STORAGE_BUCKET_NAME = 'my-bucket';
+    s3ClientMock.send.mockResolvedValueOnce({
+      ContentLength: 1024,
+      ContentType: 'video/mp4',
+    });
+
+    const metadata = await service.getObjectMetadata('videos/sample.mp4');
+    expect(metadata).toEqual({
+      size: 1024,
+      contentType: 'video/mp4',
+    });
+  });
+
+  it('should return null when object is not found in storage', async () => {
+    process.env.STORAGE_BUCKET_NAME = 'my-bucket';
+    const notFoundError: any = new Error('Not Found');
+    notFoundError.name = 'NotFound';
+    notFoundError.$metadata = { httpStatusCode: 404 };
+    s3ClientMock.send.mockRejectedValueOnce(notFoundError);
+
+    const metadata = await service.getObjectMetadata('videos/non-existent.mp4');
+    expect(metadata).toBeNull();
+  });
 });

@@ -10,7 +10,9 @@ import {
   MessageEvent,
   UseGuards,
   ForbiddenException,
+  NotFoundException,
 } from '@nestjs/common';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { ProcessVideoDto } from './dtos/process-video.dto';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
@@ -24,7 +26,7 @@ import { SessionGuard, AnonymousSession } from '../auth/session.guard';
 import { CurrentSession } from '../auth/current-session.decorator';
 
 @Controller('videos')
-@UseGuards(SessionGuard)
+@UseGuards(SessionGuard, ThrottlerGuard)
 export class VideosController {
   constructor(
     @InjectQueue('video-processing') private readonly videoQueue: Queue,
@@ -35,6 +37,7 @@ export class VideosController {
 
   @Post('process')
   @HttpCode(HttpStatus.ACCEPTED)
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   async process(
     @Body() body: ProcessVideoDto,
     @CurrentSession() session: AnonymousSession,
@@ -46,6 +49,13 @@ export class VideosController {
     if (!isOwner) {
       throw new ForbiddenException(
         'Acesso negado: o arquivo de vídeo informado não pertence à sua sessão.',
+      );
+    }
+
+    const metadata = await this.storageService.getObjectMetadata(body.fileKey);
+    if (!metadata) {
+      throw new NotFoundException(
+        'Arquivo de vídeo não encontrado no bucket de armazenamento.',
       );
     }
 
