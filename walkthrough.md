@@ -5,7 +5,7 @@ This document tracks the execution, test-driven development, commits, and PR del
 
 ## Tickets Progress
 - [x] `01-ci-e2e-hang-fix.md` (#30 part 1) - Fechamento de conexões no teardown e Redis no CI.
-- [ ] `02-bullmq-lifecycle-tests.md` (#24)
+- [x] `02-bullmq-lifecycle-tests.md` (#24) - Testes de ciclo de vida e retenção de arquivos para BullMQ.
 - [ ] `03-anonymous-session-ownership.md` (foundation for #25, #26, #27)
 - [ ] `04-idor-download-acknowledge.md` (#25, #26)
 - [ ] `05-process-video-rate-limit.md` (#27)

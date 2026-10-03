@@ -13,10 +13,8 @@ import { FFmpegVideoClipperService } from "./services/ffmpeg-video-clipper.servi
 import { LocalDiskCleanupService } from "./services/local-disk-cleanup.service";
 import { R2StorageService } from "./services/r2-storage.service";
 import { WhisperTranscriptionService } from "./services/whisper-transcription.service";
+import { handleJobCompleted, handleJobFailed } from "./job/lifecycle-handlers";
 import type { VideoProcessingJobType } from "./types/job.types";
-
-import os from "node:os";
-import path from "node:path";
 
 const storageService = new R2StorageService(s3Client, env.STORAGE_BUCKET_NAME);
 const audioExtractor = new FFmpegAudioExtractorService();
@@ -50,39 +48,11 @@ const videoWorker = new Worker(
 );
 
 videoWorker.on("completed", async (job) => {
-  console.log(`✅ Sucesso no job ${job.id}`);
-
-  const tmpDir = os.tmpdir();
-  const videoPath = path.join(tmpDir, `${job.id}-video`);
-  const audioPath = path.join(tmpDir, `${job.id}-audio.mp3`);
-
-  try {
-    await diskCleanup.cleanup({ paths: [videoPath, audioPath] });
-    console.log(`[CLEANUP] Arquivos temporários do Job ${job.id} removidos.`);
-  } catch (err) {
-    console.error(`[CLEANUP ERROR] Falha ao limpar Job ${job.id}:`, err);
-  }
+  await handleJobCompleted(job, diskCleanup);
 });
 
 videoWorker.on("failed", async (job, err) => {
-  console.error(
-    `❌ Job ${job?.id} falhou na tentativa ${job?.attemptsMade}:`,
-    err.message,
-  );
-
-  if (job && job.attemptsMade >= (job.opts.attempts || 1)) {
-    console.log(
-      `[CLEANUP] Falha definitiva. Limpando arquivos do Job ${job.id}`,
-    );
-    const tmpDir = os.tmpdir();
-    const videoPath = path.join(tmpDir, `${job.id}-video`);
-    const audioPath = path.join(tmpDir, `${job.id}-audio.mp3`);
-    await diskCleanup.cleanup({ paths: [videoPath, audioPath] });
-  } else {
-    console.log(
-      `[RETRY] Arquivos retidos no disco para a próxima tentativa do Job ${job?.id}.`,
-    );
-  }
+  await handleJobFailed(job, err, diskCleanup);
 });
 
 let isShuttingDown = false;
