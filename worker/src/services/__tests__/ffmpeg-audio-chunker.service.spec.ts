@@ -42,9 +42,9 @@ describe("FFmpegAudioChunkerService", () => {
 		);
 
 		// Mock readdirSync to return matching chunk files
-		vi.mocked(fs.readdirSync).mockImplementation((_dir: unknown) => {
-			return ["chunk-000.mp3", "chunk-001.mp3"] as unknown as string[];
-		});
+		vi.mocked(fs.readdirSync).mockImplementation((() => {
+			return ["chunk-000.mp3", "chunk-001.mp3"];
+		}) as unknown as typeof fs.readdirSync);
 
 		// We can spy on startsWith or mock output file names
 		vi.spyOn(String.prototype, "startsWith").mockImplementation(function (
