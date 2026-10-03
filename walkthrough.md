@@ -11,7 +11,7 @@ This document tracks the execution, test-driven development, commits, and PR del
 - [x] `05-process-video-rate-limit.md` (#27) - Rate limiting no POST /videos/process e validação de existência do arquivo.
 - [x] `06-server-side-file-size.md` (#29) - Validação server-side de limite de 100MB no upload e processamento.
 - [x] `07-bull-board-auth-cors.md` (#28) - Autenticação Basic no Bull Board e CORS restrito em produção.
-- [ ] `08-worker-pipeline-unit-tests.md` (#30 part 2)
+- [x] `08-worker-pipeline-unit-tests.md` (#30 part 2) - Cobertura abrangente de testes unitários para a pipeline do worker.
 - [ ] `09-local-docker-compose.md` (#31)
 
 ## PR & Code Review
