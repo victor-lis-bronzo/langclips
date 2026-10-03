@@ -17,17 +17,20 @@ async function bootstrap() {
   const fastify = app.getHttpAdapter().getInstance();
 
   if (process.env.ENABLE_BULL_BOARD === 'true') {
-    fastify.addHook('onRequest', async (request: any, reply: any) => {
-      const allowed = handleBullBoardAuth(
-        request,
-        reply,
-        process.env.BULL_BOARD_USER,
-        process.env.BULL_BOARD_PASSWORD,
-      );
-      if (!allowed) {
-        return reply;
-      }
-    });
+    fastify.addHook(
+      'onRequest',
+      (request: unknown, reply: unknown, done: () => void) => {
+        const allowed = handleBullBoardAuth(
+          request as Parameters<typeof handleBullBoardAuth>[0],
+          reply as Parameters<typeof handleBullBoardAuth>[1],
+          process.env.BULL_BOARD_USER,
+          process.env.BULL_BOARD_PASSWORD,
+        );
+        if (allowed) {
+          done();
+        }
+      },
+    );
   }
 
   const corsOrigins = process.env.CORS_ORIGINS?.split(',')

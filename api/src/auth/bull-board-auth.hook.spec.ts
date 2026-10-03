@@ -1,6 +1,7 @@
 import {
   handleBullBoardAuth,
   timingSafeStringEqual,
+  MinimalReply,
 } from './bull-board-auth.hook';
 
 describe('bull-board-auth.hook', () => {
@@ -23,13 +24,20 @@ describe('bull-board-auth.hook', () => {
       'base64',
     );
 
-    let mockReply: any;
+    let statusMock: jest.Mock;
+    let headerMock: jest.Mock;
+    let sendMock: jest.Mock;
+    let mockReply: MinimalReply;
 
     beforeEach(() => {
+      statusMock = jest.fn().mockImplementation(() => mockReply);
+      headerMock = jest.fn().mockImplementation(() => mockReply);
+      sendMock = jest.fn().mockImplementation(() => mockReply);
+
       mockReply = {
-        status: jest.fn().mockReturnThis(),
-        header: jest.fn().mockReturnThis(),
-        send: jest.fn().mockReturnThis(),
+        status: statusMock,
+        header: headerMock,
+        send: sendMock,
       };
     });
 
@@ -46,7 +54,7 @@ describe('bull-board-auth.hook', () => {
         validPass,
       );
       expect(result).toBe(true);
-      expect(mockReply.status).not.toHaveBeenCalled();
+      expect(statusMock).not.toHaveBeenCalled();
     });
 
     it('should return 500 when credentials are missing in env for admin route', () => {
@@ -57,7 +65,7 @@ describe('bull-board-auth.hook', () => {
 
       const result = handleBullBoardAuth(req, mockReply, undefined, undefined);
       expect(result).toBe(false);
-      expect(mockReply.status).toHaveBeenCalledWith(500);
+      expect(statusMock).toHaveBeenCalledWith(500);
     });
 
     it('should return 401 when Authorization header is missing', () => {
@@ -73,8 +81,8 @@ describe('bull-board-auth.hook', () => {
         validPass,
       );
       expect(result).toBe(false);
-      expect(mockReply.status).toHaveBeenCalledWith(401);
-      expect(mockReply.header).toHaveBeenCalledWith(
+      expect(statusMock).toHaveBeenCalledWith(401);
+      expect(headerMock).toHaveBeenCalledWith(
         'WWW-Authenticate',
         expect.stringContaining('Basic'),
       );
@@ -95,7 +103,7 @@ describe('bull-board-auth.hook', () => {
         validPass,
       );
       expect(result).toBe(false);
-      expect(mockReply.status).toHaveBeenCalledWith(401);
+      expect(statusMock).toHaveBeenCalledWith(401);
     });
 
     it('should return 401 when username or password is incorrect', () => {
@@ -114,7 +122,7 @@ describe('bull-board-auth.hook', () => {
         validPass,
       );
       expect(result).toBe(false);
-      expect(mockReply.status).toHaveBeenCalledWith(401);
+      expect(statusMock).toHaveBeenCalledWith(401);
     });
 
     it('should return true and not call reply when credentials match', () => {
@@ -132,8 +140,8 @@ describe('bull-board-auth.hook', () => {
         validPass,
       );
       expect(result).toBe(true);
-      expect(mockReply.status).not.toHaveBeenCalled();
-      expect(mockReply.send).not.toHaveBeenCalled();
+      expect(statusMock).not.toHaveBeenCalled();
+      expect(sendMock).not.toHaveBeenCalled();
     });
   });
 });
