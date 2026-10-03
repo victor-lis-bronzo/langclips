@@ -1,5 +1,9 @@
 import type { Job } from "bullmq";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+	MAX_CLIP_DURATION_SECONDS,
+	MIN_CLIP_DURATION_SECONDS,
+} from "../../config/clip-duration";
 import { VideoProcessingJob } from "../video-processing.job";
 import type { IAudioExtractorService } from "../../interfaces/audio-extractor.interface";
 import type { IClipUploaderService } from "../../interfaces/clip-uploader.interface";
@@ -40,8 +44,8 @@ describe("VideoProcessingJob", () => {
 			transcribe: vi.fn().mockResolvedValue({
 				transcriptionData: [
 					{ start: 1, end: 5, text: "Valid duration segment 4s" },
-					{ start: 10, end: 11, text: "Too short segment 1s" }, // filtered out (< 2s)
-					{ start: 20, end: 50, text: "Too long segment 30s" }, // filtered out (> 20s)
+					{ start: 10, end: 11, text: "Too short segment 1s" }, // filtered out (< min)
+					{ start: 20, end: 50, text: "Too long segment 30s" }, // filtered out (> max)
 					{ start: 60, end: 68, text: "Second valid segment 8s" },
 				],
 			}),
@@ -152,7 +156,7 @@ describe("VideoProcessingJob", () => {
 			percentage: 95,
 		});
 
-		// Check filtering: only segments between 2s and 20s sent to clipper
+		// Check filtering: only segments within the shared clip duration limits sent to clipper
 		expect(videoClipperMock.generateClips).toHaveBeenCalledWith({
 			sourceFilePath: expect.stringContaining("job-123-video"),
 			requests: [
@@ -167,6 +171,58 @@ describe("VideoProcessingJob", () => {
 			body: expect.any(String),
 			contentType: "application/json",
 		});
+	});
+
+	it("should turn a 1.7s phrase into a clip (regression #33)", async () => {
+		vi.mocked(transcriberMock.transcribe).mockResolvedValueOnce({
+			success: true,
+			transcriptionData: [{ start: 10, end: 11.7, text: "Short phrase" }],
+		});
+
+		await jobHandler.execute({ job: jobMock });
+
+		expect(videoClipperMock.generateClips).toHaveBeenCalledWith(
+			expect.objectContaining({
+				requests: [
+					{ startTime: 10, endTime: 11.7, transcription: "Short phrase" },
+				],
+			}),
+		);
+	});
+
+	it("should respect the shared lower and upper duration bounds", async () => {
+		vi.mocked(transcriberMock.transcribe).mockResolvedValueOnce({
+			success: true,
+			transcriptionData: [
+				{ start: 0, end: MIN_CLIP_DURATION_SECONDS - 0.1, text: "below min" },
+				{ start: 10, end: 10 + MIN_CLIP_DURATION_SECONDS, text: "at min" },
+				{ start: 30, end: 30 + MAX_CLIP_DURATION_SECONDS, text: "at max" },
+				{
+					start: 60,
+					end: 60 + MAX_CLIP_DURATION_SECONDS + 0.1,
+					text: "above max",
+				},
+			],
+		});
+
+		await jobHandler.execute({ job: jobMock });
+
+		expect(videoClipperMock.generateClips).toHaveBeenCalledWith(
+			expect.objectContaining({
+				requests: [
+					{
+						startTime: 10,
+						endTime: 10 + MIN_CLIP_DURATION_SECONDS,
+						transcription: "at min",
+					},
+					{
+						startTime: 30,
+						endTime: 30 + MAX_CLIP_DURATION_SECONDS,
+						transcription: "at max",
+					},
+				],
+			}),
+		);
 	});
 
 	it("should fail and throw error if storage download fails", async () => {
