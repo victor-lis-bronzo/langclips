@@ -13,8 +13,10 @@ This document tracks the execution, test-driven development, commits, and PR del
 - [x] `07-bull-board-auth-cors.md` (#28) - Autenticação Basic no Bull Board e CORS restrito em produção.
 - [x] `08-worker-pipeline-unit-tests.md` (#30 part 2) - Cobertura abrangente de testes unitários para a pipeline do worker.
 - [x] `09-local-docker-compose.md` (#31) - Configuração do stack local completo no docker-compose.
+- [x] `10-fix-worker-readdir-typecheck.md` - Correção de tipagem do mock de fs.readdirSync no Worker no runner Ubuntu.
+- [x] `11-fix-ci-api-test-env-validation.md` - Variáveis de ambiente de teste para validação de AppModule no CI e local.
 
 ## PR & Code Review
-- [ ] Push to `origin/fix/resolve-open-issues-24-31`
-- [ ] Open PR with `Closes #24, Closes #25, Closes #26, Closes #27, Closes #28, Closes #29, Closes #30, Closes #31`
-- [ ] Run two-axis `/code-review` (Standards vs Spec)
+- [x] Push to `origin/fix/resolve-open-issues-24-31`
+- [x] Open PR with `Closes #24, Closes #25, Closes #26, Closes #27, Closes #28, Closes #29, Closes #30, Closes #31` ([PR #32](https://github.com/victor-lis-bronzo/langclips/pull/32))
+- [x] Run two-axis `/code-review` (Standards vs Spec)

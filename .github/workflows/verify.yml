@@ -57,6 +57,16 @@ jobs:
 
       - name: Test
         working-directory: ${{ matrix.project }}
+        env:
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          STORAGE_ENDPOINT: https://dummy.r2.cloudflarestorage.com
+          STORAGE_REGION: auto
+          STORAGE_ACCESS_KEY_ID: dummy
+          STORAGE_SECRET_ACCESS_KEY: dummy
+          STORAGE_BUCKET_NAME: dummy
+          PORT: 3333
+          NODE_ENV: test
         run: pnpm run test
 
       - name: Build
