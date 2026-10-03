@@ -130,4 +130,24 @@ describe('env.validation', () => {
       },
     );
   });
+
+  describe('TRUST_PROXY validation', () => {
+    it.each(['1', '2', 'false', '172.18.0.0/16', '10.0.0.1, loopback'])(
+      'should accept TRUST_PROXY=%p',
+      (value) => {
+        expect(() =>
+          validate({ ...baseValidConfig, TRUST_PROXY: value }),
+        ).not.toThrow();
+      },
+    );
+
+    it.each(['true', '*', 'proxy.local', '10.0.0.0/33'])(
+      'should reject TRUST_PROXY=%p',
+      (value) => {
+        expect(() =>
+          validate({ ...baseValidConfig, TRUST_PROXY: value }),
+        ).toThrow(/Invalid TRUST_PROXY value/);
+      },
+    );
+  });
 });

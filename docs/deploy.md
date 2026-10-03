@@ -64,6 +64,31 @@ Adicionar um server block no nginx da VPS com `proxy_pass http://langclips-api:3
 certificado TLS via certbot para o domínio da api. Isso vive na configuração de infraestrutura da
 VPS, fora deste repositório, e não é feito pelo pipeline.
 
+O server block deve repassar o IP do cliente com
+`proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;`.
+
+### IP real do cliente atrás do proxy (`TRUST_PROXY`)
+
+O rate limit da api (`@nestjs/throttler`, ex.: 5/min em `POST /videos/process`) conta requisições
+por `request.ip`. Atrás do nginx, sem configuração, esse IP é sempre o do proxy — e o limite vira
+global, compartilhado por todos os usuários. A variável opcional `TRUST_PROXY` em `api.env` define
+de quem a api aceita o header `X-Forwarded-For`:
+
+| Valor | Comportamento |
+|---|---|
+| ausente, vazio, `false` ou `0` (padrão) | Headers de proxy ignorados; `request.ip` é o peer da conexão TCP |
+| lista de IPs/CIDRs separada por vírgula, ex. `172.18.0.0/16` (recomendado) | Só confia no `X-Forwarded-For` quando a conexão vem de um desses endereços (aceita também `loopback`, `linklocal`, `uniquelocal`) |
+| número de hops, ex. `1` | Confia nos N proxies mais próximos, independentemente do endereço do peer |
+
+`true` (confiar em qualquer hop) é rejeitado na inicialização: permitiria a qualquer cliente forjar
+o próprio IP via `X-Forwarded-For` e burlar o rate limit. Valores inválidos também impedem a api de
+subir.
+
+Em produção, use o subnet da rede `proxy-network` (`docker network inspect proxy-network --format
+'{{(index .IPAM.Config 0).Subnet}}'`). `1` também é aceitável porque o `compose.prod.yml` não publica
+portas da api — o único caminho até ela é o nginx — mas a lista de CIDRs continua correta mesmo se
+isso mudar no futuro.
+
 ## Setup do Cloudflare
 
 Criar o token de API com a permissão "Workers Scripts:Edit" e confirmar o Account ID antes do
