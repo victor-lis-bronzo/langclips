@@ -1,3 +1,15 @@
+process.env.STORAGE_ENDPOINT =
+  process.env.STORAGE_ENDPOINT || 'https://dummy.r2.cloudflarestorage.com';
+process.env.STORAGE_REGION = process.env.STORAGE_REGION || 'auto';
+process.env.STORAGE_ACCESS_KEY_ID =
+  process.env.STORAGE_ACCESS_KEY_ID || 'dummy';
+process.env.STORAGE_SECRET_ACCESS_KEY =
+  process.env.STORAGE_SECRET_ACCESS_KEY || 'dummy';
+process.env.STORAGE_BUCKET_NAME = process.env.STORAGE_BUCKET_NAME || 'dummy';
+process.env.REDIS_HOST = process.env.REDIS_HOST || 'localhost';
+process.env.REDIS_PORT = process.env.REDIS_PORT || '6379';
+process.env.NODE_ENV = process.env.NODE_ENV || 'test';
+
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   FastifyAdapter,

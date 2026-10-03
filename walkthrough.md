@@ -15,6 +15,7 @@ This document tracks the execution, test-driven development, commits, and PR del
 - [x] `09-local-docker-compose.md` (#31) - Configuração do stack local completo no docker-compose.
 - [x] `10-fix-worker-readdir-typecheck.md` - Correção de tipagem do mock de fs.readdirSync no Worker no runner Ubuntu.
 - [x] `11-fix-ci-api-test-env-validation.md` - Variáveis de ambiente de teste para validação de AppModule no CI e local.
+- [x] `12-fix-bull-board-feature-conditional-and-e2e-force-exit.md` - BullBoardModule condicional em videos.module.ts e --forceExit no test:e2e da API.
 
 ## PR & Code Review
 - [x] Push to `origin/fix/resolve-open-issues-24-31`
