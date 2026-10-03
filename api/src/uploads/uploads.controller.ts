@@ -22,6 +22,7 @@ export class UploadsController {
       await this.storageService.generatePresignedUrl(
         body.filename,
         body.contentType,
+        body.fileSize,
       );
 
     if (session?.id) {

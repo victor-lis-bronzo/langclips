@@ -74,6 +74,16 @@ describe('StorageService', () => {
     ).rejects.toThrow(BadRequestException);
   });
 
+  it('should throw BadRequestException when requested fileSize exceeds 100MB', async () => {
+    await expect(
+      service.generatePresignedUrl(
+        'large-video.mp4',
+        'video/mp4',
+        100 * 1024 * 1024 + 1,
+      ),
+    ).rejects.toThrow(BadRequestException);
+  });
+
   it('should return metadata when object exists in storage', async () => {
     process.env.STORAGE_BUCKET_NAME = 'my-bucket';
     s3ClientMock.send.mockResolvedValueOnce({

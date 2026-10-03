@@ -12,6 +12,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { randomUUID } from 'crypto';
 
 const MAX_STORAGE_SIZE = 5 * 1024 * 1024 * 1024; // 5 GB in bytes
+export const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 MB in bytes
 
 @Injectable()
 export class StorageService {
@@ -50,7 +51,14 @@ export class StorageService {
   async generatePresignedUrl(
     fileName: string,
     fileType: string,
+    fileSize?: number,
   ): Promise<{ uploadUrl: string; fileKey: string }> {
+    if (fileSize !== undefined && fileSize > MAX_FILE_SIZE) {
+      throw new BadRequestException(
+        `File size (${(fileSize / (1024 * 1024)).toFixed(2)}MB) exceeds maximum allowed limit of 100MB.`,
+      );
+    }
+
     const totalSize = await this.calculateTotalStorageSize();
     if (totalSize >= MAX_STORAGE_SIZE) {
       throw new BadRequestException(

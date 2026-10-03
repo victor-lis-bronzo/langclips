@@ -14,6 +14,11 @@ export const submitFileToR2 = createServerFn({ method: "POST" })
 			throw new Error("No file found in the request");
 		}
 
+		const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
+		if (file.size > MAX_FILE_SIZE) {
+			throw new Error("File size exceeds maximum allowed limit of 100MB");
+		}
+
 		console.log("Server received file:", file.name, file.type, file.size);
 
 		const { data: response } = await apiServer.post<{
@@ -22,6 +27,7 @@ export const submitFileToR2 = createServerFn({ method: "POST" })
 		}>("uploads/generate-presigned-url", {
 			filename: file.name,
 			contentType: file.type,
+			fileSize: file.size,
 		});
 
 		console.log("Generated presigned URL response:", response);

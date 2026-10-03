@@ -11,6 +11,7 @@ import {
   UseGuards,
   ForbiddenException,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { ProcessVideoDto } from './dtos/process-video.dto';
@@ -19,7 +20,7 @@ import { Queue } from 'bullmq';
 import { randomUUID } from 'crypto';
 import { Observable } from 'rxjs';
 import { VideoEventsService } from './video-events.service';
-import { StorageService } from '../storage/storage.service';
+import { StorageService, MAX_FILE_SIZE } from '../storage/storage.service';
 import { AcknowledgeDownloadDto } from './dtos/acknowledge-download.dto';
 import { OwnershipService } from '../ownership/ownership.service';
 import { SessionGuard, AnonymousSession } from '../auth/session.guard';
@@ -56,6 +57,12 @@ export class VideosController {
     if (!metadata) {
       throw new NotFoundException(
         'Arquivo de vídeo não encontrado no bucket de armazenamento.',
+      );
+    }
+
+    if (metadata.size > MAX_FILE_SIZE) {
+      throw new BadRequestException(
+        `File size (${(metadata.size / (1024 * 1024)).toFixed(2)}MB) exceeds maximum allowed limit of 100MB.`,
       );
     }
 

@@ -71,10 +71,33 @@ describe('UploadsController', () => {
     expect(service.generatePresignedUrl).toHaveBeenCalledWith(
       'video.mp4',
       'video/mp4',
+      undefined,
     );
     expect(ownershipService.setOwner).toHaveBeenCalledWith(
       'videos/uuid-video.mp4',
       'session-abc',
+    );
+  });
+
+  it('should forward fileSize to storageService.generatePresignedUrl', async () => {
+    jest.spyOn(service, 'generatePresignedUrl').mockResolvedValue({
+      uploadUrl: 'https://s3.amazonaws.com/bucket/file.mp4',
+      fileKey: 'videos/uuid-video.mp4',
+    });
+
+    const dto = {
+      filename: 'video.mp4',
+      contentType: 'video/mp4',
+      fileSize: 50 * 1024 * 1024,
+    };
+
+    const session = { id: 'session-abc' };
+    await controller.generatePresignedUrl(dto, session);
+
+    expect(service.generatePresignedUrl).toHaveBeenCalledWith(
+      'video.mp4',
+      'video/mp4',
+      50 * 1024 * 1024,
     );
   });
 });

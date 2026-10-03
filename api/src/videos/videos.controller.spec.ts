@@ -1,5 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { VideosController } from './videos.controller';
 import { VideoEventsService } from './video-events.service';
 import { StorageService } from '../storage/storage.service';
@@ -123,6 +127,20 @@ describe('VideosController', () => {
     await expect(
       controller.process({ fileKey: 'uploads/deleted.mp4' }, session),
     ).rejects.toThrow(NotFoundException);
+
+    expect(mockQueue.add).not.toHaveBeenCalled();
+  });
+
+  it('should reject process if file size exceeds 100MB limit', async () => {
+    mockStorageService.getObjectMetadata.mockResolvedValueOnce({
+      size: 100 * 1024 * 1024 + 1,
+      contentType: 'video/mp4',
+    });
+
+    const session = { id: 'session-123' };
+    await expect(
+      controller.process({ fileKey: 'uploads/huge.mp4' }, session),
+    ).rejects.toThrow(BadRequestException);
 
     expect(mockQueue.add).not.toHaveBeenCalled();
   });

@@ -9,7 +9,7 @@ This document tracks the execution, test-driven development, commits, and PR del
 - [x] `03-anonymous-session-ownership.md` (foundation for #25, #26, #27) - Sessão anônima assinada e OwnershipService em Redis.
 - [x] `04-idor-download-acknowledge.md` (#25, #26) - Proteção contra IDOR em download-url e acknowledge-download.
 - [x] `05-process-video-rate-limit.md` (#27) - Rate limiting no POST /videos/process e validação de existência do arquivo.
-- [ ] `06-server-side-file-size.md` (#29)
+- [x] `06-server-side-file-size.md` (#29) - Validação server-side de limite de 100MB no upload e processamento.
 - [ ] `07-bull-board-auth-cors.md` (#28)
 - [ ] `08-worker-pipeline-unit-tests.md` (#30 part 2)
 - [ ] `09-local-docker-compose.md` (#31)
