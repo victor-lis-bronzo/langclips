@@ -1,4 +1,5 @@
 name: "lang-clips-infra"
+
 services:
   redis:
     image: redis:8.8.0-alpine
@@ -8,10 +9,68 @@ services:
     command: >
       sh -c "redis-server --requirepass $${REDIS_PASSWORD:-}"
     env_file:
-      - .env
+      - path: .env
+        required: false
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping 2>/dev/null | grep -q PONG || redis-cli ping 2>/dev/null | grep -q PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - lang-clips-network
+    restart: unless-stopped
+
+  api:
+    container_name: lang-clips-api
+    build:
+      context: ../api
+      dockerfile: Dockerfile
+    ports:
+      - "${PORT:-3333}:3333"
+    env_file:
+      - path: ../api/.env
+        required: false
+      - path: .env
+        required: false
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+      - NODE_ENV=${NODE_ENV:-development}
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - lang-clips-network
+    restart: unless-stopped
+
+  worker:
+    container_name: lang-clips-worker
+    build:
+      context: ../worker
+      dockerfile: Dockerfile
+    env_file:
+      - path: ../worker/.env
+        required: false
+      - path: .env
+        required: false
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+      - NODE_ENV=${NODE_ENV:-development}
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - lang-clips-network
     restart: unless-stopped
 
 volumes:
   redis_data:
+
+networks:
+  lang-clips-network:
+    driver: bridge

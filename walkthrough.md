@@ -12,7 +12,7 @@ This document tracks the execution, test-driven development, commits, and PR del
 - [x] `06-server-side-file-size.md` (#29) - Validação server-side de limite de 100MB no upload e processamento.
 - [x] `07-bull-board-auth-cors.md` (#28) - Autenticação Basic no Bull Board e CORS restrito em produção.
 - [x] `08-worker-pipeline-unit-tests.md` (#30 part 2) - Cobertura abrangente de testes unitários para a pipeline do worker.
-- [ ] `09-local-docker-compose.md` (#31)
+- [x] `09-local-docker-compose.md` (#31) - Configuração do stack local completo no docker-compose.
 
 ## PR & Code Review
 - [ ] Push to `origin/fix/resolve-open-issues-24-31`
